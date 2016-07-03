@@ -133,21 +133,31 @@
             };
 
             function getDocuments(appId, className, limit, skip, callback) {
-                $http({
-                    method: 'GET',
-                    url: _domain + '/csbm/classes/' + className + '?limit=' + limit + '&count=1&order=-updatedAt&skip=' + skip,
-                    headers: {
-                        'X-CSBM-Application-Id': appId
-                    }
-                }).then(function(response) {
-                    var documents = response.data.results;
-                    var count = response.data.count;
 
-                    setDocuments(className, documents);
-                    callback(null, documents, count);
-                }, function(response) {
-                    callback(response);
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'GET',
+                        url: _domain + '/csbm/classes/' + className + '?limit=' + limit + '&count=1&order=-updatedAt&skip=' + skip,
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey
+                        }
+                    }).then(function(response) {
+                        var documents = response.data.results;
+                        var count = response.data.count;
+
+                        setDocuments(className, documents);
+                        callback(null, documents, count);
+                    }, function(response) {
+                        callback(response);
+                    });
                 });
+
             };
 
             function addDocument(className, _document) {
@@ -159,22 +169,30 @@
             }
 
             function createDocument(className, appId, data, callback) {
-                $http({
-                    method: 'POST',
-                    url: _domain + '/csbm/classes/' + className,
-                    headers: {
-                        'X-CSBM-Application-Id': appId,
-                        'Content-Type': 'application/json'
-                    },
-                    data: data
-                }).then(function(response) {
-                    var _document = response.data;
-                    _document.updatedAt = _document.createdAt;
-                    Object.assign(_document, data);
-                    addDocument(className, _document);
-                    callback(null, _document);
-                }, function(response) {
-                    callback(response);
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'POST',
+                        url: _domain + '/csbm/classes/' + className,
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey,
+                            'Content-Type': 'application/json'
+                        },
+                        data: data
+                    }).then(function(response) {
+                        var _document = response.data;
+                        _document.updatedAt = _document.createdAt;
+                        Object.assign(_document, data);
+                        addDocument(className, _document);
+                        callback(null, _document);
+                    }, function(response) {
+                        callback(response);
+                    });
                 });
             };
 

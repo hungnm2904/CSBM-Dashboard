@@ -12,7 +12,7 @@
         // }
 
         msUserService.getCurrentUser(function(user) {
-            if (user.accessToken) {
+            if (user) {
                 $state.go('app.managements_applications');
             }
         });

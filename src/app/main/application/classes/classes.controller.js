@@ -15,6 +15,10 @@
             var appId = $stateParams.appId;
             var checked = [];
             var objectIdList = [];
+            var imageExtension = 'png,jpg';
+            var audioExtension = 'mp3,mp4';
+            var textExtension = 'txt';
+
             $scope.columnName = '';
             $scope.fields = [];
             $scope.fields_add = [];
@@ -82,6 +86,24 @@
                 $scope.order = function(predicate) {
                     $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
                     $scope.predicate = predicate;
+                };
+            };
+
+            $scope.getFileType = function(fileName) {
+                if (!fileName) {
+                    return 'undefined';
+                }
+                
+                var tmp = fileName.split('.');
+                var fileExtension = tmp[tmp.length - 1];
+                if (imageExtension.includes(fileExtension)) {
+                    return 'Image';
+                };
+                if (audioExtension.includes(fileExtension)) {
+                    return 'Audio';
+                };
+                if (textExtension.includes(fileExtension)) {
+                    return 'Text';
                 };
             };
 
@@ -278,6 +300,10 @@
                             value = value.map(function(v) {
                                 return v.trim();
                             });
+                        }
+
+                        if ($scope.schemas[field].type === 'Boolean') {
+                            value = (value.toLowerCase() === 'true');
                         }
 
                         if (checkType) {

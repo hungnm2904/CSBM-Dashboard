@@ -75,6 +75,7 @@
                     <tbody>
                         <tr ng-if="addNewSchema">
                             <td></td>
+                            <td></td>
                             <td>
                                 <md-button aria-label="" class="md-raised md-accent" ng-click="addRow()">
                                     <md-icon md-font-icon="icon-plus"></md-icon>
@@ -87,7 +88,6 @@
                                     <span>Cancel</span>
                                 </md-button>
                             </td>
-                            <td></td>
                             <td ng-repeat="field in fields_add">
                                 <md-input-container ng-if="schemas[field].type != 'File'" md-no-float class="md-block">
                                     <input placeholder="Value" name="val" type="text" ng-model="add[field]" />
@@ -107,11 +107,9 @@
                                     {{document[key]}}
                                 </span>
                                 <md-input-container ng-if="schemas[key].type != 'File'" md-no-float class="md-block">
-                                    <input ng-if="editable(key)" placeholder="Value" name="schemavalue" type="text" ng-model="document[key]" />
+                                    <input ng-if="editable(key)" placeholder="undefined" name="schemavalue" type="text" ng-model="document[key]" />
                                 </md-input-container>
-                                <md-input-container ng-if="schemas[key].type == 'File'" md-no-float class="md-block">
-                                    <a href="{{document[key].url}}">Image</a>
-                                </md-input-container>
+                                <md-button aria-label=" " ng-if="schemas[key].type == 'File'" ng-href="{{document[key].url}}" target="_blank" style="margin-bottom: 20px">{{getFileType(document[key].name)}}</md-button>
                             </td>
                         </tr>
                     </tbody>
