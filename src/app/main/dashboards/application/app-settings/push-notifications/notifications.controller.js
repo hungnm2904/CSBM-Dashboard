@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app.application.appsettings.notifications')
+        .module('app.dashboards.application.appsettings.notifications')
         .controller('NotificationsController', function($scope, $stateParams, $http, msUserService,
             msModeService, msConfigService) {
 

@@ -9,7 +9,7 @@
     function config($stateProvider, $translatePartialLoaderProvider, msNavigationServiceProvider) {
         // State
         $stateProvider.state('app.pages_homescreen', {
-            url: '/homescreen',
+            url: '/',
             views: {
                 'main@': {
                     templateUrl: 'app/main/main.html',

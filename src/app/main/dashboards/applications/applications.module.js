@@ -2,16 +2,16 @@
     'use strict';
 
     angular
-        .module('app.managements.applications', [])
+        .module('app.dashboards.applications', [])
         .config(config);
 
     /** @ngInject */
     function config($stateProvider, msApiProvider) {
-        $stateProvider.state('app.managements_applications', {
-            url: '/managements/applications',
+        $stateProvider.state('app.dashboards_applications', {
+            url: '/dashboards/applications',
             views: {
                 'content@app': {
-                    templateUrl: 'app/main/managements/applications/applications.html',
+                    templateUrl: 'app/main/dashboards/applications/applications.html',
                     controller: 'ApplicationsController as vm'
                 }
             }

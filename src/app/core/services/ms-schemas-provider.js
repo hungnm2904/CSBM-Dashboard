@@ -347,8 +347,6 @@
                             var documents = schema.documents;
                             documents.forEach(function(_document) {
                                 if (_document.objectId === objectId) {
-                                    console.log(_document[field]);
-                                    console.log(data[field]);
                                     return _document[field] = data[field];
                                 }
                             });

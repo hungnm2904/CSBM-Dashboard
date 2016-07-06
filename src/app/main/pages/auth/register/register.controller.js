@@ -21,7 +21,7 @@
                         vm.error = response.data.message;
                     } else {
                         msUserService.login(vm.username, vm.password, function(response) {
-                            $state.go('app.managements_applications');
+                            $state.go('app.dashboards_applications');
                         });
                     }
                 });

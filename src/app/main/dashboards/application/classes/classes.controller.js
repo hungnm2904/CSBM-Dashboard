@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app.application.classes')
+        .module('app.dashboards.application.classes')
         .controller('ClassesController', function($scope, $http, $cookies, $window,
             $state, $stateParams, $mdDialog, $document, $rootScope, msModeService,
             msSchemasService, msDialogService, msToastService, msUserService) {
@@ -29,7 +29,7 @@
             $scope.updatedValue = '';
 
             var skip;
-            $scope.numPerPage = 5;
+            $scope.numPerPage = 10;
 
             var renderClass = function() {
                 msSchemasService.getSchema(appId, index, function(error, results) {
@@ -193,6 +193,10 @@
                 var value = _document[field];
                 var type = $scope.schemas[field].type;
 
+                console.log(objectId);
+                console.log(value);
+                console.log(type);
+
                 var data = {};
                 convertToType(value, type, function(error, results) {
                     if (error) {
@@ -334,6 +338,7 @@
                             if (error) {
                                 return alert(error.statusText);
                             }
+
 
                             pagination();
                         });

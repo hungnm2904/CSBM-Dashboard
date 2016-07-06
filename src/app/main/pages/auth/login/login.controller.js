@@ -13,7 +13,7 @@
 
         msUserService.getCurrentUser(function(user) {
             if (user) {
-                $state.go('app.managements_applications');
+                $state.go('app.dashboards_applications');
             }
         });
 
@@ -23,7 +23,7 @@
                 if (error) {
                     return vm.error = error.data.message;
                 }
-                $state.go('app.managements_applications');
+                $state.go('app.dashboards_applications');
                 var user = msUserService.getCurrentUsername();
             });
         };

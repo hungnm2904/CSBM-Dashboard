@@ -3,17 +3,17 @@
     'use strict';
 
     angular
-        .module('app.managements.users', [])
+        .module('app.dashboards.users', [])
         .config(config);
 
     /** @ngInject */
     function config($stateProvider, msApiProvider)
     {
-        $stateProvider.state('app.managements_users', {
-            url    : '/managements/users',
+        $stateProvider.state('app.dashboards_users', {
+            url    : '/dashboards/users',
             views  : {
                 'content@app': {
-                    templateUrl: 'app/main/managements/users/users.html',
+                    templateUrl: 'app/main/dashboards/users/users.html',
                     controller : 'UsersController as vm'
                 }
             },

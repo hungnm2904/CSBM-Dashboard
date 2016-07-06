@@ -2,17 +2,16 @@
     'use strict';
 
     angular
-        .module('app.managements', [
-            'app.managements.applications',
-            'app.managements.users'
-            // 'app.managements.classes',
+        .module('app.dashboards', [
+            'app.dashboards.applications',
+            'app.dashboards.application',
+            'app.dashboards.users'
         ])
         .config(config)
         .run(run);
-    /** @ngInject */
+
     function config(msNavigationServiceProvider, msModeServiceProvider) {
-        // Navigation
-        msNavigationServiceProvider.saveItem('managements', {
+        msNavigationServiceProvider.saveItem('dashboards', {
             title: 'MANAGEMENT',
             group: true,
             weight: 1,
@@ -21,16 +20,16 @@
             }
         });
 
-        msNavigationServiceProvider.saveItem('managements.applications', {
+        msNavigationServiceProvider.saveItem('dashboards.applications', {
             title: 'Applications',
             icon: 'icon-apps',
-            state: 'app.managements_applications'
+            state: 'app.dashboards_applications'
         });
 
-        msNavigationServiceProvider.saveItem('managements.users', {
+        msNavigationServiceProvider.saveItem('dashboards.users', {
             title: 'Users',
             icon: 'icon-account-multiple',
-            state: 'app.managements_users'
+            state: 'app.dashboards_users'
         });
     };
 
@@ -42,5 +41,4 @@
             }
         });
     };
-
 })();

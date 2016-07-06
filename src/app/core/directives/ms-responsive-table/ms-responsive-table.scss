@@ -1,8 +1,11 @@
 /*----------------------------------------------------------------*/
+
+
 /*  ms-responsive-table
 /*----------------------------------------------------------------*/
 
 .ms-responsive-table-wrapper {
+    height: 60vh;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
 }

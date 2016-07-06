@@ -22,10 +22,7 @@
             // Pages
             'app.pages',
 
-            // Managements
-            'app.managements',
-
-            // Application
-            'app.application'
+            // Dashboards
+            'app.dashboards'
         ]);
 })();

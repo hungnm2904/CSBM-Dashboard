@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app.managements.applications')
+        .module('app.dashboards.applications')
         .controller('ApplicationsController', ApplicationsController);
 
     function ApplicationsController($scope, $rootScope, $state, msUserService, msApplicationService,
@@ -19,7 +19,6 @@
                 if (error.status === 401) {
                     return $state.go('app.pages_auth_login', { error: error.statusText });
                 }
-
                 return alert(error.statusText);
             }
         });
@@ -35,7 +34,7 @@
         }
 
         $scope.goToAppManagement = function(appId) {
-            $state.go('app.application_classes', { 'appId': appId, 'index': 0 });
+            $state.go('app.dashboards_application_classes', { 'appId': appId, 'index': 0 });
             // msSchemasService.getSchemas(appId, null, function(error, results) {
             //     if (error) {
             //         if (error.status === 401) {

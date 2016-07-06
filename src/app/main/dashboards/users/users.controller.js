@@ -3,7 +3,7 @@
     'use strict';
 
     angular
-    .module('app.managements.users')
+    .module('app.dashboards.users')
     .controller('UsersController', function($scope,$http,$cookies,$window,$state, msUserService){
         if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');

@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app.application.appsettings.keys')
+        .module('app.dashboards.application.appsettings.keys')
         .controller('KeysController', function($scope, $stateParams, msModeService,
             msApplicationService, msUserService) {
 

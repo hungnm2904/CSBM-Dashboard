@@ -2,10 +2,10 @@
     'use strict';
 
     angular
-        .module('app.application', [
-            'app.application.classes',
-            'app.application.appsettings.keys',
-            'app.application.appsettings.notifications'
+        .module('app.dashboards.application', [
+            'app.dashboards.application.classes',
+            'app.dashboards.application.appsettings.keys',
+            'app.dashboards.application.appsettings.notifications'
         ])
         .config(config)
         .run(run);
@@ -55,13 +55,13 @@
 
             msNavigationService.saveItem('application.appsettings.keys', {
                 title: 'Keys',
-                state: 'app.application_appsettings_keys',
+                state: 'app.dashboards_application_appsettings_keys ',
                 stateParams: { 'appId': appId }
             });
 
             msNavigationService.saveItem('application.appsettings.notifications', {
                 title: 'Push Notifications',
-                state: 'app.application_appsettings_notifications',
+                state: 'app.dashboards_application_appsettings_notifications',
                 stateParams: { 'appId': appId }
             });
 
@@ -87,7 +87,7 @@
                     // Create navigation for schema
                     msNavigationService.saveItem('application.classes.' + schema.className, {
                         title: schema.className,
-                        state: 'app.application_classes',
+                        state: 'app.dashboards_application_classes',
                         stateParams: { 'appId': appId, 'index': i }
                     });
                 }
