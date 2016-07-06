@@ -1,9 +1,9 @@
 (function () {
     'use strict';
 
-    var fusePalettes = [
+    var masamunePalettes = [
         {
-            name: 'fuse-blue',
+            name: 'masamune-blue',
             options: {
                 '50': '#ebf1fa',
                 '100': '#c2d4ef',
@@ -25,7 +25,7 @@
             }
         },
         {
-            name: 'fuse-pale-blue',
+            name: 'masamune-pale-blue',
             options: {
                 '50': '#ececee',
                 '100': '#c5c6cb',
@@ -50,5 +50,5 @@
 
     angular
         .module('app.core')
-        .constant('fusePalettes', fusePalettes);
+        .constant('masamunePalettes', masamunePalettes);
 })();

@@ -1,12 +1,11 @@
-(function ()
-{
+(function() {
     'use strict';
 
     /**
      * Main module of the Fuse
      */
     angular
-        .module('fuse', [
+        .module('masamune', [
 
             // Core
             'app.core',

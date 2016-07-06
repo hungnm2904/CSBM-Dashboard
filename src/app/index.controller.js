@@ -3,16 +3,16 @@
     'use strict';
 
     angular
-        .module('fuse')
+        .module('masamune')
         .controller('IndexController', IndexController);
 
     /** @ngInject */
-    function IndexController(fuseTheming)
+    function IndexController(masamuneTheming)
     {
         var vm = this;
 
         // Data
-        vm.themes = fuseTheming.themes;
+        vm.themes = masamuneTheming.themes;
 
         //////////
     }

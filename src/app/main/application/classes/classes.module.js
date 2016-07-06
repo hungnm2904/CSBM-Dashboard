@@ -3,6 +3,7 @@
 
     angular
         .module('app.application.classes', ['ui.bootstrap'])
+        .directive('autofocus', autofocus)
         .config(config);
     // .run(run);
 
@@ -18,5 +19,17 @@
                 }
             }
         });
-    }
+    };
+
+    function autofocus($timeout) {
+        return {
+            restrict: 'A',
+            link: function($scope, $element) {
+                $timeout(function() {
+                    $element[0].focus();
+                });
+            }
+        }
+    };
+
 })();

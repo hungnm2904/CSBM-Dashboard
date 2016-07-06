@@ -7,7 +7,7 @@
         .directive('msMaterialColorPicker', msMaterialColorPicker);
 
     /** @ngInject */
-    function msMaterialColorPicker($mdMenu, $mdColorPalette, fuseGenerator)
+    function msMaterialColorPicker($mdMenu, $mdColorPalette, masamuneGenerator)
     {
         return {
             require    : 'ngModel',
@@ -126,8 +126,8 @@
                         palette     : palette,
                         hue         : hue,
                         class       : 'md-' + palette + '-' + hue + '-bg',
-                        bgColorValue: fuseGenerator.rgba($scope.palettes[palette][hue].value),
-                        fgColorValue: fuseGenerator.rgba($scope.palettes[palette][hue].contrast)
+                        bgColorValue: masamuneGenerator.rgba($scope.palettes[palette][hue].value),
+                        fgColorValue: masamuneGenerator.rgba($scope.palettes[palette][hue].contrast)
                     };
 
                     // If Model object not Equals the selectedColor update it

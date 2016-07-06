@@ -2,10 +2,10 @@
 {
     'use strict';
 
-    var fuseThemes = {
+    var masamuneThemes = {
         'default'  : {
             primary   : {
-                name: 'fuse-pale-blue',
+                name: 'masamune-pale-blue',
                 hues: {
                     'default': '700',
                     'hue-1'  : '500',
@@ -65,7 +65,7 @@
         },
         'teal'     : {
             primary   : {
-                name: 'fuse-blue',
+                name: 'masamune-blue',
                 hues: {
                     'default': '900',
                     'hue-1'  : '600',
@@ -97,5 +97,5 @@
 
     angular
         .module('app.core')
-        .constant('fuseThemes', fuseThemes);
+        .constant('masamuneThemes', masamuneThemes);
 })();

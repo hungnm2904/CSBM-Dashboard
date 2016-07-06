@@ -48,12 +48,6 @@
                 }
             });
 
-            msNavigationService.saveItem('application.classes', {
-                title: 'Classes',
-                icon: 'icon-library-plus',
-                group: true
-            });
-
             msNavigationService.saveItem('application.appsettings', {
                 title: 'Application Settings',
                 icon: 'icon-key'
@@ -69,6 +63,12 @@
                 title: 'Push Notifications',
                 state: 'app.application_appsettings_notifications',
                 stateParams: { 'appId': appId }
+            });
+
+            msNavigationService.saveItem('application.classes', {
+                title: 'Classes',
+                icon: 'icon-library-plus',
+                group: true
             });
 
             var schemas = msSchemasService.getSchemas(appId, index, function(error, results) {

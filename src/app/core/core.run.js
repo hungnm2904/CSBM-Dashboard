@@ -7,19 +7,19 @@
         .run(runBlock);
 
     /** @ngInject */
-    function runBlock(msUtils, fuseGenerator, fuseConfig)
+    function runBlock(msUtils, masamuneGenerator, masamuneConfig)
     {
         /**
          * Generate extra classes based on registered themes so we
          * can use same colors with non-angular-material elements
          */
-        fuseGenerator.generate();
+        masamuneGenerator.generate();
 
         /**
          * Disable md-ink-ripple effects on mobile
          * if 'disableMdInkRippleOnMobile' config enabled
          */
-        if ( fuseConfig.getConfig('disableMdInkRippleOnMobile') && msUtils.isMobile() )
+        if ( masamuneConfig.getConfig('disableMdInkRippleOnMobile') && msUtils.isMobile() )
         {
             var bodyEl = angular.element('body');
             bodyEl.attr('md-no-ink', true);

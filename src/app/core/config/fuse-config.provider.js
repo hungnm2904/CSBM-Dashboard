@@ -4,13 +4,13 @@
 
     angular
         .module('app.core')
-        .provider('fuseConfig', fuseConfigProvider);
+        .provider('masamuneConfig', masamuneConfigProvider);
 
     /** @ngInject */
-    function fuseConfigProvider()
+    function masamuneConfigProvider()
     {
         // Default configuration
-        var fuseConfiguration = {
+        var masamuneConfiguration = {
             'disableCustomScrollbars'        : false,
             'disableMdInkRippleOnMobile'     : true,
             'disableCustomScrollbarsOnMobile': true
@@ -28,7 +28,7 @@
          */
         function config(configuration)
         {
-            fuseConfiguration = angular.extend({}, fuseConfiguration, configuration);
+            masamuneConfiguration = angular.extend({}, masamuneConfiguration, configuration);
         }
 
         /**
@@ -50,12 +50,12 @@
              */
             function getConfig(configName)
             {
-                if ( angular.isUndefined(fuseConfiguration[configName]) )
+                if ( angular.isUndefined(masamuneConfiguration[configName]) )
                 {
                     return false;
                 }
 
-                return fuseConfiguration[configName];
+                return masamuneConfiguration[configName];
             }
 
             /**
@@ -66,7 +66,7 @@
              */
             function setConfig(configName, configValue)
             {
-                fuseConfiguration[configName] = configValue;
+                masamuneConfiguration[configName] = configValue;
             }
         };
     }

@@ -332,7 +332,7 @@
                 });
             }
 
-            function updateValues(className, appId, objectId, data, callback) {
+            function updateValues(className, appId, objectId, field, data, callback) {
                 $http({
                     method: 'PUT',
                     url: _domain + '/csbm/classes/' + className + '/' + objectId,
@@ -342,6 +342,18 @@
                     },
                     data: data
                 }).then(function(response) {
+                    _schemas.forEach(function(schema) {
+                        if (schema.className === className) {
+                            var documents = schema.documents;
+                            documents.forEach(function(_document) {
+                                if (_document.objectId === objectId) {
+                                    console.log(_document[field]);
+                                    console.log(data[field]);
+                                    return _document[field] = data[field];
+                                }
+                            });
+                        }
+                    });
                     callback(null, response.data);
                 }, function(response) {
                     callback(response);

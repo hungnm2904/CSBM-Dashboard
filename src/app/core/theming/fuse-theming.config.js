@@ -7,7 +7,7 @@
         .config(config);
 
     /** @ngInject */
-    function config($mdThemingProvider, fusePalettes, fuseThemes, fuseThemingProvider)
+    function config($mdThemingProvider, masamunePalettes, masamuneThemes, masamuneThemingProvider)
     {
         // Inject Cookies Service
         var $cookies;
@@ -22,19 +22,19 @@
         var customTheme = $cookies.getObject('customTheme');
         if ( customTheme )
         {
-            fuseThemes['custom'] = customTheme;
+            masamuneThemes['custom'] = customTheme;
         }
 
         $mdThemingProvider.alwaysWatchTheme(true);
 
         // Define custom palettes
-        angular.forEach(fusePalettes, function (palette)
+        angular.forEach(masamunePalettes, function (palette)
         {
             $mdThemingProvider.definePalette(palette.name, palette.options);
         });
 
         // Register custom themes
-        angular.forEach(fuseThemes, function (theme, themeName)
+        angular.forEach(masamuneThemes, function (theme, themeName)
         {
             $mdThemingProvider.theme(themeName)
                 .primaryPalette(theme.primary.name, theme.primary.hues)
@@ -45,8 +45,8 @@
 
         // Store generated PALETTES and THEMES objects from $mdThemingProvider
         // in our custom provider, so we can inject them into other areas
-        fuseThemingProvider.setRegisteredPalettes($mdThemingProvider._PALETTES);
-        fuseThemingProvider.setRegisteredThemes($mdThemingProvider._THEMES);
+        masamuneThemingProvider.setRegisteredPalettes($mdThemingProvider._PALETTES);
+        masamuneThemingProvider.setRegisteredThemes($mdThemingProvider._THEMES);
     }
 
 })();

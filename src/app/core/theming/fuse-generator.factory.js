@@ -4,10 +4,10 @@
 
     angular
         .module('app.core')
-        .factory('fuseGenerator', fuseGeneratorService);
+        .factory('masamuneGenerator', masamuneGeneratorService);
 
     /** @ngInject */
-    function fuseGeneratorService($cookies, $log, fuseTheming)
+    function masamuneGeneratorService($cookies, $log, masamuneTheming)
     {
         // Storage for simplified themes object
         var themes = {};
@@ -27,8 +27,8 @@
          */
         function generate()
         {
-            var registeredThemes = fuseTheming.getRegisteredThemes();
-            var registeredPalettes = fuseTheming.getRegisteredPalettes();
+            var registeredThemes = masamuneTheming.getRegisteredThemes();
+            var registeredPalettes = masamuneTheming.getRegisteredPalettes();
 
             // First, create a simplified object that stores
             // all registered themes and their colors
@@ -142,18 +142,18 @@
             });
 
             // Store themes and set selected theme for the first time
-            fuseTheming.setThemesList(themes);
+            masamuneTheming.setThemesList(themes);
 
             // Remember selected theme.
             var selectedTheme = $cookies.get('selectedTheme');
 
             if ( selectedTheme )
             {
-                fuseTheming.setActiveTheme(selectedTheme);
+                masamuneTheming.setActiveTheme(selectedTheme);
             }
             else
             {
-                fuseTheming.setActiveTheme('default');
+                masamuneTheming.setActiveTheme('default');
             }
         }
 

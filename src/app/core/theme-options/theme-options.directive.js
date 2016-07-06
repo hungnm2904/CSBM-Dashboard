@@ -8,12 +8,12 @@
         .directive('msThemeOptions', msThemeOptions);
 
     /** @ngInject */
-    function MsThemeOptionsController($cookies, fuseTheming)
+    function MsThemeOptionsController($cookies, masamuneTheming)
     {
         var vm = this;
 
         // Data
-        vm.themes = fuseTheming.themes;
+        vm.themes = masamuneTheming.themes;
         vm.layoutMode = 'wide';
         vm.layoutStyle = $cookies.get('layoutStyle') || 'verticalNavigation';
 
@@ -32,7 +32,7 @@
         function setActiveTheme(themeName)
         {
             // Set active theme
-            fuseTheming.setActiveTheme(themeName);
+            masamuneTheming.setActiveTheme(themeName);
         }
 
         /**

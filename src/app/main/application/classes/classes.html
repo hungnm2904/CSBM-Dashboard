@@ -59,7 +59,7 @@
         <div class="form-wrapper md-whiteframe-4dp">
         </div>
         <div class="white-bg md-whiteframe-4dp">
-            <form name="myform" id="myform">
+            <form name="documentForm" id="myform">
                 <table class="simple dataTable row-border hover" id="table" ms-responsive-table>
                     <thead>
                         <tr>
@@ -106,10 +106,13 @@
                                 <span ng-if="!editable(key)">
                                     {{document[key]}}
                                 </span>
-                                <md-input-container ng-if="schemas[key].type != 'File'" md-no-float class="md-block">
-                                    <input ng-if="editable(key)" placeholder="undefined" name="schemavalue" type="text" ng-model="document[key]" />
+                                <md-input-container ng-if="editable(key) && schemas[key].type != 'File' && !editMode[(position + 1 + '') + ($index + '')]" md-no-float class="md-block">
+                                    <input id="doc-input-{{(position + 1 + '') + ($index + '')}}" aria-label=" " ng-focus="goEditMode((position + 1 + '') + ($index + ''), document[key])" placeholder="undefined" name="schemavalue" type="text" ng-model="document[key]" />
                                 </md-input-container>
-                                <md-button aria-label=" " ng-if="schemas[key].type == 'File'" ng-href="{{document[key].url}}" target="_blank" style="margin-bottom: 20px">{{getFileType(document[key].name)}}</md-button>
+                                <md-input-container ng-if="editable(key) && schemas[key].type != 'File' && editMode[(position + 1 + '') + ($index + '')]" md-no-float class="md-block">
+                                    <textarea id="doc-textarea-{{(position + 1 + '') + ($index + '')}}" aria-label=" " ng-blur="updateValues((position + 1 + '') + ($index + ''), document, key)" ng-model="document[key]" rows="10" autofocus></textarea>
+                                </md-input-container>
+                                <md-button aria-label=" " ng-if="editable(key) && schemas[key].type == 'File'" ng-href="{{document[key].url}}" target="_blank" style="margin-bottom: 20px">{{getFileType(document[key].name)}}</md-button>
                             </td>
                         </tr>
                     </tbody>

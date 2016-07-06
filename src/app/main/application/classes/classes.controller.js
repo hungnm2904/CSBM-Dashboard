@@ -25,6 +25,8 @@
             $scope.documents = [];
             $scope.add = [];
             $scope.addNewSchema = false;
+            $scope.editMode = [];
+            $scope.updatedValue = '';
 
             var skip;
             $scope.numPerPage = 5;
@@ -89,11 +91,46 @@
                 };
             };
 
+            var convertToType = function(value, type, callback) {
+                if (value) {
+                    if (type === 'Number') {
+                        if (!Number(value) && value) {
+                            return callback(true, null);
+                        } else {
+                            value = Number(value);
+                        }
+                    }
+
+                    if (type === 'Array' && value.length > 0) {
+
+                        value = value.split(',');
+                        value = value.map(function(v) {
+                            return v.trim();
+                        });
+                    }
+
+                    if (type === 'Boolean') {
+                        value = (value.toLowerCase() === 'true');
+                    }
+                }
+
+                return callback(null, value);
+            };
+
+            var toggleEditMode = function(index) {
+                $scope.editMode[index] = !$scope.editMode[index];
+            };
+
+            $scope.goEditMode = function(index, value) {
+                $scope.updatedValue = value;
+                toggleEditMode(index);
+            };
+
             $scope.getFileType = function(fileName) {
                 if (!fileName) {
                     return 'undefined';
                 }
-                
+
                 var tmp = fileName.split('.');
                 var fileExtension = tmp[tmp.length - 1];
                 if (imageExtension.includes(fileExtension)) {
@@ -120,20 +157,9 @@
                 $scope.fields = [].concat(fields);
                 $scope.fields_add = [].concat(fields);
                 $scope.fields_add.splice(0, 3);
-                
+
                 pagination();
             });
-
-            // $rootScope.$on('field-name-changed', function(event, args) {
-            //     var fieldName = args.fieldName;
-            //     var newFieldName = args.newFieldName;
-
-            //     $scope.fields.forEach(function(field, index) {
-            //         if (field === fieldName) {
-            //             return $scope.fields[index] = newFieldName;
-            //         }
-            //     });
-            // });
 
             var uneditableFileds = ['objectId', 'createdAt', 'updatedAt'];
             $scope.editable = function(field) {
@@ -160,60 +186,101 @@
                     .showDialog(ev, 'app/core/services/dialogs/updateField.html');
             };
 
-            $scope.updateValues = function() {
-                var data = [];
-                var checkType = true;
-                var errorMessage;
-                var titleMessage;
+            $scope.updateValues = function(index, _document, field) {
+                toggleEditMode(index);
 
-                $scope.documents.forEach(function(_document, index) {
-                    var newDocument = {};
+                var objectId = _document.objectId;
+                var value = _document[field];
+                var type = $scope.schemas[field].type;
 
-                    for (var key in _document) {
-                        if (key != "objectId" && key != "createdAt" &&
-                            key != "updatedAt") {
-
-                            var value = _document[key];
-
-                            if (value) {
-                                if ($scope.schemas[key].type === 'Number') {
-
-                                    if (!Number(value) && value) {
-                                        checkType = false;
-                                        errorMessage = key + ' column has type is: ' + $scope.schemas[key].type;
-                                        titleMessage = 'Update Values Fail';
-                                    } else {
-                                        value = Number(value);
-                                    }
-                                }
-                                if ($scope.schemas[key].type === 'Array' && value.constructor !== Array &&
-                                    value.length > 0) {
-
-                                    value = value.split(',');
-                                    value = value.map(function(v) {
-                                        return v.trim();
-                                    });
-                                }
-                            }
-                            newDocument[key] = value;
-                        }
-                    }
-                    if (checkType) {
-                        data.push(newDocument);
-                    }
-                });
-                if (checkType) {
-                    data.forEach(function(d, i) {
-                        var objectId = $scope.documents[i].objectId;
-                        msSchemasService.updateValues($scope.className, appId,
-                            objectId, d,
+                var data = {};
+                convertToType(value, type, function(error, results) {
+                    if (error) {
+                        var titleMessage = 'Add New Row Fail';
+                        var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
+                        msDialogService.showAlertDialog(titleMessage, errorMessage);
+                        _document[field] = $scope.updatedValue;
+                    } else {
+                        data[field] = results;
+                        msSchemasService.updateValues($scope.className, appId, objectId, field, data,
                             function(results) {});
 
                         pagination();
-                    });
-                } else {
-                    msDialogService.showAlertDialog(titleMessage, errorMessage);
-                }
+                    }
+                });
+
+                // var data = [];
+                // var checkType = true;
+                // var errorMessage;
+                // var titleMessage;
+
+                // $scope.documents.forEach(function(_document, index) {
+                //     var newDocument = {};
+
+                //     for (var key in _document) {
+                //         if (key != "objectId" && key != "createdAt" &&
+                //             key != "updatedAt") {
+
+                //             var value = _document[key];
+                // // var type = $scope.schemas[field].type;
+                // console.log(value);
+                // console.log($scope.documents.$dirty);
+                // if ($scope[_document[key]].$dirty) {
+                //     console.log(value);
+                // }
+
+                // convertToType(value, type, function(error, results) {
+                //     if (error) {
+                //         checkType = false;
+                //         var titleMessage = 'Add New Row Fail';
+                //         var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
+                //         return msDialogService.showAlertDialog(titleMessage, errorMessage);
+                //     }
+
+                //     newDocument[key] = results;
+                // });
+
+                // var value = _document[key];
+
+                // if (value) {
+                //     if ($scope.schemas[key].type === 'Number') {
+
+                //         if (!Number(value) && value) {
+                //             checkType = false;
+                //             errorMessage = key + ' column has type is: ' + $scope.schemas[key].type;
+                //             titleMessage = 'Update Values Fail';
+                //         } else {
+                //             value = Number(value);
+                //         }
+                //     }
+                //     if ($scope.schemas[key].type === 'Array' && value.constructor !== Array &&
+                //         value.length > 0) {
+
+                //         value = value.split(',');
+                //         value = value.map(function(v) {
+                //             return v.trim();
+                //         });
+                //     }
+                // }
+                // newDocument[key] = value;
+                //     }
+                // }
+
+                // if (checkType) {
+                //     data.push(newDocument);
+                // }
+                // });
+                // if (checkType) {
+                //     data.forEach(function(d, i) {
+                //         var objectId = $scope.documents[i].objectId;
+                //         msSchemasService.updateValues($scope.className, appId, objectId, d,
+                //             function(results) {});
+
+                //         pagination();
+                //     });
+                // } else {
+                //     msDialogService.showAlertDialog(titleMessage, errorMessage);
+                // }
             };
 
             $scope.toggle = function(objectId) {
@@ -283,34 +350,21 @@
                         field != 'updatedAt') {
 
                         var value = $scope.add[field];
+                        var type = $scope.schemas[field].type;
 
-                        if ($scope.schemas[field].type === 'Number') {
-                            if (!Number(value) && value) {
+                        convertToType(value, type, function(error, results) {
+                            if (error) {
                                 checkType = false;
-                                errorMessage = field + ' column has type is: ' + $scope.schemas[field].type;
-                                titleMessage = 'Add New Row Fail';
-                            } else {
-                                value = Number(value);
+                                var titleMessage = 'Add New Row Fail';
+                                var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
+                                return msDialogService.showAlertDialog(titleMessage, errorMessage);
                             }
-                        }
 
-                        if ($scope.schemas[field].type === 'Array' && value.length > 0) {
-
-                            value = value.split(',');
-                            value = value.map(function(v) {
-                                return v.trim();
-                            });
-                        }
-
-                        if ($scope.schemas[field].type === 'Boolean') {
-                            value = (value.toLowerCase() === 'true');
-                        }
-
-                        if (checkType) {
-                            newSchema[field] = value;
-                        }
+                            newSchema[field] = results;
+                        });
                     }
                 });
+
                 if (checkType) {
                     msSchemasService.createDocument($scope.className, appId, newSchema,
                         function(error, results) {
@@ -318,14 +372,12 @@
                                 return alert(error.statusText);
                             }
                             $scope.add = [];
-                            
+
                             pagination();
 
                             objectIdList.push(results.objectId);
                         });
                     $scope.addNewSchema = false;
-                } else {
-                    msDialogService.showAlertDialog(titleMessage, errorMessage);
                 }
             };
 

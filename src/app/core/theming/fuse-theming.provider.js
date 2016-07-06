@@ -4,10 +4,10 @@
 
     angular
         .module('app.core')
-        .provider('fuseTheming', fuseThemingProvider);
+        .provider('masamuneTheming', masamuneThemingProvider);
 
     /** @ngInject */
-    function fuseThemingProvider()
+    function masamuneThemingProvider()
     {
         // Inject Cookies Service
         var $cookies;
