@@ -7,10 +7,12 @@
         .controller('MainController', MainController);
 
     /** @ngInject */
-    function MainController($scope, $rootScope)
+    function MainController($scope, $state, $rootScope)
     {
         // Data
-
+        $scope.gotoDashboard = function() {
+            $state.go('app.managements_applications');
+        }
         //////////
 
         // Remove the splash screen

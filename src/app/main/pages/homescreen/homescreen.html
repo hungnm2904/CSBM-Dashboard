@@ -1,0 +1,34 @@
+<div id="layout-content-with-toolbar" class="template-layout" layout="column" flex>
+    <md-toolbar id="toolbar" class="md-menu-toolbar md-whiteframe-1dp" ui-view="toolbar">
+        <div layout="row" layout-align="space-between center">
+            <div flex="20"></div>
+            <div layout="row" layout-align="start center" flex="10">
+                <div class="logo" layout="row" layout-align="start center">
+                    <span class="logo-image">M</span>
+                    <span class="logo-text">MASAMUNE</span>
+                </div>
+                <md-progress-circular id="toolbar-progress" ng-if="$root.loadingProgress" class="md-accent" md-mode="indeterminate" md-diameter="64">
+                </md-progress-circular>
+            </div>
+            <div layout="row" layout-align="end center" flex="50">
+                <md-menu-bar id="user-menu">
+                    <md-button class="user-button" ng-click="gotoDashboard()">
+                        <div layout="row" layout-align="space-between center">
+                            <span class="username" hide-xs>Dashboard</span>
+                        </div>
+                    </md-button>
+                </md-menu-bar>
+            </div>
+            <div flex="20"></div>
+        </div>
+    </md-toolbar>
+    <md-content id="content" class="animate-slide-up md-background md-hue-1" ui-view="content" flex>
+        <div id="login" class="flex-scrollable" layout="column" ms-scroll>
+            <div id="login-form-wrapper" layout="column" layout-align="center center">
+                <div class="logo">
+                    <span>Masamune</span>
+                </div>
+            </div>
+        </div>
+    </md-content>
+</div>

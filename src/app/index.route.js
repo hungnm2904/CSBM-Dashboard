@@ -9,7 +9,7 @@
     function routeConfig($stateProvider, $urlRouterProvider, $locationProvider) {
         $locationProvider.html5Mode(true);
 
-        $urlRouterProvider.otherwise('/login');
+        $urlRouterProvider.otherwise('/homescreen');
         /**
          * Layout Style Switcher
          *
