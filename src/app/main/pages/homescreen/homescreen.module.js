@@ -12,8 +12,12 @@
             url: '/homescreen',
             views: {
                 'main@': {
-                    templateUrl: 'app/main/pages/homescreen/homescreen.html',
+                    templateUrl: 'app/main/main.html',
                     controller: 'MainController as vm'
+                },
+                'content@app.pages_homescreen': {
+                    templateUrl: 'app/main/pages/homescreen/homescreen.html',
+                    controller: 'HomeScreenController as vm'
                 }
             },
             bodyClass: 'homescreen'
