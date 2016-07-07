@@ -24,11 +24,12 @@
                 setDocuments: setDocuments,
                 getDocuments: getDocuments,
                 createDocument: createDocument,
+                createDocuments: createDocuments,
                 addField: addField,
                 deleteDocuments: deleteDocuments,
                 deleteField: deleteField,
                 updateValues: updateValues,
-                changeField: changeField
+                changeFieldName: changeFieldName
             }
 
             return service;
@@ -133,6 +134,20 @@
             };
 
             function getDocuments(appId, className, limit, skip, callback) {
+                var findInLocal = false;
+                _schemas.some(function(schema, index) {
+                    if (schema.className === className) {
+                        if (schema.documents) {
+                            callback(null, _schemas[index].documents, null);
+                            findInLocal = true;
+                            return true;
+                        }
+                    }
+                });
+
+                if (findInLocal) {
+                    return true;
+                }
 
                 msMasterKeyService.getMasterKey(appId, function(error, results) {
                     if (error) {
@@ -140,9 +155,16 @@
                     }
 
                     var masterKey = results;
+                    var url = _domain + '/csbm/classes/' + className;
+
+                    if (limit != null && skip != null) {
+                        url = url + '?limit=' + limit + '&count=1&order=-updatedAt&skip=' + skip;
+                    }
+
                     $http({
                         method: 'GET',
-                        url: _domain + '/csbm/classes/' + className + '?limit=' + limit + '&count=1&order=-updatedAt&skip=' + skip,
+                        // url: _domain + '/csbm/classes/' + className + '?limit=' + limit + '&count=1&order=-updatedAt&skip=' + skip,
+                        url: url,
                         headers: {
                             'X-CSBM-Application-Id': appId,
                             'X-CSBM-Master-Key': masterKey
@@ -195,6 +217,47 @@
                     });
                 });
             };
+
+            function createDocuments(appId, className, documents, callback) {
+
+                var data = {
+                    'requests': []
+                };
+
+                documents.forEach(function(_document, index) {
+                    delete _document.objectId;
+                    delete _document.createdAt;
+                    delete _document.updatedAt;
+                    data.requests.push({
+                        'method': 'POST',
+                        'path': '/csbm/classes/' + className,
+                        'body': _document
+                    });
+                });
+
+                console.log(data);
+
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'POST',
+                        url: _domain + '/csbm/batch',
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey
+                        },
+                        data: data
+                    }).then(function(response) {
+                        callback(null, response);
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            }
 
             function deleteDocuments(className, appId, objectIds, callback) {
                 var data = {
@@ -333,32 +396,40 @@
             }
 
             function updateValues(className, appId, objectId, field, data, callback) {
-                $http({
-                    method: 'PUT',
-                    url: _domain + '/csbm/classes/' + className + '/' + objectId,
-                    headers: {
-                        'X-CSBM-Application-Id': appId,
-                        'Content-Type': 'application/json'
-                    },
-                    data: data
-                }).then(function(response) {
-                    _schemas.forEach(function(schema) {
-                        if (schema.className === className) {
-                            var documents = schema.documents;
-                            documents.forEach(function(_document) {
-                                if (_document.objectId === objectId) {
-                                    return _document[field] = data[field];
-                                }
-                            });
-                        }
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'PUT',
+                        url: _domain + '/csbm/classes/' + className + '/' + objectId,
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey,
+                            'Content-Type': 'application/json'
+                        },
+                        data: data
+                    }).then(function(response) {
+                        _schemas.forEach(function(schema) {
+                            if (schema.className === className) {
+                                var documents = schema.documents;
+                                documents.forEach(function(_document) {
+                                    if (_document.objectId === objectId) {
+                                        return _document[field] = data[field];
+                                    }
+                                });
+                            }
+                        });
+                        callback(null, response.data);
+                    }, function(response) {
+                        callback(response);
                     });
-                    callback(null, response.data);
-                }, function(response) {
-                    callback(response);
                 });
             };
 
-            function changeField(applicationName, className, fieldName, newFieldName, appId,
+            function changeFieldName(applicationName, className, fieldName, newFieldName, appId,
                 callback) {
 
                 var accessToken = msUserService.getAccessToken();
@@ -375,9 +446,25 @@
                         newFieldName: newFieldName
                     },
                 }).then(function(response) {
-                    updateFieldName(className, appId, function(error, results) {
-                        updateField(results);
+                    _schemas.forEach(function(schema) {
+                        if (schema.className === className) {
+                            schema.fields[newFieldName] = schema.fields[fieldName];
+                            delete schema.fields[fieldName];
+
+                            schema.documents.forEach(function(_document) {
+                                _document[newFieldName] = _document[fieldName];
+                                delete _document[fieldName]
+                            });
+
+                            console.log(_schemas);
+
+                            return;
+                        }
                     });
+
+                    // updateFieldName(className, appId, function(error, results) {
+                    //     updateField(results);
+                    // });
                     callback(null, response.data);
                 }, function(response) {
                     callback(response);

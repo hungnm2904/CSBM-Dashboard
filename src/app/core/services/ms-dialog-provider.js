@@ -184,7 +184,7 @@
 
                     msSchemasService.getSchema(appId, index, function(err, result) {
                         var className = result.className;
-                        msSchemasService.changeField(appName, className, $scope.field,
+                        msSchemasService.changeFieldName(appName, className, $scope.field,
                             $scope.columnName, appId,
                             function(error, results) {});
                     });

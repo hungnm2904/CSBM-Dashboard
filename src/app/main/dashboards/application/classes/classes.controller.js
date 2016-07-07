@@ -5,7 +5,7 @@
         .module('app.dashboards.application.classes')
         .controller('ClassesController', function($scope, $http, $cookies, $window,
             $state, $stateParams, $mdDialog, $document, $rootScope, msModeService,
-            msSchemasService, msDialogService, msToastService, msUserService) {
+            msSchemasService, msDialogService, msToastService, msUserService, msApplicationService) {
 
             if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');
@@ -27,6 +27,7 @@
             $scope.addNewSchema = false;
             $scope.editMode = [];
             $scope.updatedValue = '';
+            $scope.jsFileImport;
 
             var skip;
             $scope.numPerPage = 10;
@@ -44,9 +45,10 @@
                     $scope.className = results.className;
                     $scope.schemas = results.fields;
                     var fields = Object.getOwnPropertyNames(results.fields);
+                    fields.splice(0, 3);
                     $scope.fields = [].concat(fields);
                     $scope.fields_add = [].concat(fields);
-                    $scope.fields_add.splice(0, 3);
+                    // $scope.fields_add.splice(0, 3);
 
                     pagination();
                 });
@@ -58,21 +60,23 @@
                 } else {
                     skip = ($scope.currentPage - 1) * $scope.numPerPage;
                 }
-                msSchemasService.getDocuments(appId, $scope.className, $scope.numPerPage, skip,
+                msSchemasService.getDocuments(appId, $scope.className, null, null,
                     function(error, results, count) {
                         if (error) {
                             return alert(error.statusText);
                         }
-                        $scope.documents = [];
-                        for (var i in results) {
-                            var _document = results[i];
-                            var newDocument = {};
-                            for (var y in $scope.fields) {
-                                var field = $scope.fields[y];
-                                newDocument[field] = _document[field];
-                            };
-                            $scope.documents.push(newDocument);
-                        }
+
+                        $scope.documents = results;
+                        // $scope.documents = [];
+                        // for (var i in results) {
+                        //     var _document = results[i];
+                        //     var newDocument = {};
+                        //     for (var y in $scope.fields) {
+                        //         var field = $scope.fields[y];
+                        //         newDocument[field] = _document[field];
+                        //     };
+                        //     $scope.documents.push(newDocument);
+                        // }
                         $scope.documents.forEach(function(_document) {
                             objectIdList.push(_document.objectId);
                         });
@@ -121,6 +125,21 @@
                 $scope.editMode[index] = !$scope.editMode[index];
             };
 
+            var showDialog = function(ev, path) {
+                $mdDialog.show({
+                    controller: 'ClassesController',
+                    controllerAs: 'vm',
+                    templateUrl: path,
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false
+                });
+            };
+
+            $scope.closeDialog = function() {
+                $mdDialog.hide();
+            };
+
             $scope.goEditMode = function(index, value) {
                 $scope.updatedValue = value;
                 toggleEditMode(index);
@@ -144,19 +163,50 @@
                 };
             };
 
-            $scope.$watch('currentPage + numPerPage', function() {
-                pagination();
-                checked = [];
-            });
+            $scope.importJsFile = function(el) {
+                var files = el.files;
+
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    var reader = new FileReader();
+                    reader.onload = (function(theFile) {
+                        return function(e) {
+                            if (e.target.result) {
+                                var documents = JSON.parse(e.target.result);
+                                var className = theFile.name.split('.')[0];
+
+                                msSchemasService.createDocuments(appId, className, documents.results,
+                                    function(error, results) {
+                                        if (error) {
+                                            return alert(error.statusText);
+                                        }
+
+                                        $scope.closeDialog();
+                                    });
+                            }
+
+                        };
+                    })(file);
+                    reader.readAsText(file);
+                }
+
+                console.log(results);
+            }
+
+            // $scope.$watch('currentPage + numPerPage', function() {
+            //     pagination();
+            //     checked = [];
+            // });
 
             renderClass();
             sort();
 
             $rootScope.$on('fields-change', function(event, args) {
                 var fields = Object.getOwnPropertyNames(args.fields);
+                fields.splice(0, 3)
                 $scope.fields = [].concat(fields);
                 $scope.fields_add = [].concat(fields);
-                $scope.fields_add.splice(0, 3);
+                // $scope.fields_add.splice(0, 3);
 
                 pagination();
             });
@@ -181,10 +231,41 @@
                     .showDialog(ev, 'app/core/services/dialogs/deleteColumnDialog.html');
             };
 
-            $scope.updateField = function(ev) {
-                msDialogService
-                    .showDialog(ev, 'app/core/services/dialogs/updateField.html');
+            $scope.showUpdateFieldNameDialog = function(ev) {
+                showDialog(ev, 'app/main/dashboards/application/classes/dialogs/changeFieldName.html');
             };
+
+            $scope.showImportClassesDialog = function(ev) {
+                showDialog(ev, 'app/main/dashboards/application/classes/dialogs/importClasses.html');
+            }
+
+            $scope.updateFieldName = function() {
+                var confirm = $mdDialog.confirm()
+                    .title('Are you sure to change ' + '"' + $scope.field + '"' +
+                        ' to ' + '"' + $scope.newFieldName + '"' + ' ?')
+                    .ok('Yes')
+                    .cancel('No');
+
+                $mdDialog.show(confirm).then(function() {
+                    msApplicationService.getAppName(appId, function(error, result) {
+                        var appName = result.data.data.appName;
+                        msSchemasService.changeFieldName(appName, $scope.className, $scope.field,
+                            $scope.newFieldName, appId,
+                            function(error, results) {
+                                if (error) {
+                                    if (error.status === 401) {
+                                        return $state.go('app.pages_auth_login');
+                                    }
+
+                                    return alert(error.statusText);
+                                }
+                            });
+                    });
+                    $scope.closeDialog();
+                }, function() {
+                    $scope.closeDialog();
+                });
+            }
 
             $scope.updateValues = function(index, _document, field) {
                 toggleEditMode(index);
@@ -192,11 +273,6 @@
                 var objectId = _document.objectId;
                 var value = _document[field];
                 var type = $scope.schemas[field].type;
-
-                console.log(objectId);
-                console.log(value);
-                console.log(type);
-
                 var data = {};
                 convertToType(value, type, function(error, results) {
                     if (error) {
@@ -208,83 +284,8 @@
                         data[field] = results;
                         msSchemasService.updateValues($scope.className, appId, objectId, field, data,
                             function(results) {});
-
-                        pagination();
                     }
                 });
-
-                // var data = [];
-                // var checkType = true;
-                // var errorMessage;
-                // var titleMessage;
-
-                // $scope.documents.forEach(function(_document, index) {
-                //     var newDocument = {};
-
-                //     for (var key in _document) {
-                //         if (key != "objectId" && key != "createdAt" &&
-                //             key != "updatedAt") {
-
-                //             var value = _document[key];
-                // // var type = $scope.schemas[field].type;
-                // console.log(value);
-                // console.log($scope.documents.$dirty);
-                // if ($scope[_document[key]].$dirty) {
-                //     console.log(value);
-                // }
-
-                // convertToType(value, type, function(error, results) {
-                //     if (error) {
-                //         checkType = false;
-                //         var titleMessage = 'Add New Row Fail';
-                //         var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
-                //         return msDialogService.showAlertDialog(titleMessage, errorMessage);
-                //     }
-
-                //     newDocument[key] = results;
-                // });
-
-                // var value = _document[key];
-
-                // if (value) {
-                //     if ($scope.schemas[key].type === 'Number') {
-
-                //         if (!Number(value) && value) {
-                //             checkType = false;
-                //             errorMessage = key + ' column has type is: ' + $scope.schemas[key].type;
-                //             titleMessage = 'Update Values Fail';
-                //         } else {
-                //             value = Number(value);
-                //         }
-                //     }
-                //     if ($scope.schemas[key].type === 'Array' && value.constructor !== Array &&
-                //         value.length > 0) {
-
-                //         value = value.split(',');
-                //         value = value.map(function(v) {
-                //             return v.trim();
-                //         });
-                //     }
-                // }
-                // newDocument[key] = value;
-                //     }
-                // }
-
-                // if (checkType) {
-                //     data.push(newDocument);
-                // }
-                // });
-                // if (checkType) {
-                //     data.forEach(function(d, i) {
-                //         var objectId = $scope.documents[i].objectId;
-                //         msSchemasService.updateValues($scope.className, appId, objectId, d,
-                //             function(results) {});
-
-                //         pagination();
-                //     });
-                // } else {
-                //     msDialogService.showAlertDialog(titleMessage, errorMessage);
-                // }
             };
 
             $scope.toggle = function(objectId) {
@@ -396,12 +397,5 @@
                     $scope.add[field] = '';
                 });
             }
-
-            // $scope.dtOptions = {
-            //     dom: '<"top"f>rt<"bottom"<"left"<"length"l>><"right"<"info"i><"pagination"p>>>',
-            //     pagingType: 'full_numbers',
-            //     autoWidth: false,
-            //     responsive: false,
-            // };
         });
 })();

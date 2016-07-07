@@ -14,9 +14,9 @@ md-input-container {
                 <md-icon md-font-icon="icon-plus"></md-icon>
                 <span>Create new class</span>
             </md-button>
-            <md-button aria-label="" class="md-primary md-raised" ng-click="updateValues()">
-                <md-icon md-font-icon="icon-table-edit"></md-icon>
-                <span>Update Values</span>
+            <md-button aria-label="" class="md-primary md-raised" ng-click="showImportClassesDialog($event)">
+                <md-icon md-font-icon="icon-plus"></md-icon>
+                <span>Import classes</span>
             </md-button>
             <md-menu id="projects-menu">
                 <md-button aria-label="" class="md-primary md-raised" ng-click="$mdOpenMenu()" md-position-mode="target-right target">
@@ -49,7 +49,7 @@ md-input-container {
                         </md-button>
                     </md-menu-item>
                     <md-menu-item>
-                        <md-button ng-click="updateField($event)" aria-label="">
+                        <md-button ng-click="showUpdateFieldNameDialog($event)" aria-label="">
                             <md-icon md-font-icon="icon-table-edit"></md-icon>
                             <span>Update Field Name</span>
                         </md-button>
@@ -60,14 +60,17 @@ md-input-container {
     </div>
     <!-- / HEADER -->
     <!-- CONTENT -->
-    <div class="content" md-background-bg>
-        <table class="simple" ms-responsive-table>
+    <!-- <div class="content" md-background-bg> -->
+    <div class="ms-responsive-table-wrapper">
+        <table class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th>
+                    <!-- <th>
                         <md-checkbox aria-label=" " ng-checked="isChecked()" md-indeterminate="isIndeterminate()" ng-click="toggleAll()"></md-checkbox>
+                    </th> -->
+                    <th ng-repeat="(key, value) in schemas">
+                        <b>{{key}}</b>
                     </th>
-                    <th ng-repeat="field in fields"><b>{{field}}</b></th>
                 </tr>
             </thead>
             <tbody>
@@ -96,13 +99,13 @@ md-input-container {
                         </div>
                     </td>
                 </tr>
-                <tr ng-repeat="document in documents | orderBy:predicate:reverse | filter:paginate track by document.objectId" ng-init="position = $index">
-                    <td>
+                <tr ng-repeat="document in documents" ng-init="position = $index">
+                    <!-- <td>
                         <md-checkbox aria-label=" " ng-checked="exists(document.objectId)" ng-click="toggle(document.objectId)"></md-checkbox>
-                    </td>
-                    <td ng-repeat="(key, value) in document">
+                    </td> -->
+                    <td ng-repeat="(key, value) in schemas">
                         <md-input-container ng-if="!editable(key)">
-                            <input aria-label="{{document[key]}}" ng-model="document[key]" disabled />
+                            <input aria-label=" " ng-model="document[key]" disabled />
                         </md-input-container>
                         <md-input-container ng-if="editable(key) && schemas[key].type != 'File' && !editMode[(position + 1 + '') + ($index + '')]" md-no-float class="md-block">
                             <input id="doc-input-{{(position + 1 + '') + ($index + '')}}" aria-label=" " ng-focus="goEditMode((position + 1 + '') + ($index + ''), document[key])" placeholder="undefined" name="schemavalue" type="text" ng-model="document[key]" />
@@ -110,12 +113,13 @@ md-input-container {
                         <md-input-container ng-if="editable(key) && schemas[key].type != 'File' && editMode[(position + 1 + '') + ($index + '')]" md-no-float class="md-block">
                             <textarea id="doc-textarea-{{(position + 1 + '') + ($index + '')}}" aria-label=" " ng-blur="updateValues((position + 1 + '') + ($index + ''), document, key)" ng-model="document[key]" rows="10" autofocus></textarea>
                         </md-input-container>
-                        <md-button aria-label=" " ng-if="editable(key) && schemas[key].type == 'File'" ng-href="{{document[key].url}}" target="_blank" style="margin-bottom: 20px">{{getFileType(document[key].name)}}</md-button>
+<!--                         <md-button aria-label=" " ng-if="editable(key) && schemas[key].type == 'File'" ng-href="{{document[key].url}}" target="_blank" style="margin-bottom: 20px">{{getFileType(document[key].name)}}</md-button> -->
                     </td>
                 </tr>
             </tbody>
         </table>
-        <uib-pagination total-items="totalItems" ng-model="currentPage" max-size="5" boundary-links="true" items-per-page="numPerPage" class="pagination-sm"></uib-pagination>
     </div>
+    <!-- <uib-pagination total-items="totalItems" ng-model="currentPage" max-size="5" boundary-links="true" items-per-page="numPerPage" class="pagination-sm"></uib-pagination> -->
+    <!-- </div> -->
     <!-- / CONTENT -->
 </div>

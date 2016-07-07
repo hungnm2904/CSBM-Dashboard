@@ -5,7 +5,25 @@
 /*----------------------------------------------------------------*/
 
 .ms-responsive-table-wrapper {
-    height: 60vh;
-    overflow-x: auto;
-    overflow-y: auto;
+    height: 70vh;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    table-layout: fixed;
+    thead {
+        display: block;
+    }
+    tbody {
+        display: block;
+        height: 60vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+    th,
+    td {
+        min-width: 150px;
+        width: 150px;
+    }
+    .md-errors-spacer {
+        min-height: 0;
+    }
 }
