@@ -2,28 +2,30 @@
     <form class="md-inline-form">
         <md-toolbar class="md-accent md-hue-2">
             <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-                <span class="title" translate="NEW APPLICATION">New Application</span>
-                <md-button class="md-icon-button" ng-click="vm.closeDialog()" aria-label="Close dialog" tranlate
-                           translate-aria-label="CLOSE DIALOG">
+                <span class="title" translate="NEW APPLICATION">New Class</span>
+                <md-button class="md-icon-button" ng-click="vm.closeDialog()" aria-label="Close dialog" tranlate translate-aria-label="CLOSE DIALOG">
                     <md-icon md-font-icon="icon-close"></md-icon>
                 </md-button>
             </div>
         </md-toolbar>
-
         <md-dialog-content ms-scroll>
             <md-input-container class="md-block">
                 <label translate="APPLICATION NAME">Application Name</label>
                 <input ng-model="className" type="text">
             </md-input-container>
         </md-dialog-content>
-
         <md-dialog-actions layout="row" layout-align="space-between center">
             <div layout="row" layout-align="start center">
-                <md-button ng-click="createClass()" class="send-button md-accent md-raised" aria-label="Create"
-                           translate="CREATE CLASS"
-                           translate-attr-aria-label="CREATE CLASS">
-                    SEND
+                <md-button ng-disabled="!!!className" ng-click="createClass()" class="send-button md-accent md-raised" aria-label="Create" translate="CREATE CLASS" translate-attr-aria-label="CREATE CLASS">
                 </md-button>
+                <div layout="row" layout-align="center center">
+                    <input class="ng-hide" id="js-file" type="file" onchange="angular.element(this).scope().importJsFiles(this)" multiple/>
+                    <label for="js-file" class="md-button md-raised md-accent">IMPORT JSON FILES</label>
+                </div>
+                <!-- <md-button ng-click="" class="send-button md-accent md-raised" aria-label="Import"
+                           translate="IMPORT JSON FILES"
+                           translate-attr-aria-label="IMPORT JSON FILES">
+                </md-button> -->
             </div>
         </md-dialog-actions>
     </form>

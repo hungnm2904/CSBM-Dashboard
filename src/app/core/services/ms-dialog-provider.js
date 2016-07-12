@@ -23,7 +23,7 @@
                     templateUrl: path,
                     parent: angular.element($document.body),
                     targetEvent: ev,
-                    clickOutsideToClose: true
+                    clickOutsideToClose: false
                 });
             };
 
@@ -124,6 +124,33 @@
             });
             closeDialog();
         };
+
+        $scope.importJsFiles = function(el) {
+            var files = el.files;
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var reader = new FileReader();
+                reader.onload = (function(theFile) {
+                    return function(e) {
+                        if (e.target.result) {
+                            var documents = JSON.parse(e.target.result);
+                            var className = theFile.name.split('.')[0];
+
+                            msSchemasService.createDocuments(appId, className, documents.results,
+                                function(error, results) {
+                                    if (error) {
+                                        return console.log(error.statusText);
+                                    }
+                                });
+                        }
+                    };
+                })(file);
+                reader.readAsText(file);
+            }
+
+            closeDialog();
+        }
 
         $scope.addColumn = function() {
             if (!$scope.columnName || !$scope.type) {

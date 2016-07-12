@@ -2,7 +2,7 @@
     'use strict';
 
     /**
-     * Main module of the Fuse
+     * Main module of the masamune
      */
     angular
         .module('masamune', [
@@ -19,10 +19,13 @@
             // Quick panel
             'app.quick-panel',
 
-            // Pages
+            // Sample
             'app.pages',
 
-            // Dashboards
-            'app.dashboards'
+            // Management
+            'app.management',
+
+            // Application
+            'app.application'
         ]);
 })();

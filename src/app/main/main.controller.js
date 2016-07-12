@@ -8,7 +8,7 @@
     function MainController($scope, $state, $rootScope, msUserService) {
 
         $scope.gotoDashboard = function() {
-            msUserService.getAccessToken() ? $state.go('app.dashboards_applications') : $state.go('app.pages_auth_login');
+            msUserService.getAccessToken() ? $state.go('app.management_applications') : $state.go('app.pages_auth_login');
         }
 
         $scope.$on('$viewContentAnimationEnded', function(event) {

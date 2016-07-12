@@ -7,11 +7,16 @@
                     <span class="logo-image">M</span>
                     <span class="logo-text">MASAMUNE</span>
                 </div>
-                <md-progress-circular id="toolbar-progress" ng-if="$root.loadingProgress" class="md-accent" md-mode="indeterminate" md-diameter="64">
+<!--                 <md-progress-circular id="toolbar-progress" ng-if="$root.loadingProgress" class="md-accent" md-mode="indeterminate" md-diameter="64"> -->
                 </md-progress-circular>
             </div>
             <div layout="row" layout-align="end center" flex="50">
                 <md-menu-bar id="user-menu">
+                    <md-button class="user-button" ng-click="">
+                        <div layout="row" layout-align="space-between center">
+                            <span class="username" hide-xs>Docs</span>
+                        </div>
+                    </md-button>
                     <md-button class="user-button" ng-click="gotoDashboard()">
                         <div layout="row" layout-align="space-between center">
                             <span class="username" hide-xs>Dashboard</span>

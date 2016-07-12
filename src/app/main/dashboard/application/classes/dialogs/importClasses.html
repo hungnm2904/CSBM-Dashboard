@@ -1,0 +1,31 @@
+<md-dialog class="compose-dialog" aria-label="New Message">
+    <form class="md-inline-form">
+        <md-toolbar class="md-accent md-hue-2">
+            <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+                <span class="title" translate="UPDATE FIELD">Update Field Name</span>
+                <md-button class="md-icon-button" ng-click="closeDialog()" aria-label="Close dialog" tranlate translate-aria-label="CLOSE DIALOG">
+                    <md-icon md-font-icon="icon-close"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content ms-scroll>
+            <div layout="row" layout-align="center center">
+                <div layout="row" layout-align="center center" flex="50">
+                    <input class="ng-hide" id="js-file" type="file" onchange="angular.element(this).scope().importJsFile(this)" multiple/>
+                    <label for="js-file" class="md-button md-raised md-primary">.js file</label>
+                </div>
+                <div layout="row" layout-align="center center" flex="50">
+                    <input class="ng-hide" id="zip-file" type="file" />
+                    <label for="zip-file" class="md-button md-raised md-primary">.zip file</label>
+                </div>
+            </div>
+        </md-dialog-content>
+<!--         <md-dialog-actions layout="row" layout-align="start center">
+            <div layout="row" layout-align="start center">
+                <md-button ng-click="updateFieldName()" class="send-button md-accent md-raised" aria-label="Delete" translate="UPDATE FIELD" translate-attr-aria-label="UPDATE FIELD">
+                    UPDATE FIELD NAME
+                </md-button>
+            </div>
+        </md-dialog-actions> -->
+    </form>
+</md-dialog>

@@ -32,7 +32,7 @@
             tabindex: false
         });
 
-        // Fuse theme configurations
+        // masamune theme configurations
         masamuneConfigProvider.config({
             'disableCustomScrollbars'        : false,
             'disableCustomScrollbarsOnMobile': true,

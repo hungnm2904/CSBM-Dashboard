@@ -1,0 +1,104 @@
+<md-dialog class="compose-dialog" aria-label="New Message">
+    <form class="md-inline-form">
+        <md-toolbar class="md-accent md-hue-2">
+            <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+                <span class="title">FILTER THIS CLASS</span>
+<!--                 <md-button class="md-icon-button" ng-click="closeDialog()" aria-label="Close dialog" tranlate translate-aria-label="CLOSE DIALOG">
+                    <md-icon md-font-icon="icon-close"></md-icon>
+                </md-button> -->
+            </div>
+        </md-toolbar>
+        <md-dialog-content ms-scroll>
+            <div layout="row" ng-repeat="criteria in filterCriteria">
+                <md-input-container flex="30">
+                    <label>Field</label>
+                    <md-select ng-model="criteria.field">
+                        <md-option ng-repeat="(key, value) in schemas" value="{{key}}">
+                            {{key}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+                <!-- String Type -->
+                <div ng-if="schemas[criteria.field].type === 'String'" layout="row" flex="65">
+                    <!-- Operations -->
+                    <md-input-container class="md-block" flex>
+                        <label>Operation</label>
+                        <md-select ng-model="criteria.operation">
+                            <md-option ng-repeat="operation in stringFilterOperations" value="{{operation}}">
+                                {{operation}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <!-- / Operations -->
+                    <!-- Input -->
+                    <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex>
+                        <label>Value</label>
+                        <input aria-label=" " type="text" ng-model="criteria.value" />
+                    </md-input-container>
+                    <!-- / Input -->
+                </div>
+                <!-- / String Type -->
+                <!-- Number Type -->
+                <div ng-if="schemas[criteria.field].type === 'Number'" layout="row" flex="65">
+                    <!-- Operations -->
+                    <md-input-container class="md-block" flex>
+                        <label>Operation</label>
+                        <md-select ng-model="criteria.operation">
+                            <md-option ng-repeat="operation in numberFilterOperations" value="{{operation}}">
+                                {{operation}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <!-- / Operations -->
+                    <!-- Input -->
+                    <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex>
+                        <label>Value</label>
+                        <input aria-label=" " type="number" ng-model="criteria.value" />
+                    </md-input-container>
+                    <!-- / Input -->
+                </div>
+                <!-- / Number Type -->
+                <!-- Boolean Type -->
+                <div ng-if="schemas[criteria.field].type === 'Boolean'" layout="row" flex="65">
+                    <!-- Operations -->
+                    <md-input-container class="md-block" flex>
+                        <label>Operation</label>
+                        <md-select ng-model="criteria.operation">
+                            <md-option ng-repeat="operation in booleanFilterOperations" value="{{operation}}">
+                                {{operation}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <!-- / Operations -->
+                    <!-- Input -->
+                    <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex>
+                        <label>Value</label>
+                        <md-select ng-model="criteria.value">
+                            <md-option ng-repeat="boolean in [true, false]" value="{{boolean}}">
+                                {{boolean}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <!-- / Input -->
+                </div>
+                <!-- / Boolean Type -->
+                <md-input-container>
+                    <md-icon ng-click="deleteCriteria(criteria.field)" aria-label=" " md-font-icon="icon-minus-circle" class="clickable-icon" flex="5"></md-icon>
+                </md-input-container>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row" layout-align="start center">
+            <div layout="row" layout-align="start center">
+                <md-button ng-disabled="filterCriteria.length == 0" ng-click="clearAllFilterCriteria()" class="send-button md-accent md-raised" aria-label=" ">
+                    Clear all
+                </md-button>
+                <md-button ng-click="addFilterCriteria()" class="send-button md-accent md-raised" aria-label=" ">
+                    Add filter
+                </md-button>
+                <md-button ng-click="filter()" class="send-button md-accent md-raised" aria-label=" ">
+                    Apply these filters
+                </md-button>
+            </div>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

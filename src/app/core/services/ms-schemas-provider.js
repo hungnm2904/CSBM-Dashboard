@@ -29,25 +29,22 @@
                 deleteDocuments: deleteDocuments,
                 deleteField: deleteField,
                 updateValues: updateValues,
-                changeFieldName: changeFieldName
+                changeFieldName: changeFieldName,
+                filter: filter
             }
 
             return service;
 
-            function setSchemas(appId, index, schemas) {
+            function setSchemas(appId, className, schemas) {
                 _schemas = schemas;
                 _schemas.forEach(function(schema) {
                     delete schema.fields.ACL;
                 });
 
-                if (!index || index > _schemas.length - 1) {
-                    index = 0;
-                }
-
-                $rootScope.$broadcast('schemas-changed', { 'appId': appId, 'index': index });
+                $rootScope.$broadcast('schemas-changed', { 'appId': appId, 'className': className });
             };
 
-            function getSchemas(appId, index, callback) {
+            function getSchemas(appId, className, callback) {
                 if (_schemas && _schemas.length > 0) {
                     return callback(null, _schemas);
                 }
@@ -66,7 +63,7 @@
                             'X-CSBM-Master-Key': masterKey
                         }
                     }).then(function(response) {
-                        setSchemas(appId, index, response.data.results);
+                        setSchemas(appId, className, response.data.results);
                         callback(null, _schemas);
                     }, function(response) {
                         callback(response);
@@ -74,20 +71,29 @@
                 });
             };
 
-            function getSchema(appId, index, callback) {
+            function getSchema(appId, className, callback) {
                 if (_schemas && _schemas.length > 0) {
-                    if (index > _schemas.length - 1) {
-                        index = 0;
-                    }
-                    return callback(null, _schemas[index]);
+                    _schemas.some(function(schema) {
+                        if (schema.className === className) {
+                            callback(null, schema);
+
+                            return true;
+                        }
+                    });
                 }
 
-                service.getSchemas(appId, index, function(error, results) {
+                service.getSchemas(appId, className, function(error, results) {
                     if (error) {
                         return callback(error);
                     }
 
-                    callback(null, _schemas[index]);
+                    _schemas.some(function(schema) {
+                        if (schema.className === className) {
+                            callback(null, schema);
+
+                            return true;
+                        }
+                    });
                 });
             };
 
@@ -235,8 +241,6 @@
                     });
                 });
 
-                console.log(data);
-
                 msMasterKeyService.getMasterKey(appId, function(error, results) {
                     if (error) {
                         return callback(error);
@@ -312,9 +316,15 @@
                         },
                         data: data
                     }).then(function(response) {
-                        var schema = response.data;
+                        _schemas.forEach(function(schema) {
+                            if (schema.className === className) {
+                                schema.fields[columnName] = {
+                                    'type': type
+                                };
+                            }
+                        });
 
-                        updateField(schema);
+                        // updateField(schema);
                         callback(null, response.data);
                     }, function(response) {
                         callback(response);
@@ -349,10 +359,12 @@
                         },
                         data: data
                     }).then(function(response) {
-                        var schema = response.data;
-
-                        updateField(schema);
-                        callback(null, schema);
+                        _schemas.forEach(function(schema) {
+                            if (schema.className === className) {
+                                delete schema.fields[columnName];
+                            }
+                        });
+                        callback(null, response.data);
                     }, function(response) {
                         callback(response);
                     });
@@ -387,7 +399,6 @@
                             'X-CSBM-Master-Key': masterKey,
                         }
                     }).then(function(response) {
-                        console.log(response);
                         callback(null, response.data);
                     }, function(response) {
                         callback(response);
@@ -456,8 +467,6 @@
                                 delete _document[fieldName]
                             });
 
-                            console.log(_schemas);
-
                             return;
                         }
                     });
@@ -469,7 +478,38 @@
                 }, function(response) {
                     callback(response);
                 });
-            }
+            };
+
+            function filter(appId, className, filterCriteria, callback) {
+                $http({
+                    method: 'GET',
+                    url: _domain + '/csbm/classes/' + className + '?where=' + JSON.stringify(filterCriteria),
+                    headers: {
+                        'X-CSBM-Application-Id': appId
+                    }
+                }).then(function(response) {
+                    _schemas.some(function(schema, index) {
+                        if (schema.className === className) {
+                            var filteredDocuments = response.data.results;
+                            if (schema.documents && schema.documents.length > 0) {
+                                schema.documents.splice(0, schema.documents.length);
+                                filteredDocuments.forEach(function(_document) {
+                                    schema.documents.push(_document);
+                                });
+                            } else {
+                                schema.documents = filteredDocuments;
+                            }
+
+                            callback(null, schema);
+                            return true;
+                        }
+                    });
+
+                    // callback(null, response.data);
+                }, function(response) {
+                    callback(response);
+                });
+            };
         };
     };
 })();
