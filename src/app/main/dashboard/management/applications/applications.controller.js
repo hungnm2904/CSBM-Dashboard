@@ -13,6 +13,7 @@
         }
 
         $scope.applications = msApplicationService.applications();
+        $scope.applicationNames = [];
 
         msApplicationService.getAll(function(error) {
             if (error) {
@@ -21,6 +22,10 @@
                 }
                 return alert(error.statusText);
             }
+
+            $scope.applications.forEach(function(application) {
+                $scope.applicationNames.push(application.name);
+            });
         });
 
         $scope.showAddDialog = function(ev) {
@@ -30,10 +35,15 @@
                 templateUrl: 'app/main/dashboard/management/applications/dialogs/addApplicationDialog.html',
                 parent: angular.element($document.body),
                 targetEvent: ev,
+                locals: {
+                    applicationNames: $scope.applicationNames
+                },
                 clickOutsideToClose: false
             });
 
-            function AddApplicationDialogController($scope, $state) {
+            function AddApplicationDialogController($scope, $state, applicationNames) {
+                $scope.applicationNames = applicationNames;
+
                 $scope.closeDialog = function() {
                     $mdDialog.hide();
                 };
@@ -83,8 +93,6 @@
                         .ok('Yes')
                         .cancel('No');
 
-                        console.log(confirm);
-
                     $mdDialog.show(confirm).then(function() {
                         msApplicationService.remove(application._id,
                             function(error, results) {
@@ -103,8 +111,13 @@
             };
         }
 
-        $scope.goToAppManagement = function(appId) {
-            $state.go('app.application_classes', { 'appId': appId, 'className': '_User' });
+        $scope.goToAppManagement = function(appId, appName) {
+            $state.go('app.application_classes', {
+                'appId': appId,
+                'appName': appName,
+                'className': '_User',
+                'objectId': null
+            });
         };
     }
 })();

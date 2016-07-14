@@ -1,0 +1,32 @@
+<md-dialog class="compose-dialog" aria-label="New Message">
+    <form class="md-inline-form">
+        <md-toolbar class="md-warn">
+            <div class="md-toolbar-tools" layout="row" layout-align="center center">
+                <h2>Delete Application</h2>
+            </div>
+        </md-toolbar>
+        <md-dialog-content ms-scroll>
+            <div layout="row" layout-align="start">
+                <div flex="60">
+                    <h3><strong>Your password</strong></h3>
+                    <span>We want to make sure it’s really you.</span>
+                </div>
+                <div flex="40" layout="row" layout-align="center center">
+                    <md-input-container md-no-float class="md-block">
+                        <input type="password" placeholder="Password" ng-model="password">
+                    </md-input-container>
+                </div>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions>
+            <div layout="row" layout-align="start center">
+                <md-button ng-disabled="!password" ng-click="deleteApplication()" class="send-button md-raised md-warn md-default-theme">
+                    Delete Application
+                </md-button>
+                <md-button class="md-default md-raised" ng-click="closeDialog()">
+                    Close
+                </md-button>
+            </div>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

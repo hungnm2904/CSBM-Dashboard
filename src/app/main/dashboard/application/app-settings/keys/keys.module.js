@@ -9,7 +9,7 @@
     /** @ngInject */
     function config($stateProvider) {
         $stateProvider.state('app.application_appsettings_keys', {
-            url: '/dashboard-application/:appId/app-settings/keys',
+            url: '/apps/:appName/settings/keys',
             views: {
                 'content@app': {
                     templateUrl: 'app/main/dashboard/application/app-settings/keys/keys.html',

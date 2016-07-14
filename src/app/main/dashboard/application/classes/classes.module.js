@@ -11,8 +11,9 @@
     function config($stateProvider, msApiProvider) {
 
         $stateProvider.state('app.application_classes', {
-            url: '/dashboard-application/:appId/classes/:className',
+            url: '/apps/:appName/classes/:className',
             params: {
+                appId: null,
                 objectId: null
             },
             views: {

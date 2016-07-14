@@ -20,7 +20,7 @@
     <div class="content" md-background-bg layout="row" layout-wrap>
         <div ng-repeat="application in applications track by $index" flex="33">
             <!-- MS-CARD -->
-            <ms-card template="'app/core/directives/ms-card/templates/template-7/template-7.html'" ng-model="application" ng-click="goToAppManagement(application._id)"></ms-card>
+            <ms-card template="'app/core/directives/ms-card/templates/template-7/template-7.html'" ng-model="application" ng-click="goToAppManagement(application._id, application.name)"></ms-card>
             <!-- / MS-CARD -->
         </div>
     </div>

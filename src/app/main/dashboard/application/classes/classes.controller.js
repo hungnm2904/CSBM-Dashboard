@@ -3,24 +3,27 @@
 
     angular
         .module('app.application.classes')
-        .controller('ClassesController', function($scope, $http, $cookies, $window,
-            $state, $stateParams, $mdDialog, $document, $rootScope, msModeService,
-            msSchemasService, msDialogService, msToastService, msUserService, msApplicationService) {
+        .controller('ClassesController', function($scope, $http, $cookies, $window, $state,
+            $stateParams, $mdDialog, $document, $rootScope, msSchemasService, msDialogService,
+            msToastService, msUserService, msApplicationService) {
 
             if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');
             }
 
             var appId = $stateParams.appId;
+            var appName = $stateParams.appName;
             var className = $stateParams.className;
             var _objectId = $stateParams.objectId;
+
             var checked = [];
             var objectIdList = [];
             var imageExtension = 'png,jpg';
             var audioExtension = 'mp3,mp4';
             var textExtension = 'txt';
 
-            $scope.columnName = '';
+            $scope.className = className,
+                $scope.columnName = '';
             $scope.fields = [];
             $scope.fields_add = [];
             $scope.documents = [];
@@ -35,7 +38,7 @@
             $scope.numPerPage = 10;
 
             var renderClass = function() {
-                msSchemasService.getSchema(appId, className, function(error, results) {
+                msSchemasService.getSchema(appId, appName, className, function(error, results) {
                     if (error) {
                         if (error.status === 401) {
                             return $state.go('app.pages_auth_login');
@@ -44,7 +47,7 @@
                         return alert(error.statusText);
                     }
 
-                    $scope.className = results.className;
+                    appId = msSchemasService.getAppId();
                     $scope.schemas = results.fields;
 
                     var fields = Object.getOwnPropertyNames(results.fields);
@@ -62,8 +65,6 @@
                             if (error) {
                                 return alert(error.statusText);
                             }
-
-                            console.log(results);
 
                             $scope.documents = results.documents;
                             $scope.documents.forEach(function(_document) {
@@ -125,11 +126,11 @@
             }
 
             var pagination = function() {
-                if ($scope.currentPage === 1) {
-                    skip = 0;
-                } else {
-                    skip = ($scope.currentPage - 1) * $scope.numPerPage;
-                }
+                // if ($scope.currentPage === 1) {
+                //     skip = 0;
+                // } else {
+                //     skip = ($scope.currentPage - 1) * $scope.numPerPage;
+                // }
                 msSchemasService.getDocuments(appId, $scope.className, null, null,
                     function(error, results, count) {
                         if (error) {
@@ -141,22 +142,22 @@
                             objectIdList.push(_document.objectId);
                         });
 
-                        $scope.totalItems = count;
+                        // $scope.totalItems = count;
                     });
             }
 
-            var sort = function() {
-                $scope.predicate = 'updatedAt';
-                $scope.reverse = true;
-                $scope.currentPage = 1;
-                $scope.order = function(predicate) {
-                    $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
-                    $scope.predicate = predicate;
-                };
-            };
+            // var sort = function() {
+            //     $scope.predicate = 'updatedAt';
+            //     $scope.reverse = true;
+            //     $scope.currentPage = 1;
+            //     $scope.order = function(predicate) {
+            //         $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
+            //         $scope.predicate = predicate;
+            //     };
+            // };
 
             renderClass();
-            sort();
+            // sort();
 
             var convertToType = function(value, type, callback) {
                 if (value) {

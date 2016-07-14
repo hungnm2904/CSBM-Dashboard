@@ -8,16 +8,20 @@
     function msSchemasServiceProvider() {
         var $rootScope = angular.injector(['ng']).get('$rootScope');
 
+        var _appId = '';
         var _schemas = [];
 
-        this.$get = function($rootScope, $http, $cookies, msConfigService,
-            msMasterKeyService, msUserService) {
+        this.$get = function($rootScope, $http, $cookies, msConfigService, msMasterKeyService,
+            msUserService, msApplicationService) {
 
             var _domain = (msConfigService.getConfig()).domain;
 
             var service = {
                 setSchemas: setSchemas,
                 getSchemas: getSchemas,
+                getAppId: getAppId,
+                setAppId: setAppId,
+                clearSchemas: clearSchemas,
                 getSchema: getSchema,
                 createSchema: createSchema,
                 addSchema: addSchema,
@@ -35,17 +39,18 @@
 
             return service;
 
-            function setSchemas(appId, className, schemas) {
-                _schemas = schemas;
-                _schemas.forEach(function(schema) {
+            function setSchemas(appId, appName, className, schemas) {
+                schemas.forEach(function(schema) {
                     delete schema.fields.ACL;
                 });
+                _schemas = schemas;
+                _appId = appId;
 
-                $rootScope.$broadcast('schemas-changed', { 'appId': appId, 'className': className });
+                // $rootScope.$broadcast('schemas-changed', { 'appId': appId, 'className': className });
             };
 
-            function getSchemas(appId, className, callback) {
-                if (_schemas && _schemas.length > 0) {
+            function getSchemas(appId, appName, className, callback) {
+                if (_schemas.length > 0 && _appId === appId) {
                     return callback(null, _schemas);
                 }
 
@@ -63,7 +68,7 @@
                             'X-CSBM-Master-Key': masterKey
                         }
                     }).then(function(response) {
-                        setSchemas(appId, className, response.data.results);
+                        setSchemas(appId, appName, className, response.data.results);
                         callback(null, _schemas);
                     }, function(response) {
                         callback(response);
@@ -71,34 +76,82 @@
                 });
             };
 
-            function getSchema(appId, className, callback) {
-                if (_schemas && _schemas.length > 0) {
-                    _schemas.some(function(schema) {
-                        if (schema.className === className) {
-                            callback(null, schema);
-
-                            return true;
-                        }
-                    });
-                }
-
-                service.getSchemas(appId, className, function(error, results) {
-                    if (error) {
-                        return callback(error);
-                    }
-
-                    _schemas.some(function(schema) {
-                        if (schema.className === className) {
-                            callback(null, schema);
-
-                            return true;
-                        }
-                    });
-                });
+            function clearSchemas() {
+                _schemas = [];
             };
 
-            function createSchema(className, appId, callback) {
-                msMasterKeyService.getMasterKey(appId, function(error, results) {
+            function getAppId() {
+                return _appId;
+            };
+
+            function setAppId(appId) {
+                _appId = appId;
+            }
+
+            function getSchema(appId, appName, className, callback) {
+                if (appId) {
+                    if (_schemas.length > 0 && _appId === appId) {
+                        _schemas.some(function(schema) {
+                            if (schema.className === className) {
+                                callback(null, schema);
+
+                                return true;
+                            }
+                        });
+                    } else {
+                        service.getSchemas(appId, appName, className, function(error, results) {
+                            if (error) {
+                                return callback(error);
+                            }
+
+                            _schemas.some(function(schema) {
+                                if (schema.className === className) {
+                                    callback(null, schema);
+
+                                    return true;
+                                }
+                            });
+                        });
+                    }
+                } else {
+                    if (_appId) {
+                        console.log('!appId && _appId');
+                        _schemas.some(function(schema) {
+                            if (schema.className === className) {
+                                callback(null, schema);
+
+                                return true;
+                            }
+                        });
+                    } else {
+                        console.log('!appId && !_appId');
+                        msApplicationService.getAppId(appName, function(error, results) {
+                            if (error) {
+                                return callback(error);
+                            }
+
+                            console.log(results);
+
+                            service.getSchemas(results.appId, appName, className, function(error, results) {
+                                if (error) {
+                                    return callback(error);
+                                }
+
+                                _schemas.some(function(schema) {
+                                    if (schema.className === className) {
+                                        callback(null, schema);
+
+                                        return true;
+                                    }
+                                });
+                            });
+                        });
+                    }
+                }
+            };
+
+            function createSchema(className, appName, callback) {
+                msMasterKeyService.getMasterKey(_appId, function(error, results) {
                     if (error) {
                         return callback(error);
                     }
@@ -108,7 +161,7 @@
                         method: 'POST',
                         url: _domain + '/csbm/schemas/' + className,
                         headers: {
-                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Application-Id': _appId,
                             'X-CSBM-Master-Key': masterKey,
                             'Content-Type': 'application/json'
                         },
@@ -116,7 +169,7 @@
                             'className': className
                         }
                     }).then(function(response) {
-                        addSchema(appId, response.data);
+                        addSchema(appName, response.data);
                         callback(null, response.data);
                     }, function(response) {
                         callback(response);
@@ -124,11 +177,11 @@
                 });
             };
 
-            function addSchema(appId, schema) {
+            function addSchema(appName, schema) {
                 delete schema.fields.ACL
                 _schemas.push(schema);
-                var index = _schemas.length - 1;
-                $rootScope.$broadcast('schemas-changed', { 'appId': appId, 'index': index });
+
+                $rootScope.$broadcast('schemas-changed', { 'appId': _appId, 'appName': appName });
             };
 
             function setDocuments(className, documents) {
@@ -224,7 +277,7 @@
                 });
             };
 
-            function createDocuments(appId, className, documents, callback) {
+            function createDocuments(className, documents, callback) {
 
                 var data = {
                     'requests': []
@@ -241,7 +294,7 @@
                     });
                 });
 
-                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                msMasterKeyService.getMasterKey(_appId, function(error, results) {
                     if (error) {
                         return callback(error);
                     }
@@ -251,7 +304,7 @@
                         method: 'POST',
                         url: _domain + '/csbm/batch',
                         headers: {
-                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Application-Id': _appId,
                             'X-CSBM-Master-Key': masterKey
                         },
                         data: data

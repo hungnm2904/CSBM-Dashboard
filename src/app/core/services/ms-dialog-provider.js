@@ -45,6 +45,7 @@
         var vm = this;
         var index = $stateParams.index;
         var appId = $stateParams.appId;
+        var appName = $stateParams.appName;
         var className;
         var appName;
 
@@ -118,7 +119,7 @@
         }
 
         $scope.createClass = function() {
-            msSchemasService.createSchema($scope.className, appId, function(result) {
+            msSchemasService.createSchema($scope.className, appName, function(result) {
                 // console.log(result);
                 // msSchemasService.addSchema(result);
             });
@@ -137,7 +138,7 @@
                             var documents = JSON.parse(e.target.result);
                             var className = theFile.name.split('.')[0];
 
-                            msSchemasService.createDocuments(appId, className, documents.results,
+                            msSchemasService.createDocuments(className, documents.results,
                                 function(error, results) {
                                     if (error) {
                                         return console.log(error.statusText);

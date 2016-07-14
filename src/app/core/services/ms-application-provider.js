@@ -8,8 +8,7 @@
     function msApplicationServiceProvider() {
         var _applications = [];
         // var service = this;
-        this.$get = function($http, $state, $cookies, msConfigService,
-            msUserService) {
+        this.$get = function($http, $state, $cookies, msConfigService, msUserService) {
 
             var _domain = (msConfigService.getConfig()).domain;
 
@@ -20,7 +19,8 @@
                 create: create,
                 remove: remove,
                 getMasterkey: getMasterkey,
-                getAppName: getAppName
+                getAppName: getAppName,
+                getAppId: getAppId
             };
 
             return service;
@@ -31,7 +31,7 @@
 
             function setApplications(applications) {
                 // _applications = applications;
-                applications.forEach(function(application, index){
+                applications.forEach(function(application, index) {
                     _applications.push(application);
                 });
             };
@@ -89,14 +89,18 @@
                 });
             };
 
-            function remove(id, callback) {
+            function remove(id, password, callback) {
                 var accessToken = msUserService.getAccessToken();
                 $http({
                     method: 'DELETE',
                     url: _domain + '/applications/',
                     headers: {
                         'X-CSBM-Application-Id': id,
+                        'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + accessToken
+                    },
+                    data: {
+                        "password": password
                     }
                 }).then(function(response) {
                     removeApplication(id);
@@ -133,6 +137,22 @@
                     }
                 }).then(function(response) {
                     callback(null, response);
+                }, function(response) {
+                    callback(response);
+                });
+            };
+
+            function getAppId(appName, callback) {
+                var accessToken = msUserService.getAccessToken();
+                $http({
+                    method: 'GET',
+                    url: _domain + '/appId',
+                    headers: {
+                        'X-CSBM-Application-Name': appName,
+                        'Authorization': 'Bearer ' + accessToken
+                    }
+                }).then(function(response) {
+                    callback(null, response.data);
                 }, function(response) {
                     callback(response);
                 });

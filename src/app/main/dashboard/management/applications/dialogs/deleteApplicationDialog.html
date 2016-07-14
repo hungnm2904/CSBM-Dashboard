@@ -2,7 +2,7 @@
     <form class="md-inline-form">
         <md-toolbar class="md-warn md-hue-2">
             <div class="md-toolbar-tools" layout="row" layout-align="center center">
-                <span class="title">DELETE APPLICATION</span>
+                <span class="title">Delete Application (this is an irreversible action!)</span>
             </div>
         </md-toolbar>
         <md-dialog-content ms-scroll>
@@ -10,7 +10,7 @@
                 <md-input-container flex=100>
                     <label>Applications</label>
                     <md-select ng-model="application">
-                        <md-option ng-repeat="application in applications track by application._id" value="{{application}}">
+                        <md-option ng-repeat="application in applications track by application._id" value="{{application}}" ng-selected="$index == 0">
                             {{application.name}}
                         </md-option>
                     </md-select>
