@@ -1,5 +1,4 @@
-(function ()
-{
+(function() {
     'use strict';
 
     angular
@@ -7,8 +6,7 @@
         .controller('NavigationController', NavigationController);
 
     /** @ngInject */
-    function NavigationController($scope)
-    {
+    function NavigationController($scope, $state) {
         var vm = this;
 
         // Data
@@ -26,16 +24,18 @@
         /**
          * Toggle folded status
          */
-        function toggleMsNavigationFolded()
-        {
+        function toggleMsNavigationFolded() {
             vm.folded = !vm.folded;
         }
 
         // Close the mobile menu on $stateChangeSuccess
-        $scope.$on('$stateChangeSuccess', function ()
-        {
+        $scope.$on('$stateChangeSuccess', function() {
             vm.bodyEl.removeClass('ms-navigation-horizontal-mobile-menu-active');
         });
+
+        $scope.goToHome = function() {
+            $state.go('app.pages_homescreen');
+        };
     }
 
 })();

@@ -1,0 +1,46 @@
+#docs {
+    #title {
+        max-width: 86vh;
+    }
+    .be-docs-card {
+        border: 1px solid #E0E0EA;
+        border-radius: 1vh;
+        min-width: 35vh;
+        .be-card-header {
+            border-bottom: 1px solid #E0E0EA;
+            background: rgba(14, 105, 161, 0.03);
+        }
+        .be-card-content {
+            .be-card-item {
+                cursor: pointer;
+                border-bottom: 1px solid #E0E0EA;
+                * {
+                    padding: 0;
+                }
+            }
+        }
+    }
+    .content {
+        font-size: 1.6rem;
+        color: #66637A;
+        p {
+            margin: 1.2em auto;
+            line-height: 1.7;
+            code {
+                border-radius: .3rem;
+                padding: .1rem .3rem;
+                color: #3B2C48;
+                border: 1px solid #E0E0EA;
+                font-weight: 400;
+                letter-spacing: -1px;
+                word-wrap: break-word;
+            }
+        }
+        h2 {
+            font-size: 2.6rem;
+            font-weight: 400;
+            margin: .5em 0;
+            line-height: 1.2;
+        }
+    }
+}

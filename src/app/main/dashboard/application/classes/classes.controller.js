@@ -22,8 +22,8 @@
             var audioExtension = 'mp3,mp4';
             var textExtension = 'txt';
 
-            $scope.className = className,
-                $scope.columnName = '';
+            $scope.className = className;
+            $scope.columnName = '';
             $scope.fields = [];
             $scope.fields_add = [];
             $scope.documents = [];
@@ -256,7 +256,7 @@
             };
 
             $scope.gotoPointerClass = function(_className, _objectId) {
-                $state.go('app.application_classes', { 'appId': appId, 'className': _className, 'objectId': _objectId });
+                $state.go('app.application_classes_' + _className, { 'appId': appId, 'className': _className, 'objectId': _objectId });
             };
 
             // $scope.$watch('currentPage + numPerPage', function() {

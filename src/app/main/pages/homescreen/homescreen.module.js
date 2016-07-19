@@ -6,7 +6,7 @@
         .config(config);
 
     /** @ngInject */
-    function config($stateProvider, $translatePartialLoaderProvider, msNavigationServiceProvider) {
+    function config($stateProvider) {
         // State
         $stateProvider.state('app.pages_homescreen', {
             url: '/',

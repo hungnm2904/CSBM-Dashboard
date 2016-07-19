@@ -3,7 +3,7 @@
         <div layout="row" layout-align="space-between center">
             <div flex="20"></div>
             <div layout="row" layout-align="start center" flex="10">
-                <div class="logo" layout="row" layout-align="start center">
+                <div ng-click="goToHome()" class="logo" layout="row" layout-align="start center">
                     <span class="logo-image">M</span>
                     <span class="logo-text">MASAMUNE</span>
                 </div>
@@ -12,7 +12,7 @@
             </div>
             <div layout="row" layout-align="end center" flex="50">
                 <md-menu-bar id="user-menu">
-                    <md-button class="user-button" ng-click="">
+                    <md-button ng-class="{'pages-active': $state.current.name.includes('docs')}" class="user-button" ng-click="gotoDocs()">
                         <div layout="row" layout-align="space-between center">
                             <span class="username" hide-xs>Docs</span>
                         </div>

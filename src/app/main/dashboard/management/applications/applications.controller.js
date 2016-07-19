@@ -6,7 +6,7 @@
         .controller('ApplicationsController', ApplicationsController);
 
     function ApplicationsController($scope, $rootScope, $state, $mdDialog, $document, msUserService,
-        msApplicationService, msSchemasService, msDialogService) {
+        msApplicationService, msSchemasService, msDialogService, msModeService) {
 
         if (!msUserService.getAccessToken()) {
             $state.go('app.pages_auth_login');
@@ -112,12 +112,13 @@
         }
 
         $scope.goToAppManagement = function(appId, appName) {
-            $state.go('app.application_classes', {
-                'appId': appId,
-                'appName': appName,
-                'className': '_User',
-                'objectId': null
-            });
+            msModeService.renderApplicationNavigations(appId, appName, '_User');
+            // $state.go('app.application_classes', {
+            //     'appId': appId,
+            //     'appName': appName,
+            //     'className': '_User',
+            //     'objectId': null
+            // });
         };
     }
 })();

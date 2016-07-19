@@ -1,0 +1,24 @@
+<div id="docs" class="page-layout simple fullwidth doc-page">
+    <!-- HEADER -->
+    <div class="header md-accent-bg" layout="row" layout-align="space-between">
+        <div layout="column" layout-align="center start">
+            <div class="title">Objects</div>
+        </div>
+    </div>
+    <!-- / HEADER -->
+    <!-- CONTENT -->
+    <div class="content">
+        <h2>BEObject</h2>
+        <p>
+            Storing data on CSBM is built around the <code>BEObject</code>. Each <code>BEObject</code> contains key-value pairs of JSON-compatible data. This data is schemaless, which means that you don't need to specify ahead of time what keys exist on each <code>BEObject</code>. You simply set whatever key-value pairs you want, and our backend will store it.
+        </p>
+        <p>
+            For example, let's say you're tracking high scores for a game. A single <code>BEObject</code> could contain:
+        </p>
+        <pre><code>score: <span class="string">1337</span>, playerName: <span class="string">"Sean Plott"</span>, cheatMode: <span class="string">false</span></code></pre>
+        <p>
+            On Parse, you create an App for each of your mobile applications. Each App has its own application id and client key that you apply to your SDK install. Your account on Parse can accommodate multiple Apps. This is useful even if you have one application, since you can deploy different versions for test and production.
+        </p>
+    </div>
+    <!-- / CONTENT -->
+</div>

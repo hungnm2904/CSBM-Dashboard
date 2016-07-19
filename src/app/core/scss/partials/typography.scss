@@ -103,7 +103,7 @@ blockquote {
 }
 
 // Code
-code {
+/*code {
     font-family: $font-family-code;
 
     &:not(.highlight) {
@@ -113,7 +113,7 @@ code {
         padding: 2px 3px;
         border-radius: 2px;
     }
-}
+}*/
 
 // Definition lists
 dl {

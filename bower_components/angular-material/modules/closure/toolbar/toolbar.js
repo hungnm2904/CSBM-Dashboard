@@ -2,7 +2,7 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.0.5
+ * v1.1.0-rc.5
  */
 goog.provide('ng.material.components.toolbar');
 goog.require('ng.material.components.content');
@@ -74,11 +74,11 @@ function mdToolbarDirective($$rAF, $mdConstant, $mdUtil, $mdTheming, $animate) {
 
   return {
     template: '',
-
     restrict: 'E',
 
     link: function(scope, element, attr) {
 
+      element.addClass('_md');     // private md component indicator for styling
       $mdTheming(element);
 
       if (angular.isDefined(attr.mdScrollShrink)) {
@@ -202,14 +202,14 @@ function mdToolbarDirective($$rAF, $mdConstant, $mdUtil, $mdTheming, $animate) {
           contentElement.on('scroll', debouncedContentScroll);
           contentElement.attr('scroll-shrink', 'true');
 
-          $$rAF(updateToolbarHeight);
+          $mdUtil.nextTick(updateToolbarHeight, false);
 
           return function disableScrollShrink() {
             contentElement.off('scroll', debouncedContentScroll);
             contentElement.attr('scroll-shrink', 'false');
 
-            $$rAF(updateToolbarHeight);
-          }
+            updateToolbarHeight();
+          };
         }
 
         /**

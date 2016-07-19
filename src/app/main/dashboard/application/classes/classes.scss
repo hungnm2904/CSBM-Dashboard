@@ -4,4 +4,10 @@
         min-height: 120px;
         max-height: 120px;
     }
+    .ms-responsive-be-table-wrapper {
+        height: 72.9vh;
+        tbody {
+            height: 65vh;
+        }
+    }
 }

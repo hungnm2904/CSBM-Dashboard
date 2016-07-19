@@ -4,56 +4,56 @@
 /*  ms-responsive-table
 /*----------------------------------------------------------------*/
 
-#classes {
-    .ms-responsive-table-wrapper {
-        padding: 3px;
-        height: 73vh;
-        overflow-y: hidden;
-        overflow-x: scroll;
-        table-layout: fixed;
-        thead {
-            display: block;
-            border: none;
-        }
-        tbody {
-            display: block;
-            height: 65vh;
-            overflow-y: scroll;
-            overflow-x: hidden;
-            tr:nth-child(even) {
-            	background-color: #EEEEEE;
-            }
-        }
-        th,
-        td {
-            min-width: 150px;
-            width: 150px;
-        }
-        th:first-child,
-        td:first-child {
-            min-width: 150px;
-            width: 150px;
-            padding-left: 24px;
-        }
-        th {
-            color: #fff;
-            padding: 10px 8px;
-        }
-        td {
-        	padding: 0px 8px;
-        	border-right: 1px solid rgba(0, 0, 0, 0.12);
-        }
-        th:nth-child(even) {
-            background-color: rgb(114, 111, 133);
-        }
-        th:nth-child(odd) {
-            background-color: rgb(102, 99, 122);
-        }
-        .md-errors-spacer {
-            min-height: 0;
-        }
-        md-input-container {
-        	margin: 3px 0;
+.ms-responsive-be-table-wrapper {
+    padding: 3px;
+    height: 90vh;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    table-layout: fixed;
+    thead {
+        display: block;
+        border: none !important;
+    }
+    tbody {
+        display: block;
+        height: 81vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        tr:nth-child(even) {
+            background-color: #EEEEEE;
         }
     }
+    th,
+    td {
+        min-width: 150px;
+        width: 150px;
+    }
+    th:first-child,
+    td:first-child {
+        min-width: 150px;
+        width: 150px;
+        padding-left: 24px;
+    }
+    th {
+        color: #fff;
+        padding: 10px 8px !important;
+    }
+    td {
+        padding: 0px 8px !important;
+        border-right: 1px solid rgba(0, 0, 0, 0.12);
+    }
+    th:nth-child(even) {
+        background-color: rgb(114, 111, 133);
+    }
+    th:nth-child(odd) {
+        background-color: rgb(102, 99, 122);
+    }
+    .md-errors-spacer {
+        min-height: 0;
+    }
+    md-input-container {
+        margin: 3px 0;
+    }
 }
+
+#classes {}

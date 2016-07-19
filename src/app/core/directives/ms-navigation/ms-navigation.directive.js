@@ -327,11 +327,13 @@
              */
             function clearNavigation() {
                 // Clear the navigation array
-                navigation = [];
+                navigation.splice(0, navigation.length);
+                // navigation = [];
 
                 // Clear the vm.navigation from main controller
                 if (navigationScope) {
-                    navigationScope.vm.navigation = [];
+                    navigationScope.vm.navigation.splice(0, navigationScope.vm.navigation.lenght);
+                    // navigationScope.vm.navigation = [];
                 }
             }
 

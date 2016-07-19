@@ -2,8 +2,87 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     max-height: 60vh;
     height: 60vh;
+    font-size: 1.3rem;
+    #select-from,
+    #where {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    }
     #constrains,
     #code {
         border-right: 1px solid rgba(0, 0, 0, 0.12);
+        md-tabs {
+            height: 60vh;
+            md-tab-content {
+                background: #110D11;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+                font-size: 1.4rem;
+                font-weight: 700;
+            }
+        }
+        pre {
+            max-height: 45vh;
+            height: 45vh;
+            background-color: #110D11!important;
+            border-radius: 4px;
+            word-wrap: normal;
+            margin: 0;
+            code {
+                display: block;
+                max-height: 45vh;
+                height: 45vh;
+                overflow-x: auto;
+                padding: 1.5em;
+                margin: 0;
+                background: #110D11;
+                color: #ddd;
+                -webkit-text-size-adjust: none;
+                line-height: 1.8;
+                .string {
+                    color: #a6e22e;
+                }
+                .keyword {
+                    color: #66d9ef;
+                }
+                .function {
+                    color: #e6db74;
+                }
+                .comment {
+                    opacity: .4;
+                }
+                .subst {
+                    color: #E55300;
+                }
+            }
+        }
+    }
+    md-input-container {
+        margin: 0;
+        md-select {
+            max-width: 55vh;
+        }
+    }
+    tr {
+        td {
+            &:first-child {
+                width: 15vh;
+            }
+        }
+    }
+    #where {
+        max-height: 36vh;
+        height: 36vh;
+        overflow: auto;
+    }
+}
+
+#results-table {
+    padding: 3px;
+    width: 157vh;
+    min-height: 30.6vh;
+    max-height: 90.5vh;
+    overflow: auto;
+    .table-title {
+        background: #fff;
+        color: #000;
     }
 }

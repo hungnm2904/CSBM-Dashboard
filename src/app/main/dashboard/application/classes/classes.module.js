@@ -4,25 +4,21 @@
     angular
         .module('app.application.classes', [])
         .directive('autofocus', autofocus)
-        .config(config);
-    // .run(run);
+        .config(config)
+        .run(run);
 
     /** @ngInject */
-    function config($stateProvider, msApiProvider) {
-
-        $stateProvider.state('app.application_classes', {
-            url: '/apps/:appName/classes/:className',
-            params: {
-                appId: null,
-                objectId: null
-            },
-            views: {
-                'content@app': {
-                    templateUrl: 'app/main/dashboard/application/classes/classes.html',
-                    controller: 'ClassesController as vm'
+    function config($stateProvider, $urlRouterProvider, msApiProvider) {
+        $urlRouterProvider.when('/apps/:appName/classes/:className', ['$state', '$stateParams', '$location', 'msModeService',
+            function($state, $stateParams, $location, msModeService) {
+                if (!$state.current.name) {
+                    var path = $location.path().split('/');
+                    var appName = path[2];
+                    var className = path[4];
+                    msModeService.renderApplicationNavigations(null, appName, className);
                 }
             }
-        });
+        ]);
     };
 
     function autofocus($timeout) {
@@ -35,5 +31,7 @@
             }
         }
     };
+
+    function run($rootScope) {};
 
 })();

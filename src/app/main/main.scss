@@ -1,9 +1,113 @@
+#user-menu {
+    .user-button {
+        &:hover {
+            background: transparent;
+            color: #169CEE;
+        }
+    }
+}
+
+.pages-active {
+    color: #169CEE!important;
+}
+
+#toolbar {
+    .logo {
+        cursor: pointer;
+    }
+}
+
 .no-error-check {
-	.md-errors-spacer {
-		min-height: 0;
-	}
+    .md-errors-spacer {
+        min-height: 0;
+    }
 }
 
 .clickable-icon {
-	cursor: pointer;
+    cursor: pointer;
+}
+
+md-select[multiple] {
+    md-select-value {
+        >:first-child {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+        }
+    }
+}
+
+.simple-table-container {
+    .simple {
+        thead {
+            tr {
+                th {
+                    color: #fff;
+                    padding: 10px 8px;
+                }
+            }
+        }
+        tbody {
+            tr {
+                td {
+                    padding: 10px 8px;
+                }
+            }
+            tr:nth-child(even) {
+                background-color: #EEEEEE;
+            }
+        }
+        th:nth-child(even) {
+            background-color: rgb(114, 111, 133);
+        }
+        th:nth-child(odd) {
+            background-color: rgb(102, 99, 122);
+        }
+    }
+}
+
+.be-button-no-bg {
+    border: 1px solid rgb(3, 155, 229);
+    color: rgb(3, 155, 229)!important;
+}
+
+.page-layout.simple.fullwidth {
+    .header {
+        height: 15vh;
+        min-height: 15vh;
+        max-height: 15vh;
+    }
+}
+
+pre {
+    background-color: #110D11!important;
+    border-radius: .5vh;
+    word-wrap: normal;
+    margin: 3.5em 0;
+    overflow: auto;
+    code {
+        display: block;
+        overflow-x: auto;
+        padding: 1.5em;
+        margin: 0;
+        background: #110D11;
+        color: #ddd;
+        -webkit-text-size-adjust: none;
+        line-height: 1.8;
+        .string {
+            color: #a6e22e;
+        }
+        .keyword {
+            color: #66d9ef;
+        }
+        .function {
+            color: #e6db74;
+        }
+        .comment {
+            opacity: .4;
+        }
+        .subst {
+            color: #E55300;
+        }
+    }
 }

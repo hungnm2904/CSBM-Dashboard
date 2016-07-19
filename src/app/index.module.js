@@ -26,6 +26,9 @@
             'app.management',
 
             // Application
-            'app.application'
+            'app.application',
+
+            // Documents for frameworks
+            'app.docs'
         ]);
 })();
