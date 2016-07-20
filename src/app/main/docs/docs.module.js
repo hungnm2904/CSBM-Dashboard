@@ -35,7 +35,7 @@
                     if (toState.name.includes('ios')) {
                         msModeService.renderiOSDocsGuideNavigations();
                     } else {
-
+                        msModeService.renderAndroidDocsGuideNavigations();
                     }
                 }
             }

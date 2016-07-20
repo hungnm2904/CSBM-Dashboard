@@ -59,7 +59,8 @@
                 isDocsMode: isDocsMode,
                 renderApplicationNavigations: renderApplicationNavigations,
                 renderiOSDocsGuideNavigations: renderiOSDocsGuideNavigations,
-                renderManagementNavigations: renderManagementNavigations
+                renderManagementNavigations: renderManagementNavigations,
+                renderAndroidDocsGuideNavigations: renderAndroidDocsGuideNavigations
             }
 
             return service;
@@ -248,6 +249,20 @@
                 msNavigationService.saveItem('guide.objects.beobject', {
                     title: 'BEObject',
                     state: 'app.docs_ios_guide_beobject'
+                });
+            };
+
+            function renderAndroidDocsGuideNavigations() {
+                msNavigationService.clearNavigation();
+                msNavigationService.saveItem('guide', {
+                    title: 'Guide',
+                    group: true,
+                    weight: 1
+                });
+
+                msNavigationService.saveItem('guide.getting-started', {
+                    title: 'Getting Started',
+                    state: 'app.docs_android_guide_getting-started'
                 });
             };
         };

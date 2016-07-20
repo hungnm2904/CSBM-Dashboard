@@ -9,8 +9,7 @@
         $rootScope.$state = $state;
 
         $scope.goToHome = function() {
-            msUserService.getAccessToken() ? $state.go('app.pages_homescreen') :
-                $state.go('app.pages_auth_login');
+            $state.go('app.pages_homescreen');
         };
 
         $scope.gotoDashboard = function() {
@@ -19,8 +18,7 @@
         }
 
         $scope.gotoDocs = function() {
-            msUserService.getAccessToken() ? $state.go('app.docs') :
-                $state.go('app.pages_auth_login');
+            $state.go('app.docs')
         }
 
         $scope.$on('$viewContentAnimationEnded', function(event) {
