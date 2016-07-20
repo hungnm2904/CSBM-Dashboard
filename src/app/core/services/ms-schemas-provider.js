@@ -534,33 +534,41 @@
             };
 
             function filter(appId, className, filterCriteria, callback) {
-                $http({
-                    method: 'GET',
-                    url: _domain + '/csbm/classes/' + className + '?where=' + JSON.stringify(filterCriteria),
-                    headers: {
-                        'X-CSBM-Application-Id': appId
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
                     }
-                }).then(function(response) {
-                    _schemas.some(function(schema, index) {
-                        if (schema.className === className) {
-                            var filteredDocuments = response.data.results;
-                            if (schema.documents && schema.documents.length > 0) {
-                                schema.documents.splice(0, schema.documents.length);
-                                filteredDocuments.forEach(function(_document) {
-                                    schema.documents.push(_document);
-                                });
-                            } else {
-                                schema.documents = filteredDocuments;
-                            }
 
-                            callback(null, schema);
-                            return true;
+                    var masterKey = results;
+                    $http({
+                        method: 'GET',
+                        url: _domain + '/csbm/classes/' + className + '?where=' + JSON.stringify(filterCriteria),
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey
                         }
-                    });
+                    }).then(function(response) {
+                        _schemas.some(function(schema, index) {
+                            if (schema.className === className) {
+                                var filteredDocuments = response.data.results;
+                                if (schema.documents && schema.documents.length > 0) {
+                                    schema.documents.splice(0, schema.documents.length);
+                                    filteredDocuments.forEach(function(_document) {
+                                        schema.documents.push(_document);
+                                    });
+                                } else {
+                                    schema.documents = filteredDocuments;
+                                }
 
-                    // callback(null, response.data);
-                }, function(response) {
-                    callback(response);
+                                callback(null, schema);
+                                return true;
+                            }
+                        });
+
+                        // callback(null, response.data);
+                    }, function(response) {
+                        callback(response);
+                    });
                 });
             };
         };

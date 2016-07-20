@@ -160,10 +160,14 @@
 
                     for (var i = 0; i < schemas.length; i++) {
                         var schema = schemas[i];
+                        var title = schema.className;
+                        if (title.includes('_')) {
+                            title = title.split('_')[1];
+                        }
 
                         // Create navigation for schema
                         msNavigationService.saveItem('application.classes.' + schema.className, {
-                            title: schema.className,
+                            title: title,
                             state: 'app.application_classes_' + schema.className,
                             stateParams: {
                                 'appName': appName,

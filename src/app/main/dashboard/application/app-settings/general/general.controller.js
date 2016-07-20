@@ -11,10 +11,7 @@
             }
 
             var appId = $stateParams.appId;
-            var appName = '';
-            msApplicationService.getAppName(appId, function(error, results) {
-                appName = results.data.data.appName;
-            });
+            var appName = $stateParams.appName;
 
             $scope.showDeleteDialog = function(ev) {
                 $mdDialog.show({
@@ -28,11 +25,9 @@
                         applicationId: appId,
                         applicationName: appName
                     }
-                }).then(function() {
-                    $state.go('app.management_applications');
                 });
 
-                function DeleteApplicationDialogController($scope, applicationId,
+                function DeleteApplicationDialogController($scope, $mdDialog, applicationId,
                     applicationName) {
 
                     $scope.closeDialog = function() {
@@ -46,17 +41,26 @@
                             .cancel('No');
 
                         $mdDialog.show(confirm).then(function() {
-                            msApplicationService.remove(applicationId, $scope.password,
+                            msApplicationService.remove(applicationId, applicationName, $scope.password,
                                 function(error, results) {
                                     if (error) {
                                         if (error.status === 401) {
                                             return $state.go('app.pages_auth_login');
                                         }
 
-                                        return alert(error.statusText);
+                                        $mdDialog.show(
+                                            $mdDialog.alert()
+                                            .parent(angular.element($document.body))
+                                            .clickOutsideToClose(true)
+                                            .title(error.data.message)
+                                            .textContent('Your app was not deleted.')
+                                            .ariaLabel('Alert Dialog Demo')
+                                            .ok('Close')
+                                            .targetEvent(ev)
+                                        );
+                                    } else {
+                                        $state.go('app.management_applications');
                                     }
-
-                                    $mdDialog.hide();
                                 });
                         }, function() {
                             $mdDialog.hide();

@@ -89,7 +89,7 @@
                 });
             };
 
-            function remove(id, password, callback) {
+            function _remove(id, password, callback) {
                 var accessToken = msUserService.getAccessToken();
                 $http({
                     method: 'DELETE',
@@ -108,6 +108,17 @@
                 }, function(response) {
                     callback(response);
                 });
+            };
+
+            function remove(id, appName, password, callback) {
+                if (!id) {
+                    getAppId(appName, function(error, results) {
+                        id = results.appId;
+                        _remove(id, password, callback);
+                    });
+                } else {
+                    _remove(id, password, callback);
+                }
             };
 
             function getMasterkey(id, callback) {

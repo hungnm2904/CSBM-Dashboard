@@ -14,7 +14,18 @@
         .run(run);
 
     /** @ngInject */
-    function config($stateProvider, msNavigationServiceProvider, msModeServiceProvider) {};
+    function config($stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.when('/apps/:appName/classes/:className', ['$state', '$stateParams', '$location', 'msModeService',
+            function($state, $stateParams, $location, msModeService) {
+                if (!$state.current.name) {
+                    var path = $location.path().split('/');
+                    var appName = path[2];
+                    var className = path[4];
+                    msModeService.renderApplicationNavigations(null, appName, className);
+                }
+            }
+        ]);
+    };
 
     function run($rootScope, $state, $stateParams, $location, msSchemasService, msNavigationService,
         msModeService, msApplicationService, msDialogService) {
@@ -25,7 +36,7 @@
                 var fromAppName = fromParams.appName;
                 if (toAppName != fromAppName) {
                     var path = toState.url.split('/');
-                    if (path.length < 5) {
+                    if (path[3] === 'settings' || path[3] === 'diagram' || path[3] === 'query') {
                         msApplicationService.getAppId(toAppName, function(error, results) {
                             if (error) {
                                 if (error.status === 401) {

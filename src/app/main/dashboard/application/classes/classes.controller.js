@@ -14,6 +14,10 @@
             var appId = $stateParams.appId;
             var appName = $stateParams.appName;
             var className = $stateParams.className;
+            $scope.title = className;
+            if ($scope.title.includes('_')) {
+                $scope.title = $scope.title.split('_')[1];
+            }
             var _objectId = $stateParams.objectId;
 
             var checked = [];
@@ -22,7 +26,7 @@
             var audioExtension = 'mp3,mp4';
             var textExtension = 'txt';
 
-            $scope.className = className;
+            // $scope.className = className;
             $scope.columnName = '';
             $scope.fields = [];
             $scope.fields_add = [];
@@ -61,7 +65,7 @@
                             'objectId': _objectId
                         };
 
-                        msSchemasService.filter(appId, $scope.className, preparedCriteria, function(error, results) {
+                        msSchemasService.filter(appId, className, preparedCriteria, function(error, results) {
                             if (error) {
                                 return alert(error.statusText);
                             }
@@ -118,7 +122,7 @@
                         });
                 });
 
-                msSchemasService.filter(appId, $scope.className, preparedCriteria, function(error, results) {
+                msSchemasService.filter(appId, className, preparedCriteria, function(error, results) {
                     if (error) {
                         return alert(error.statusText);
                     }
@@ -131,7 +135,7 @@
                 // } else {
                 //     skip = ($scope.currentPage - 1) * $scope.numPerPage;
                 // }
-                msSchemasService.getDocuments(appId, $scope.className, null, null,
+                msSchemasService.getDocuments(appId, className, null, null,
                     function(error, results, count) {
                         if (error) {
                             return alert(error.statusText);
@@ -291,7 +295,7 @@
                     locals: {
                         schemas: $scope.schemas,
                         appId: appId,
-                        className: $scope.className,
+                        className: className,
                         filterCriteria: $scope.filterCriteria
                     }
                 }).then(function(filterCriteria) {
@@ -366,7 +370,7 @@
                 if (!$scope.columnName || !$scope.type) {
                     msDialogService.showAlertDialog('Add New Column Fail', 'Name and Type not allow null');
                 } else {
-                    msSchemasService.addField($scope.className, appId, $scope.columnName, $scope.type,
+                    msSchemasService.addField(className, appId, $scope.columnName, $scope.type,
                         function(error, results) {
                             if (error) {
                                 if (error.status === 401) {
@@ -396,7 +400,7 @@
                         .cancel('No');
 
                     $mdDialog.show(confirm).then(function() {
-                        msSchemasService.deleteField($scope.className, appId, $scope.columnName,
+                        msSchemasService.deleteField(className, appId, $scope.columnName,
                             function(error, results) {
                                 if (error) {
                                     if (error.status === 401) {
@@ -431,7 +435,7 @@
                 $mdDialog.show(confirm).then(function() {
                     msApplicationService.getAppName(appId, function(error, result) {
                         var appName = result.data.data.appName;
-                        msSchemasService.changeFieldName(appName, $scope.className, $scope.field,
+                        msSchemasService.changeFieldName(appName, className, $scope.field,
                             $scope.newFieldName, appId,
                             function(error, results) {
                                 if (error) {
@@ -464,7 +468,7 @@
                         _document[field] = $scope.updatedValue;
                     } else {
                         data[field] = results;
-                        msSchemasService.updateValues($scope.className, appId, objectId, field, data,
+                        msSchemasService.updateValues(className, appId, objectId, field, data,
                             function(results) {});
                     }
                 });
@@ -516,7 +520,7 @@
                     .cancel('No');
 
                 $mdDialog.show(confirm).then(function() {
-                    msSchemasService.deleteDocuments($scope.className, appId, checked,
+                    msSchemasService.deleteDocuments(className, appId, checked,
                         function(error, results) {
                             if (error) {
                                 return alert(error.statusText);
@@ -554,7 +558,7 @@
                 });
 
                 if (checkType) {
-                    msSchemasService.createDocument($scope.className, appId, newSchema,
+                    msSchemasService.createDocument(className, appId, newSchema,
                         function(error, results) {
                             if (error) {
                                 return alert(error.statusText);
