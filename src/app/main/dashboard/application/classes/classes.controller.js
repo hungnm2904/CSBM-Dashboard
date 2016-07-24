@@ -386,36 +386,88 @@
             };
 
             $scope.showDeleteColumnDialog = function(ev) {
-                msDialogService
-                    .showDialog(ev, 'app/core/services/dialogs/deleteColumnDialog.html');
-            };
+                // msDialogService
+                //     .showDialog(ev, 'app/core/services/dialogs/deleteColumnDialog.html');
+                $mdDialog.show({
+                    controller: DeleteDialogController,
+                    controllerAs: 'vm',
+                    templateUrl: 'app/main/dashboard/application/classes/dialogs/deleteColumnDialog.html',
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false,
+                    locals: {
+                        schemas: $scope.schemas
+                    }
+                });
 
-            $scope.deleteColumn = function() {
-                if (!$scope.columnName) {
-                    msDialogService.showAlertDialog('Delete Exists Column Fail', 'Please select column.');
-                } else {
-                    var confirm = $mdDialog.confirm()
-                        .title('Are you sure to delete ' + '"' + $scope.columnName + '"' + ' ?')
-                        .ok('Yes')
-                        .cancel('No');
+                function DeleteDialogController($scope, schemas) {
+                    var uneditableFileds = ['objectId', 'createdAt', 'updatedAt'];
 
-                    $mdDialog.show(confirm).then(function() {
-                        msSchemasService.deleteField(className, appId, $scope.columnName,
-                            function(error, results) {
-                                if (error) {
-                                    if (error.status === 401) {
-                                        return $state.go('app.pages_auth_login');
-                                    }
+                    $scope.schemas = schemas;
 
-                                    return alert(error.statusText);
-                                }
+                    $scope.closeDialog = function() {
+                        $mdDialog.hide();
+                    };
+
+                    $scope.editable = function(field) {
+                        return uneditableFileds.indexOf(field) === -1;
+                    };
+
+                    $scope.deleteColumn = function() {
+                        if (!$scope.columnName) {
+                            msDialogService.showAlertDialog('Delete Exists Column Fail', 'Please select column.');
+                        } else {
+                            var confirm = $mdDialog.confirm()
+                                .title('Are you sure to delete ' + '"' + $scope.columnName + '"' + ' ?')
+                                .ok('Yes')
+                                .cancel('No');
+
+                            $mdDialog.show(confirm).then(function() {
+                                msSchemasService.deleteField(className, appId, $scope.columnName,
+                                    function(error, results) {
+                                        if (error) {
+                                            if (error.status === 401) {
+                                                return $state.go('app.pages_auth_login');
+                                            }
+
+                                            return alert(error.statusText);
+                                        }
+                                    });
+                                $scope.closeDialog();
+                            }, function() {
+                                $scope.closeDialog();
                             });
-                        $scope.closeDialog();
-                    }, function() {
-                        $scope.closeDialog();
-                    });
-                }
+                        }
+                    };
+                };
             };
+
+            // $scope.deleteColumn = function() {
+            //     if (!$scope.columnName) {
+            //         msDialogService.showAlertDialog('Delete Exists Column Fail', 'Please select column.');
+            //     } else {
+            //         var confirm = $mdDialog.confirm()
+            //             .title('Are you sure to delete ' + '"' + $scope.columnName + '"' + ' ?')
+            //             .ok('Yes')
+            //             .cancel('No');
+
+            //         $mdDialog.show(confirm).then(function() {
+            //             msSchemasService.deleteField(className, appId, $scope.columnName,
+            //                 function(error, results) {
+            //                     if (error) {
+            //                         if (error.status === 401) {
+            //                             return $state.go('app.pages_auth_login');
+            //                         }
+
+            //                         return alert(error.statusText);
+            //                     }
+            //                 });
+            //             $scope.closeDialog();
+            //         }, function() {
+            //             $scope.closeDialog();
+            //         });
+            //     }
+            // };
 
             $scope.showUpdateFieldNameDialog = function(ev) {
                 showDialog(ev, 'app/main/dashboard/application/classes/dialogs/changeFieldName.html');
@@ -537,7 +589,8 @@
                 var checkType = true;
                 var errorMessage;
                 var titleMessage;
-                $scope.fields.forEach(function(field) {
+
+                for (var field in $scope.schemas) {
                     if (field != 'objectId' && field != 'createdAt' &&
                         field != 'updatedAt') {
 
@@ -555,7 +608,7 @@
                             newSchema[field] = results;
                         });
                     }
-                });
+                };
 
                 if (checkType) {
                     msSchemasService.createDocument(className, appId, newSchema,

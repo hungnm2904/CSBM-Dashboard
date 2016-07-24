@@ -79,11 +79,11 @@
                             <span>Cancel</span>
                         </md-button>
                     </td>
-                    <td ng-repeat="field in fields_add">
-                        <md-input-container ng-if="schemas[field].type != 'File'" md-no-float class="md-block">
-                            <input placeholder="Value" name="val" type="text" ng-model="add[field]" />
+                    <td ng-repeat="(key, value) in schemas" ng-if="editable(key)">
+                        <md-input-container ng-if="value.type != 'File'" md-no-float class="md-block">
+                            <input placeholder="Value" name="val" type="text" ng-model="add[key]" />
                         </md-input-container>
-                        <div ng-if="schemas[field].type == 'File'">
+                        <div ng-if="value.type == 'File'">
                             <input class="ng-hide" id="input-file-id" type="file" />
                             <label for="input-file-id" class="md-button md-raised md-primary">Choose File</label>
                         </div>

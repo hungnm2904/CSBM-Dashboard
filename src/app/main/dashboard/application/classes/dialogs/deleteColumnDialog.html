@@ -13,8 +13,8 @@
                 <md-input-container flex=100>
                     <label>Column Name</label>
                     <md-select ng-model="columnName">
-                        <md-option ng-repeat="field in fields" value="{{field}}">
-                            {{field}}
+                        <md-option ng-if="editable(key)" ng-repeat="(key, value) in schemas" value="{{key}}">
+                            {{key}}
                         </md-option>
                     </md-select>
                 </md-input-container>

@@ -6,27 +6,25 @@
                 <table class="simple" ms-responsive-table>
                     <tbody>
                         <tr>
-                            <td>Select</td>
+                            <td>Table</td>
                             <td>
                                 <md-input-container>
-                                    <label>Columns</label>
-                                    <md-select ng-model="fields" data-md-container-class="selectdemoSelectHeader" multiple>
-                                        <md-optgroup>
-                                            <md-option ng-value="key" ng-repeat="(key, value) in schema.fields">{{key}}</md-option>
-                                        </md-optgroup>
+                                    <md-select ng-model="schema" ng-change="changeTable()">
+                                        <md-option ng-repeat="schema in schemas" ng-value="schema">
+                                            {{schema.className}}
+                                        </md-option>
                                     </md-select>
                                 </md-input-container>
                             </td>
                         </tr>
                         <tr>
-                            <td>From</td>
+                            <td>Fields</td>
                             <td>
                                 <md-input-container>
-                                    <label>Table</label>
-                                    <md-select ng-model="schema" ng-change="changeTable()">
-                                        <md-option ng-repeat="schema in schemas" ng-value="schema">
-                                            {{schema.className}}
-                                        </md-option>
+                                    <md-select ng-model="fields" data-md-container-class="selectdemoSelectHeader" multiple>
+                                        <md-optgroup>
+                                            <md-option ng-value="key" ng-repeat="(key, value) in schema.fields">{{key}}</md-option>
+                                        </md-optgroup>
                                     </md-select>
                                 </md-input-container>
                             </td>
@@ -38,7 +36,7 @@
                 <table class="simple" ms-responsive-table>
                     <tbody>
                         <tr>
-                            <td>Where</td>
+                            <td>Conditions</td>
                             <td>
                                 <div layout="row" ng-repeat="criteria in filterCriteria">
                                     <md-input-container flex="30">
@@ -130,9 +128,9 @@
                     <md-tab>
                         <md-tab-label>Android</md-tab-label>
                         <md-tab-body layout="row" layout-align="start">
-                            <pre><code id="android-code-string" class="java">ParseQuery&lt;ParseObject&gt; query = ParseQuery.getQuery(<span class="string">"{{schema.className}}"</span>);
-<span ng-repeat="criteria in filterCriteria" ng-if="criteria.field">query.{{getAndroidConstraints(criteria.operation)}}(<span class="string">"{{criteria.field}}"</span><span ng-if="criteria.value" class="string">, "{{criteria.value}}"</span>);<br/></span>query.findInBackground(<span class="keyword">new</span> FindCallback&lt;ParseObject&gt;() {
-    <span class="keyword">public void</span> <span class="function">done</span>(List&lt;ParseObject&gt; objList, ParseException e) {
+                            <pre><code id="android-code-string" class="java">BEQuery&lt;BEObject&gt; query = BEQuery.getQuery(<span class="string">"{{schema.className}}"</span>);
+<span ng-repeat="criteria in filterCriteria" ng-if="criteria.field">query.{{getAndroidConstraints(criteria.operation)}}(<span class="string">"{{criteria.field}}"</span><span ng-if="criteria.value" class="string">, "{{criteria.value}}"</span>);<br/></span>query.findInBackground(<span class="keyword">new</span> FindCallback&lt;BEObject&gt;() {
+    <span class="keyword">public void</span> <span class="function">done</span>(List&lt;BEObject&gt; objList, BEException e) {
         <span class="keyword">if</span> (e == <span class="keyword">null</span>) {
             Log.d(<span class="string">"{{schema.className}}"</span>, <span class="string">"Retrieved "</span> + objList.size() + <span class="string">" objects"</span>);
         } <span class="keyword">else</span> {

@@ -14,6 +14,13 @@
                 }
             });
 
+            var copyToClipboardiOS = new Clipboard('#swift-code-copy-button', {
+                text: function(trigger) {
+                    var copiedCodeString = document.getElementById('swift-code-string').innerText;
+                    return copiedCodeString;
+                }
+            });
+
             if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');
             }
