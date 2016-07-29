@@ -4,7 +4,7 @@
     angular
         .module('app.application.classes')
         .controller('ClassesController', function($scope, $http, $cookies, $window, $state,
-            $stateParams, $mdDialog, $document, $rootScope, msSchemasService, msDialogService,
+            $stateParams, $mdDialog, $document, $rootScope, $timeout, msSchemasService, msDialogService,
             msToastService, msUserService, msApplicationService) {
 
             if (!msUserService.getAccessToken()) {
@@ -54,6 +54,8 @@
                     appId = msSchemasService.getAppId();
                     $scope.schemas = results.fields;
 
+                    console.log($scope.schemas);
+
                     var fields = Object.getOwnPropertyNames(results.fields);
                     $scope.allFields = [].concat(fields);
                     fields.splice(0, 3);
@@ -71,7 +73,7 @@
                             }
 
                             $scope.documents = results.documents;
-                            $scope.documents.forEach(function(_document) {
+                            $scope.documents.forEach(function(_document, index) {
                                 objectIdList.push(_document.objectId);
                             });
                             $scope.filterCriteria = [{
@@ -284,6 +286,10 @@
                 return uneditableFileds.indexOf(field) === -1;
             };
 
+            var editable = function(field) {
+                return uneditableFileds.indexOf(field) === -1;
+            };
+
             $scope.showFilterDialog = function(ev) {
                 $mdDialog.show({
                     controller: FilterDialogController,
@@ -442,72 +448,110 @@
                 };
             };
 
-            // $scope.deleteColumn = function() {
-            //     if (!$scope.columnName) {
-            //         msDialogService.showAlertDialog('Delete Exists Column Fail', 'Please select column.');
-            //     } else {
-            //         var confirm = $mdDialog.confirm()
-            //             .title('Are you sure to delete ' + '"' + $scope.columnName + '"' + ' ?')
-            //             .ok('Yes')
-            //             .cancel('No');
-
-            //         $mdDialog.show(confirm).then(function() {
-            //             msSchemasService.deleteField(className, appId, $scope.columnName,
-            //                 function(error, results) {
-            //                     if (error) {
-            //                         if (error.status === 401) {
-            //                             return $state.go('app.pages_auth_login');
-            //                         }
-
-            //                         return alert(error.statusText);
-            //                     }
-            //                 });
-            //             $scope.closeDialog();
-            //         }, function() {
-            //             $scope.closeDialog();
-            //         });
-            //     }
-            // };
-
             $scope.showUpdateFieldNameDialog = function(ev) {
-                showDialog(ev, 'app/main/dashboard/application/classes/dialogs/changeFieldName.html');
+                $mdDialog.show({
+                    controller: UpdateFieldNameController,
+                    controllerAs: 'vm',
+                    templateUrl: 'app/main/dashboard/application/classes/dialogs/changeFieldName.html',
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: true,
+                    locals: {
+                        schemas: $scope.schemas
+                    }
+                });
+
+                function UpdateFieldNameController($scope, schemas) {
+                    $scope.schemas = schemas;
+
+                    $scope.editable = editable;
+
+                    $scope.closeDialog = function() {
+                        $mdDialog.hide();
+                    };
+
+                    $scope.updateFieldName = function() {
+                        var confirm = $mdDialog.confirm()
+                            .title('Are you sure to change ' + '"' + $scope.field + '"' +
+                                ' to ' + '"' + $scope.newFieldName + '"' + ' ?')
+                            .ok('Yes')
+                            .cancel('No');
+
+                        $mdDialog.show(confirm).then(function() {
+                            msSchemasService.changeFieldName(appName, className, $scope.field,
+                                $scope.newFieldName, appId,
+                                function(error, results) {
+                                    if (error) {
+                                        if (error.status === 401) {
+                                            return $state.go('app.pages_auth_login');
+                                        }
+
+                                        return alert(error.statusText);
+                                    }
+                                });
+                            $scope.closeDialog();
+                        }, function() {
+                            $scope.closeDialog();
+                        });
+                    }
+                };
+                // showDialog(ev, 'app/main/dashboard/application/classes/dialogs/changeFieldName.html');
             };
 
             $scope.showImportClassesDialog = function(ev) {
                 showDialog(ev, 'app/main/dashboard/application/classes/dialogs/importClasses.html');
             }
 
-            $scope.updateFieldName = function() {
-                var confirm = $mdDialog.confirm()
-                    .title('Are you sure to change ' + '"' + $scope.field + '"' +
-                        ' to ' + '"' + $scope.newFieldName + '"' + ' ?')
-                    .ok('Yes')
-                    .cancel('No');
-
-                $mdDialog.show(confirm).then(function() {
-                    msApplicationService.getAppName(appId, function(error, result) {
-                        var appName = result.data.data.appName;
-                        msSchemasService.changeFieldName(appName, className, $scope.field,
-                            $scope.newFieldName, appId,
-                            function(error, results) {
-                                if (error) {
-                                    if (error.status === 401) {
-                                        return $state.go('app.pages_auth_login');
-                                    }
-
-                                    return alert(error.statusText);
-                                }
-                            });
-                    });
-                    $scope.closeDialog();
-                }, function() {
-                    $scope.closeDialog();
+            $scope.showDeleteClassDialog = function(ev) {
+                $mdDialog.show({
+                    controller: DeleteClassDialogController,
+                    controllerAs: 'vm',
+                    templateUrl: 'app/main/dashboard/application/classes/dialogs/deleteClassDialog.html',
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false,
+                    fullscreen: false,
+                    locals: {
+                        documents: $scope.documents
+                    }
                 });
-            }
+
+                function DeleteClassDialogController($scope, documents) {
+
+                    $scope.closeDialog = function() {
+                        $mdDialog.hide();
+                    };
+
+                    $scope.deleteClass = function() {
+                        if (documents.length > 0) {
+                            var objectIds = [];
+                            documents.forEach(function(_document) {
+                                objectIds.push(_document.objectId);
+                            });
+
+                            msSchemasService.deleteDocuments(className, appId, objectIds,
+                                function(error, results) {
+                                    if (error) {
+                                        alert(error.statusText);
+                                    } else {
+                                        documents.splice(0, documents.length);
+
+                                        msSchemasService.deleteClass(className,
+                                            function(error, results) {
+
+                                                console.log(results);
+                                            });
+                                    }
+                                    $mdDialog.hide();
+                                });
+                        }
+                    };
+
+                };
+            };
 
             $scope.updateValues = function(index, _document, field) {
                 toggleEditMode(index);
-
                 var objectId = _document.objectId;
                 var value = _document[field];
                 var type = $scope.schemas[field].type;
@@ -567,7 +611,7 @@
 
             $scope.deleteRow = function() {
                 var confirm = $mdDialog.confirm()
-                    .title('Are you sure to delete this rows ?')
+                    .title('Are you sure to delete these rows ?')
                     .ok('Yes')
                     .cancel('No');
 
@@ -628,13 +672,44 @@
 
             $scope.showAddRow = function() {
                 $scope.addNewSchema = !$scope.addNewSchema;
-            }
+            };
 
             $scope.cancelAddRow = function() {
                 $scope.addNewSchema = false;
                 $scope.fields.forEach(function(field) {
                     $scope.add[field] = '';
                 });
-            }
+            };
+
+
+            var curTH;
+            var startOffset;
+            var curIndex;
+            $scope.beResize = function(ev, index) {
+                var curEl = ev.currentTarget;
+
+                curTH = curEl.parentElement;
+                curIndex = index;
+                startOffset = curTH.offsetWidth - ev.pageX;
+            };
+
+            document.addEventListener('mousemove', function(e) {
+                if (curTH) {
+                    var offset = startOffset + e.pageX;
+
+                    if (offset < 60) {
+                        return false;
+                    }
+
+                    curTH.style.width = offset + 'px';
+                    $timeout(function() {
+                        $scope['width' + curIndex] = offset + 'px';
+                    });
+                }
+            });
+
+            document.addEventListener('mouseup', function() {
+                curTH = undefined;
+            });
         });
 })();

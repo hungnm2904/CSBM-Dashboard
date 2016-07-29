@@ -1,0 +1,24 @@
+<md-dialog aria-label="New Message" flex="40">
+    <form class="md-inline-form">
+        <md-toolbar class="md-warn">
+            <div class="md-toolbar-tools">
+                <div layout="column" layout-align="start start">
+                    <h2>Delete This Class ?</h2>
+                    <span style="font-size: 1.3rem">This action cannot be undone!</span>
+                </div>
+                <span flex></span>
+                <md-icon flex="10" hide-sm md-font-icon="icon-alert-octagon" style="font-size: 5rem"></md-icon>
+            </div>
+        </md-toolbar>
+        <md-dialog-actions>
+            <div layout="row" layout-align="center center">
+                <md-button ng-click="deleteClass()" class="send-button md-raised md-warn md-default-theme">
+                    Yes, delete
+                </md-button>
+                <md-button class="md-default md-raised" ng-click="closeDialog()">
+                    Don't
+                </md-button>
+            </div>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

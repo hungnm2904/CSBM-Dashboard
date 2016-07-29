@@ -88,18 +88,18 @@
                 });
             };
 
-            function getCurrentUser(callback) {
+            function getCurrentUser() {
                 if (_currentUser) {
-                    return callback(_currentUser);
+                    return _currentUser;
                 }
 
                 var user = $cookies.getObject('USER');
                 if (user) {
                     _setCurrentUser(user);
-                    return callback(_currentUser);
+                    return _currentUser;
                 }
 
-                return callback(null);;
+                return null;
             };
 
             function _setCurrentUser(user) {

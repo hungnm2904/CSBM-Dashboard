@@ -6,19 +6,71 @@
 
 .ms-responsive-be-table-wrapper {
     padding: 3px;
+    width: 100%;
+    overflow-x: auto;
     height: 90vh;
     overflow-y: hidden;
     overflow-x: scroll;
-    table-layout: fixed;
+    table {
+        border: none;
+        table-layout: fixed;
+        width: 0;
+        margin: 0;
+        th {
+            border: none;
+            position: relative;
+            color: #fff;
+            padding: 10px 8px !important;
+            .be-header {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                span {
+                    color: #a2a6b1;
+                    font-size: 1.1rem;
+                    margin-left: 0.5rem;
+                }
+            }
+            .be-grip {
+                top: 0;
+                right: -5px;
+                bottom: 0;
+                width: 8px;
+                position: absolute;
+                cursor: col-resize;
+                z-index: 10;
+                background: transparent;
+            }
+        }
+        td {
+            padding: 8px !important;
+            .be-cell {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                color: #0e69a1;
+            }
+            md-input-container {
+                width: 100%;
+                span {
+                    text-overflow: ellipsis;
+                }
+                a {
+                    span {
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                    }
+                }
+            }
+        }
+    }
     thead {
-        display: block;
         border: none !important;
+        white-space: nowrap;
     }
     tbody {
-        display: block;
         height: 81vh;
         overflow-y: scroll;
         overflow-x: hidden;
+        white-space: nowrap;
         tr:nth-child(even) {
             background-color: #EEEEEE;
         }
@@ -33,14 +85,6 @@
         min-width: 150px;
         width: 150px;
         padding-left: 24px;
-    }
-    th {
-        color: #fff;
-        padding: 10px 8px !important;
-    }
-    td {
-        padding: 0px 8px !important;
-        border-right: 1px solid rgba(0, 0, 0, 0.12);
     }
     th:nth-child(even) {
         background-color: rgb(114, 111, 133);

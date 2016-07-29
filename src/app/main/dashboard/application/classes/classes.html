@@ -45,6 +45,12 @@
                             <span>Update Field Name</span>
                         </md-button>
                     </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="showDeleteClassDialog($event)" aria-label="">
+                            <md-icon md-font-icon="icon-delete"></md-icon>
+                            <span>Delete This Class</span>
+                        </md-button>
+                    </md-menu-item>
                 </md-menu-content>
             </md-menu>
         </div>
@@ -53,14 +59,23 @@
     <!-- CONTENT -->
     <!-- <div class="content" md-background-bg> -->
     <div class="ms-responsive-be-table-wrapper">
-        <table class="dataTable row-border">
+        <table class="dataTable row-border" border="1">
             <thead>
                 <tr>
                     <!--                     <th>
                         <md-checkbox aria-label=" " ng-checked="isChecked()" md-indeterminate="isIndeterminate()" ng-click="toggleAll()"></md-checkbox>
                     </th> -->
-                    <th ng-repeat="(key, value) in schemas">
-                        <b>{{key}}</b>
+                    <th ng-repeat="(key, value) in schemas" class="no-select">
+                        <div class="be-header">
+                            {{key}} 
+                            <span ng-if="schemas[key].type != 'Pointer'">{{schemas[key].type}}</span>
+                            <span ng-if="schemas[key].type == 'Pointer'">
+                                {{schemas[key].type}} <{{schemas[key].targetClass}}>
+                            </span>
+                        </div>
+                        <div class="be-grip" ng-mousedown="beResize($event, $index)">
+                            &nbsp;
+                        </div>
                     </th>
                 </tr>
             </thead>
@@ -93,21 +108,24 @@
                     <!--                    <td>
                         <md-checkbox aria-label=" " ng-checked="exists(document.objectId)" ng-click="toggle(document.objectId)"></md-checkbox>
                     </td> -->
-                    <td ng-repeat="(key, value) in schemas">
-                        <div ng-if="!editable(key)">
-                            <md-input-container>
-                                <input aria-label=" " ng-model="document[key]" disabled />
-                            </md-input-container>
+                    <td ng-repeat="(key, value) in schemas" ng-style="{'width': width{{$index}} }" ng-dblclick="goEditMode((position + 1 + '') + ($index + ''), document[key])">
+                        <div ng-if="!editable(key)" class="be-cell">
+                            <span class="disable-text" ng-model="document[key]">{{document[key]}}</span>
                         </div>
                         <div ng-if="editable(key)">
                             <!-- String, Datetime, Number, Boolean Type -->
                             <div ng-if="schemas[key].type == 'String' || schemas[key].type == 'Date' || schemas[key].type == 'Number' || schemas[key].type == 'Boolean'">
-                                <md-input-container ng-if="!editMode[(position + 1 + '') + ($index + '')]" md-no-float class="md-block">
-                                    <input id="doc-input-{{(position + 1 + '') + ($index + '')}}" aria-label=" " ng-focus="goEditMode((position + 1 + '') + ($index + ''), document[key])" placeholder="undefined" name="schemavalue" type="text" ng-model="document[key]" />
-                                </md-input-container>
-                                <md-input-container ng-if="editMode[(position + 1 + '') + ($index + '')]" md-no-float class="md-block">
+                                <div ng-if="!editMode[(position + 1 + '') + ($index + '')]" class="be-cell">
+                                    <span ng-if="document[key]" id="doc-input-{{(position + 1 + '') + ($index + '')}}" name="schemavalue" ng-model="document[key]">
+                                        {{document[key]}}
+                                    </span>
+                                    <span class="undefined-text" ng-if="!document[key]" id="doc-input-{{(position + 1 + '') + ($index + '')}}" name="schemavalue" ng-model="document[key]">
+                                        (undefined)
+                                    </span>
+                                </div>
+                                <div ng-if="editMode[(position + 1 + '') + ($index + '')]" class="be-cell">
                                     <textarea id="doc-textarea-{{(position + 1 + '') + ($index + '')}}" aria-label=" " ng-blur="updateValues((position + 1 + '') + ($index + ''), document, key)" ng-model="document[key]" rows="10" autofocus></textarea>
-                                </md-input-container>
+                                </div>
                             </div>
                             <!-- / String, Datetime, Number, Boolean Type -->
                             <!-- File Type -->
@@ -123,7 +141,7 @@
                             <div ng-if="schemas[key].type == 'Pointer'">
                                 <md-input-container ng-if="editable(key)" md-no-float class="md-block ">
                                     <a href="" ng-click="gotoPointerClass(document[key].className, document[key].objectId)" layout="row" layout-align="center center" class="pt-5">
-                                        {{document[key].objectId}}
+                                        <span>{{document[key].objectId}}</span>
                                     </a>
                                 </md-input-container>
                             </div>

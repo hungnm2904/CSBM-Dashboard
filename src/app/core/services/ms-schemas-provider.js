@@ -34,7 +34,8 @@
                 deleteField: deleteField,
                 updateValues: updateValues,
                 changeFieldName: changeFieldName,
-                filter: filter
+                filter: filter,
+                deleteClass: deleteClass
             }
 
             return service;
@@ -238,7 +239,6 @@
                         callback(response);
                     });
                 });
-
             };
 
             function addDocument(className, _document) {
@@ -247,7 +247,7 @@
                         return schema.documents.push(_document);
                     }
                 });
-            }
+            };
 
             function createDocument(className, appId, data, callback) {
                 msMasterKeyService.getMasterKey(appId, function(error, results) {
@@ -566,6 +566,29 @@
                         });
 
                         // callback(null, response.data);
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            };
+
+            function deleteClass(className, callback) {
+                msMasterKeyService.getMasterKey(_appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'DELETE',
+                        url: _domain + '/csbm/schemas/' + className,
+                        headers: {
+                            'X-CSBM-Application-Id': _appId,
+                            'X-CSBM-Master-Key': masterKey,
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(function(response) {
+                        callback(null, response);
                     }, function(response) {
                         callback(response);
                     });
