@@ -1,119 +1,117 @@
 <div id="query" layout="row" layout-align="start stretch">
     <!-- Query Constrains -->
-    <div id="constrains" flex>
-        <div class="simple-table-container">
-            <div id="select-from">
-                <table class="simple" ms-responsive-table>
-                    <tbody>
-                        <tr>
-                            <td>Table</td>
-                            <td>
-                                <md-input-container>
-                                    <md-select ng-model="schema" ng-change="changeTable()">
-                                        <md-option ng-repeat="schema in schemas" ng-value="schema">
-                                            {{schema.className}}
+    <div id="constrains" flex="50" layout="column" layout-align="start stretch">
+        <div id="select-from" flex="40">
+            <table class="simple" ms-responsive-table>
+                <tbody>
+                    <tr>
+                        <td>Table</td>
+                        <td>
+                            <md-select ng-model="schema" ng-change="changeTable()" aria-label="table">
+                                <md-option ng-repeat="schema in schemas" ng-value="schema">
+                                    {{schema.className}}
+                                </md-option>
+                            </md-select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Fields</td>
+                        <td>
+                            <md-select ng-model="fields" data-md-container-class="selectdemoSelectHeader" multiple aria-label="fields">
+                                <md-optgroup>
+                                    <md-option ng-value="key" ng-repeat="(key, value) in schema.fields">{{key}}</md-option>
+                                </md-optgroup>
+                            </md-select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="where" flex="60">
+            <table class="simple" ms-responsive-table>
+                <tbody>
+                    <tr>
+                        <td>Conditions</td>
+                        <td>
+                            <div layout="row" ng-repeat="criteria in filterCriteria">
+                                <md-input-container flex="30">
+                                    <md-select ng-model="criteria.field" ng-change="addFilterCriteria('{{criteria.field}}')" placeholder="Field" aria-label="conditions">
+                                        <md-option ng-repeat="field in fields" ng-value="field">
+                                            {{field}}
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Fields</td>
-                            <td>
-                                <md-input-container>
-                                    <md-select ng-model="fields" data-md-container-class="selectdemoSelectHeader" multiple>
-                                        <md-optgroup>
-                                            <md-option ng-value="key" ng-repeat="(key, value) in schema.fields">{{key}}</md-option>
-                                        </md-optgroup>
-                                    </md-select>
-                                </md-input-container>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div id="where">
-                <table class="simple" ms-responsive-table>
-                    <tbody>
-                        <tr>
-                            <td>Conditions</td>
-                            <td>
-                                <div layout="row" ng-repeat="criteria in filterCriteria">
-                                    <md-input-container flex="30">
-                                        <md-select ng-model="criteria.field" ng-change="addFilterCriteria('{{criteria.field}}')" placeholder="Field">
-                                            <md-option ng-repeat="field in fields" ng-value="field">
-                                                {{field}}
+                                <!-- String Type -->
+                                <div ng-if="schema.fields[criteria.field].type === 'String'" layout="row" flex="65">
+                                    <!-- Operations -->
+                                    <md-input-container class="md-block" flex>
+                                        <md-select ng-model="criteria.operation" placeholder="Operation" aria-label="string operations">
+                                            <md-option ng-repeat="operation in stringFilterOperations" ng-value="operation">
+                                                {{operation}}
                                             </md-option>
                                         </md-select>
                                     </md-input-container>
-                                    <!-- String Type -->
-                                    <div ng-if="schema.fields[criteria.field].type === 'String'" layout="row" flex="65">
-                                        <!-- Operations -->
-                                        <md-input-container class="md-block" flex>
-                                            <md-select ng-model="criteria.operation" placeholder="Operation">
-                                                <md-option ng-repeat="operation in stringFilterOperations" ng-value="operation">
-                                                    {{operation}}
-                                                </md-option>
-                                            </md-select>
-                                        </md-input-container>
-                                        <!-- / Operations -->
-                                        <!-- Input -->
-                                        <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex md-no-float>
-                                            <input aria-label=" " type="text" ng-model="criteria.value" placeholder="Value" />
-                                        </md-input-container>
-                                        <!-- / Input -->
-                                    </div>
-                                    <!-- / String Type -->
-                                    <!-- Number Type -->
-                                    <div ng-if="schema.fields[criteria.field].type === 'Number'" layout="row" flex="65">
-                                        <!-- Operations -->
-                                        <md-input-container class="md-block" flex>
-                                            <md-select ng-model="criteria.operation">
-                                                <md-option ng-repeat="operation in numberFilterOperations" ng-value="operation" placeholder="Operation">
-                                                    {{operation}}
-                                                </md-option>
-                                            </md-select>
-                                        </md-input-container>
-                                        <!-- / Operations -->
-                                        <!-- Input -->
-                                        <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex md-no-float>
-                                            <label>Value</label>
-                                            <input aria-label=" " type="number" ng-model="criteria.value" placeholder="Value" />
-                                        </md-input-container>
-                                        <!-- / Input -->
-                                    </div>
-                                    <!-- / Number Type -->
-                                    <!-- Boolean Type -->
-                                    <div ng-if="schema.fields[criteria.field].type === 'Boolean'" layout="row" flex="65">
-                                        <!-- Operations -->
-                                        <md-input-container class="md-block" flex>
-                                            <md-select ng-model="criteria.operation">
-                                                <md-option ng-repeat="operation in booleanFilterOperations" ng-value="operation" placeholder="Operation">
-                                                    {{operation}}
-                                                </md-option>
-                                            </md-select>
-                                        </md-input-container>
-                                        <!-- / Operations -->
-                                        <!-- Input -->
-                                        <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex>
-                                            <md-select ng-model="criteria.value" placeholder="Value">
-                                                <md-option ng-repeat="boolean in [true, false]" ng-value="boolean">
-                                                    {{boolean}}
-                                                </md-option>
-                                            </md-select>
-                                        </md-input-container>
-                                        <!-- / Input -->
-                                    </div>
-                                    <!-- / Boolean Type -->
-                                    <md-input-container>
-                                        <md-icon ng-if="criteria.field" ng-click="deleteCriteria(criteria.field)" aria-label=" " md-font-icon="icon-minus-circle" class="clickable-icon" flex="5"></md-icon>
+                                    <!-- / Operations -->
+                                    <!-- Input -->
+                                    <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex md-no-float>
+                                        <input aria-label=" " type="text" ng-model="criteria.value" placeholder="Value" />
                                     </md-input-container>
+                                    <!-- / Input -->
                                 </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                                <!-- / String Type -->
+                                <!-- Number Type -->
+                                <div ng-if="schema.fields[criteria.field].type === 'Number'" layout="row" flex="65">
+                                    <!-- Operations -->
+                                    <md-input-container class="md-block" flex>
+                                        <md-select ng-model="criteria.operation" aria-label="number operations">
+                                            <md-option ng-repeat="operation in numberFilterOperations" ng-value="operation" placeholder="Operation">
+                                                {{operation}}
+                                            </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <!-- / Operations -->
+                                    <!-- Input -->
+                                    <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex md-no-float>
+                                        <label>Value</label>
+                                        <input aria-label=" " type="number" ng-model="criteria.value" placeholder="Value" />
+                                    </md-input-container>
+                                    <!-- / Input -->
+                                </div>
+                                <!-- / Number Type -->
+                                <!-- Boolean Type -->
+                                <div ng-if="schema.fields[criteria.field].type === 'Boolean'" layout="row" flex="65">
+                                    <!-- Operations -->
+                                    <md-input-container class="md-block" flex>
+                                        <md-select ng-model="criteria.operation" aria-label="boolean operations">
+                                            <md-option ng-repeat="operation in booleanFilterOperations" ng-value="operation" placeholder="Operation">
+                                                {{operation}}
+                                            </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <!-- / Operations -->
+                                    <!-- Input -->
+                                    <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex>
+                                        <md-select ng-model="criteria.value" placeholder="Value" aria-label="boolean operations">
+                                            <md-option ng-repeat="boolean in [true, false]" ng-value="boolean">
+                                                {{boolean}}
+                                            </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <!-- / Input -->
+                                </div>
+                                <!-- / Boolean Type -->
+                                <md-input-container>
+                                    <md-icon ng-if="criteria.field" ng-click="deleteCriteria(criteria.field)" aria-label=" " md-font-icon="icon-minus-circle" class="clickable-icon" flex="5"></md-icon>
+                                </md-input-container>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+        </div>
+        <div>
             <md-button ng-click="filter()" class="send-button md-accent md-raised" aria-label=" ">
                 Query
             </md-button>
@@ -121,14 +119,15 @@
     </div>
     <!-- / Query Constrains -->
     <!-- Framework Code -->
-    <div id="code" flex>
-        <div ng-cloak>
-            <md-content>
-                <md-tabs class="md-accent" md-align-tabs="bottom">
-                    <md-tab>
-                        <md-tab-label>Android</md-tab-label>
-                        <md-tab-body layout="row" layout-align="start">
-                            <pre><code id="android-code-string" class="java">BEQuery&lt;BEObject&gt; query = BEQuery.getQuery(<span class="string">"{{schema.className}}"</span>);
+    <div id="code" flex="50">
+        <md-button id="copy-code-btn" class="be-button-no-bg md-primary">
+            Copy
+        </md-button>
+        <md-tabs class="md-accent" md-align-tabs="bottom" md-selected="selectedIndex">
+            <md-tab>
+                <md-tab-label>Android</md-tab-label>
+                <md-tab-body layout="row" layout-align="start">
+                    <pre><code id="android-code-string" class="java">BEQuery&lt;BEObject&gt; query = BEQuery.getQuery(<span class="string">"{{schema.className}}"</span>);
 <span ng-repeat="criteria in filterCriteria" ng-if="criteria.field">query.{{getAndroidConstraints(criteria.operation)}}(<span class="string">"{{criteria.field}}"</span><span ng-if="criteria.value" class="string">, "{{criteria.value}}"</span>);<br/></span>query.findInBackground(<span class="keyword">new</span> FindCallback&lt;BEObject&gt;() {
     <span class="keyword">public void</span> <span class="function">done</span>(List&lt;BEObject&gt; objList, BEException e) {
         <span class="keyword">if</span> (e == <span class="keyword">null</span>) {
@@ -138,17 +137,15 @@
         }
     }
 });</code></pre>
-                            <div layout="row" layout-align="end">
-                                <md-button id="android-code-copy-button" class="be-button-no-bg md-primary">
-                                    Copy
-                                </md-button>
-                            </div>
-                        </md-tab-body>
-                    </md-tab>
-                    <md-tab>
-                        <md-tab-label>iOS-swift</md-tab-label>
-                        <md-tab-body layout="row" layout-align="start">
-                            <pre><code id="swift-code-string">let query = BEQuery(<span class="keyword">className</span>:<span class="string">"{{schema.className}}"</span>)
+                    <!--                     <md-button id="android-code-copy-button" class="be-button-no-bg md-primary">
+                        Copy
+                    </md-button> -->
+                </md-tab-body>
+            </md-tab>
+            <md-tab>
+                <md-tab-label>iOS-swift</md-tab-label>
+                <md-tab-body layout="row" layout-align="start">
+                    <pre><code id="swift-code-string">let query = BEQuery(<span class="keyword">className</span>:<span class="string">"{{schema.className}}"</span>)
 <span ng-repeat="criteria in filterCriteria" ng-if="criteria.field"><span ng-if="checkIfSwiftOperationWithValue(criteria.operation)">query.<span class="function">whereKey</span>(<span class="string">"{{criteria.field}}"</span>, <span class="function">{{getSwiftConstraints(criteria.operation)}}:</span><span class="string">"{{criteria.value}}"</span>)<br/></span><span ng-if="!checkIfSwiftOperationWithValue(criteria.operation)">query.<span class="function">{{getSwiftConstraints(criteria.operation)}}</span>(<span class="string">"{{criteria.field}}"</span>)<br/></span></span>query.<span class="function">findObjectsInBackgroundWithBlock</span> {
   (objects: [<span class="function">BEObject</span>]?, error: <span class="function">NSError</span>?) -> <span class="function">Void</span> <span class="keyword">in</span>
 
@@ -166,16 +163,12 @@
     <span class="function">print</span>(<span class="string">"Error: <span class="subst">\(error!) \(error!.userInfo)</span>"</span>)
   }
 }</code></pre>
-                            <div layout="row" layout-align="end">
-                                <md-button id="swift-code-copy-button" class="be-button-no-bg md-primary">
-                                    Copy
-                                </md-button>
-                            </div>
-                        </md-tab-body>
-                    </md-tab>
-                </md-tabs>
-            </md-content>
-        </div>
+                    <!--                     <md-button id="swift-code-copy-button" class="be-button-no-bg md-primary">
+                        Copy
+                    </md-button> -->
+                </md-tab-body>
+            </md-tab>
+        </md-tabs>
     </div>
     <!-- / Framework Code -->
 </div>
@@ -184,11 +177,15 @@
     <div class="table-title">
         {{schema.className}}
     </div>
-    <table class="simple" ms-responsive-table>
+    <table class="simple">
         <thead>
             <tr>
                 <th ng-repeat="field in fields">
                     <b>{{field}}</b>
+                    <span ng-if="schema.fields[field].type != 'Pointer'" class="field-type">{{schema.fields[field].type}}</span>
+                    <span ng-if="schema.fields[field].type == 'Pointer'" class="field-type">
+                        {{schema.fields[field].type}} <{{schema.fields[field].targetClass}}>
+                    </span>
                 </th>
             </tr>
         </thead>

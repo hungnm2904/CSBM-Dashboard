@@ -607,21 +607,24 @@
                                 objectIds.push(_document.objectId);
                             });
 
-                            msSchemasService.deleteDocuments(className, appId, objectIds,
+                            msSchemasService.deleteDocuments(documents, className, appId, objectIds,
                                 function(error, results) {
                                     if (error) {
                                         alert(error.statusText);
                                     } else {
-                                        documents.splice(0, documents.length);
-
-                                        msSchemasService.deleteClass(className,
-                                            function(error, results) {
-
-                                                console.log(results);
-                                            });
+                                        msSchemasService.deleteClass(appName, className, function(error, results) {
+                                            // console.log(results);
+                                        });
                                     }
+
                                     $mdDialog.hide();
                                 });
+                        } else {
+                            msSchemasService.deleteClass(appName, className, function(error, results) {
+                                // console.log(results);
+                            });
+
+                            $mdDialog.hide();
                         }
                     };
 

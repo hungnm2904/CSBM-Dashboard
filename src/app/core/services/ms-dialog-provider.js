@@ -47,7 +47,7 @@
         var appId = $stateParams.appId;
         var appName = $stateParams.appName;
         var className;
-        var appName;
+        // var appName;
 
         $scope.applications = [];
         $scope.applicationId;
@@ -138,7 +138,7 @@
                             var documents = JSON.parse(e.target.result);
                             var className = theFile.name.split('.')[0];
 
-                            msSchemasService.createDocuments(className, documents.results,
+                            msSchemasService.createDocuments(className, documents.results, appName,
                                 function(error, results) {
                                     if (error) {
                                         return console.log(error.statusText);

@@ -57,7 +57,9 @@
         $rootScope.$on('schemas-changed', function(event, args) {
             var appId = args.appId;
             var appName = args.appName;
-            msModeService.renderApplicationNavigations(appId, appName);
+            var className = args.className;
+            
+            msModeService.renderApplicationNavigations(appId, appName, className);
         });
     };
 })();

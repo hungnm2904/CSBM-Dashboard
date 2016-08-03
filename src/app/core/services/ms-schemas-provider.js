@@ -131,8 +131,6 @@
                                 return callback(error);
                             }
 
-                            console.log(results);
-
                             service.getSchemas(results.appId, appName, className, function(error, results) {
                                 if (error) {
                                     return callback(error);
@@ -217,15 +215,8 @@
                     var masterKey = results;
                     var url = _domain + '/csbm/classes/' + className + '?order=-createdAt';
 
-                    console.log(url);
-
-                    // if (limit != null && skip != null) {
-                    //     url = url + '?limit=' + limit + '&count=1&order=-updatedAt&skip=' + skip;
-                    // }
-
                     $http({
                         method: 'GET',
-                        // url: _domain + '/csbm/classes/' + className + '?limit=' + limit + '&count=1&order=-updatedAt&skip=' + skip,
                         url: url,
                         headers: {
                             'X-CSBM-Application-Id': appId,
@@ -279,8 +270,7 @@
                 });
             };
 
-            function createDocuments(className, documents, callback) {
-
+            function createDocuments(className, documents, appName, callback) {
                 var data = {
                     'requests': []
                 };
@@ -311,6 +301,21 @@
                         },
                         data: data
                     }).then(function(response) {
+                        $http({
+                            method: 'GET',
+                            url: _domain + '/csbm/schemas',
+                            headers: {
+                                'X-CSBM-Application-Id': _appId,
+                                'X-CSBM-Master-Key': masterKey
+                            }
+                        }).then(function(response) {
+                            setSchemas(_appId, appName, className, response.data.results);
+                            getDocuments(_appId, className, null, null, function(error, results) {});
+                            $rootScope.$broadcast('schemas-changed', { 'appId': _appId, 'appName': appName, 'className': className });
+                        }, function(response) {
+                            callback(response);
+                        });
+
                         callback(null, response);
                     }, function(response) {
                         callback(response);
@@ -330,24 +335,34 @@
                     });
                 });
 
-                $http({
-                    method: 'POST',
-                    url: _domain + '/csbm/batch',
-                    headers: {
-                        'X-CSBM-Application-Id': appId
-                    },
-                    data: data
-                }).then(function(response) {
-                    objectIds.forEach(function(objectId, index) {
-                        documents.some(function(_document, index) {
-                            if (_document.objectId === objectId) {
-                                documents.splice(index, 1);
-                            }
+                console.log(data);
+
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'POST',
+                        url: _domain + '/csbm/batch',
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey,
+                        },
+                        data: data
+                    }).then(function(response) {
+                        objectIds.forEach(function(objectId, index) {
+                            documents.some(function(_document, index) {
+                                if (_document.objectId === objectId) {
+                                    documents.splice(index, 1);
+                                }
+                            });
                         });
+                        callback(null, objectIds);
+                    }, function(response) {
+                        callback(response);
                     });
-                    callback(null, objectIds);
-                }, function(response) {
-                    callback(response);
                 });
             };
 
@@ -581,7 +596,7 @@
                 });
             };
 
-            function deleteClass(className, callback) {
+            function deleteClass(appName, className, callback) {
                 msMasterKeyService.getMasterKey(_appId, function(error, results) {
                     if (error) {
                         return callback(error);
@@ -597,6 +612,15 @@
                             'Content-Type': 'application/json'
                         }
                     }).then(function(response) {
+                        _schemas.some(function(schema, index) {
+                            if (schema.className === className) {
+                                _schemas.splice(index, 1);
+
+                                return true;
+                            }
+                        });
+
+                        $rootScope.$broadcast('schemas-changed', { 'appId': _appId, 'appName': appName, 'className': '_User' });
                         callback(null, response);
                     }, function(response) {
                         callback(response);

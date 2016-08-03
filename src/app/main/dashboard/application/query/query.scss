@@ -5,27 +5,32 @@
     font-size: 1.3rem;
     #select-from {
         border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-        max-height: 57%;
-        height: 57%;
         overflow: auto;
+        md-select {
+            margin: 0;
+        }
     }
     #where {
         border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-        max-height: 57%;
-        height: 57%;
         overflow: auto;
     }
     #constrains {
         border-right: 1px solid rgba(0, 0, 0, 0.12);
-        .simple-table-container {
-            height: 100%;
-        }
     }
     #code {
+        position: relative;
         border-right: 1px solid rgba(0, 0, 0, 0.12);
-        height: 100%;
+        .be-button-no-bg {
+            position: absolute;
+            bottom: 48px;
+            right: 10px;
+            z-index: 1000;
+        }
         md-tabs {
-            height: 60%;
+            min-height: 100% !important;
+            md-tabs-content-wrapper {
+                height: 100%;
+            }
             md-tab-content {
                 background: #110D11;
                 border-bottom: 1px solid rgba(0, 0, 0, 0.12);
@@ -34,16 +39,12 @@
             }
         }
         pre {
-            max-height: 45%;
-            height: 45%;
             background-color: #110D11!important;
             border-radius: 4px;
             word-wrap: normal;
-            margin: 0;
+            margin: 0 0 48px 0;
             code {
                 display: block;
-                max-height: 45%;
-                height: 45%;
                 overflow-x: auto;
                 padding: 1.5em;
                 margin: 0;
@@ -78,7 +79,7 @@
     tr {
         td {
             &:first-child {
-                width: 15%;
+                width: 20%;
             }
         }
     }
@@ -92,5 +93,19 @@
     .table-title {
         background: #fff;
         color: #000;
+    }
+    table {
+        border: 1px solid #e3e3ea;
+        th {
+            &:first-child {
+                padding-left: 8px;
+            }
+        }
+        td {
+            &:first-child {
+                padding-left: 8px;
+            }
+            border-right: 1px solid #e3e3ea;
+        }
     }
 }

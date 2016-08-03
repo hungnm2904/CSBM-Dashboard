@@ -7,16 +7,18 @@
             msUserService, msSchemasService, msApplicationService, msConfigService,
             msMasterKeyService) {
 
-            var copyToClipboardAndroid = new Clipboard('#android-code-copy-button', {
+            var copyToClipboardAndroid = new Clipboard('#copy-code-btn', {
                 text: function(trigger) {
-                    var copiedCodeString = document.getElementById('android-code-string').innerText;
-                    return copiedCodeString;
-                }
-            });
+                    var copiedCodeString = '';
+                    switch ($scope.selectedIndex) {
+                        case 0:
+                            copiedCodeString = document.getElementById('android-code-string').innerText;
+                            break;
+                        case 1:
+                            copiedCodeString = document.getElementById('swift-code-string').innerText;
+                            break;
+                    }
 
-            var copyToClipboardiOS = new Clipboard('#swift-code-copy-button', {
-                text: function(trigger) {
-                    var copiedCodeString = document.getElementById('swift-code-string').innerText;
                     return copiedCodeString;
                 }
             });
@@ -40,6 +42,8 @@
             $scope.numberFilterOperations = ['exists', 'does not exist', 'equals', 'does not equal', 'less than', 'less than or equal', 'greater than', 'greater than or equal'];
             $scope.datetimeFilterOperations = ['exists', 'does not exist', 'is before', 'is after'];
             $scope.booleanFilterOperations = ['exists', 'does not exist', 'equals'];
+            $scope.copyId = 'android-code-copy-button';
+            $scope.selectedIndex = 0;
 
             var getSchemas = function() {
                 msSchemasService.getSchemas(appId, appName, null, function(error, results) {
@@ -52,6 +56,7 @@
                     }
 
                     $scope.schemas = results;
+
                 });
             };
 
@@ -96,6 +101,9 @@
 
             var filter = function(filterCriteria) {
                 var fields = $scope.schema.fields;
+
+                console.log(fields);
+
                 var preparedCriteria = {};
                 filterCriteria.forEach(function(criteria, index) {
                     var field = criteria.field;
@@ -147,7 +155,6 @@
                         }
                     }).then(function(response) {
                         $scope.documents = response.data.results;
-                        console.log($scope.documents);
                     }, function(response) {
                         console.log(response);
                     });
