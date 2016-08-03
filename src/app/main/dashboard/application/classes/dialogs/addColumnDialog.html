@@ -2,32 +2,46 @@
     <form class="md-inline-form">
         <md-toolbar class="md-accent md-hue-2">
             <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-                <span class="title" translate="NEW COLUMN">New Column</span>
-                <md-button class="md-icon-button" ng-click="closeDialog()" aria-label="Close dialog" tranlate translate-aria-label="CLOSE DIALOG">
+                <span class="title">Add a new column</span>
+                <md-button class="md-icon-button" ng-click="closeDialog()" aria-label="Close dialog">
                     <md-icon md-font-icon="icon-close"></md-icon>
                 </md-button>
             </div>
         </md-toolbar>
         <md-dialog-content ms-scroll>
-            <div layout="row">
-                <md-input-container class="md-block" flex="60">
-                    <label>Column Name</label>
-                    <input ng-model="columnName" type="text">
-                </md-input-container>
-                <md-input-container flex=40>
-                    <label>Type</label>
-                    <md-select ng-model="type">
-                        <md-option ng-repeat="type in types" value="{{type}}">
-                            {{type}}
-                        </md-option>
-                    </md-select>
-                </md-input-container>
+            <div layout="column">
+                <div layout="row" layout-align="space-between center">
+                    <div>Type of this column</div>
+                    <md-input-container flex="50">
+                        <label>Type</label>
+                        <md-select ng-model="type">
+                            <md-option ng-repeat="type in types" value="{{type}}" ng-selected="$index == 0">
+                                {{type}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <md-divider></md-divider>
+                <div layout="row" layout-align="space-between center" class="mt-5">
+                    <div layout="column">
+                        <div>
+                            Name of this column
+                        </div>
+                        <div class="sub-title">
+                            Don’t use any special characters, and start your name with a letter.
+                        </div>
+                    </div>
+                    <md-input-container class="md-block no-error-check-input" flex="50">
+                        <label>Column Name</label>
+                        <input ng-model="columnName" type="text">
+                    </md-input-container>
+                </div>
             </div>
         </md-dialog-content>
         <md-dialog-actions layout="row" layout-align="space-between center">
             <div layout="row" layout-align="start center">
-                <md-button ng-click="addColumn()" class="send-button md-accent md-raised" aria-label="Create" translate="CREATE COLUMN" translate-attr-aria-label="CREATE COLUMN">
-                    CREATE COLUMN
+                <md-button ng-click="addColumn()" class="send-button md-accent md-raised" aria-label="Create" ng-disabled="!columnName || !type || !validColumnName()">
+                    Add column
                 </md-button>
             </div>
         </md-dialog-actions>

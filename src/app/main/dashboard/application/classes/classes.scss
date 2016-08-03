@@ -1,8 +1,11 @@
 #classes {
-    .ms-responsive-be-table-wrapper {
-        height: 75.6vh;
-        tbody {
-            height: 75.6vh;
+    .header {
+        .title {
+            color: #fff;
+            font-size: 2.3rem;
+        }
+        md-icon {
+            color: #fff;
         }
     }
 }

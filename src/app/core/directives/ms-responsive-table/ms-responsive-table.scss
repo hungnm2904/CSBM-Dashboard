@@ -5,12 +5,14 @@
 /*----------------------------------------------------------------*/
 
 .ms-responsive-be-table-wrapper {
-    padding: 3px;
-    width: 100%;
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    left: 0;
+    right: 0;
     overflow-x: auto;
-    height: 90vh;
     overflow-y: hidden;
-    overflow-x: scroll;
+    padding: 3px;
     table {
         border: none;
         table-layout: fixed;
@@ -20,8 +22,10 @@
             border: none;
             position: relative;
             color: #fff;
-            padding: 10px 8px !important;
+            padding: 0 !important;
+            font-weight: 500;
             .be-header {
+                padding: 8px !important;
                 text-overflow: ellipsis;
                 overflow: hidden;
                 span {
@@ -30,36 +34,40 @@
                     margin-left: 0.5rem;
                 }
             }
+            &.be-drag-over {
+                border: 2px dashed #000 !important;
+                .be-header {
+                    padding: 8px 6px !important;
+                }
+            }
             .be-grip {
                 top: 0;
                 right: -5px;
                 bottom: 0;
-                width: 8px;
+                width: 10px;
                 position: absolute;
                 cursor: col-resize;
                 z-index: 10;
                 background: transparent;
             }
+            md-checkbox {
+                margin-left: 4px;
+            }
         }
         td {
-            padding: 8px !important;
+            padding: 0 !important;
             .be-cell {
                 text-overflow: ellipsis;
                 overflow: hidden;
                 color: #0e69a1;
+                padding: 5px 8px;
             }
-            md-input-container {
+            md-input-container,
+            textarea,
+            input {
                 width: 100%;
-                span {
-                    text-overflow: ellipsis;
-                }
-                a {
-                    span {
-                        text-overflow: ellipsis;
-                        overflow: hidden;
-                    }
-                }
             }
+
         }
     }
     thead {
@@ -82,8 +90,8 @@
     }
     th:first-child,
     td:first-child {
-        min-width: 150px;
-        width: 150px;
+        min-width: 28px;
+        width: 28px;
         padding-left: 24px;
     }
     th:nth-child(even) {
@@ -98,6 +106,7 @@
     md-input-container {
         margin: 3px 0;
     }
+    md-checkbox {
+        margin: 3px;
+    }
 }
-
-#classes {}

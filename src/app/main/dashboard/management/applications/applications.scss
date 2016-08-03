@@ -1,7 +1,21 @@
 #applications {
-	.header {
-		height: 120px;
-		min-height: 120px;
-		max-height: 120px;
-	}
+    background: #EEEEEE;
+    .header {
+        height: 80px;
+        min-height: 80px;
+        max-height: 80px;
+    }
+    .be-app-card {
+        cursor: pointer;
+        .be-app-card-header {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+        .be-app-card-info {
+        	height: 100%;
+        	margin-left: 1px;
+        	border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+    }
 }

@@ -7,20 +7,11 @@
             <div class="title">Create an account</div>
             <form name="registerForm" novalidate>
                 <md-input-container class="md-block" md-no-float>
-                    <label>Username</label>
-                    <input name="username" ng-model="vm.username" required>
-                    <div ng-messages="registerForm.username.$error" role="alert">
-                        <div ng-message="required">
-                            <span>Username field is required</span>
-                        </div>
-                    </div>
-                </md-input-container>
-                <md-input-container class="md-block" md-no-float>
                     <label>Email</label>
-                    <input type="email" name="email" ng-model="vm.email" ng-pattern="/^.+@.+\..+$/" required>
+                    <input type="text" name="email" ng-model="vm.email" ng-pattern="/^.+@.+\..+$/" required>
                     <div ng-messages="registerForm.email.$error" role="alert" multiple>
                         <div ng-message="required">
-                            <span>Email field is required</span>
+                            <span>Email is required</span>
                         </div>
                         <div ng-message="pattern">
                             <span>Email must be a valid e-mail address</span>
@@ -32,16 +23,16 @@
                     <input type="password" name="password" ng-model="vm.password" required>
                     <div ng-messages="registerForm.password.$error" role="alert">
                         <div ng-message="required">
-                            <span>Password field is required</span>
+                            <span>Password is required</span>
                         </div>
                     </div>
                 </md-input-container>
                 <md-input-container class="md-block" md-no-float>
-                    <label>Password (Confirm)</label>
+                    <label>Confirm Password</label>
                     <input type="password" name="passwordConfirm" ng-model="vm.passwordConfirm" required>
                     <div ng-messages="registerForm.passwordConfirm.$error" role="alert">
                         <div ng-message="required">
-                            <span>Password (Confirm) field is required</span>
+                            <span>Confirm Password is required</span>
                         </div>
                     </div>
                 </md-input-container>
@@ -65,6 +56,9 @@
         <div class="register" layout="row" layout-xs="column" layout-align="center center">
             <span class="text" translate="REGISTER.ALREADY_HAVE">Already have an account?</span>&nbsp;
             <a class="link" ui-sref="app.pages_auth_login" translate="REGISTER.LOGIN">Log in</a>
+        </div>
+        <div layout="row" layout-sm="column" layout-align="center center">
+            <a class="link" ui-sref="app.pages_homescreen">Back to Homepage</a>
         </div>
     </div>
 </div>

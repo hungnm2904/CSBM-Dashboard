@@ -8,8 +8,7 @@
         .run(run);
 
     /** @ngInject */
-    function config() {
-    };
+    function config() {};
 
     function autofocus($timeout) {
         return {
@@ -17,6 +16,7 @@
             link: function($scope, $element) {
                 $timeout(function() {
                     $element[0].focus();
+                    $element[0].select();
                 });
             }
         }

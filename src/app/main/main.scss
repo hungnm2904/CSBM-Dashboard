@@ -69,13 +69,21 @@ md-select[multiple] {
 .be-button-no-bg {
     border: 1px solid rgb(3, 155, 229);
     color: rgb(3, 155, 229)!important;
+    &:disabled {
+        border: rgba(0, 0, 0, 0.38);
+        color: rgba(0, 0, 0, 0.38)!important;
+    }
 }
 
 .page-layout.simple.fullwidth {
     .header {
-        height: 15vh;
-        min-height: 15vh;
-        max-height: 15vh;
+        height: 5%;
+        min-height: 5%;
+        max-height: 5%;
+        padding: 4px 16px !important;
+        background: #353446;
+        line-height: normal;
+        margin-left: 3px;
     }
 }
 
@@ -122,4 +130,26 @@ pre {
 
 .disable-text {
     color: rgba(0, 0, 0, 0.38);
+}
+
+.ellipsis-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.sub-title,
+.title-info {
+    color: #757985;
+    font-size: 1.2rem;
+}
+
+.title-info {
+    font-size: 1.4rem;
+    margin-left: 6px;
+}
+
+.no-error-check-input {
+    .md-errors-spacer {
+        min-height: 0;
+    }
 }

@@ -215,11 +215,13 @@
                     }
 
                     var masterKey = results;
-                    var url = _domain + '/csbm/classes/' + className;
+                    var url = _domain + '/csbm/classes/' + className + '?order=-createdAt';
 
-                    if (limit != null && skip != null) {
-                        url = url + '?limit=' + limit + '&count=1&order=-updatedAt&skip=' + skip;
-                    }
+                    console.log(url);
+
+                    // if (limit != null && skip != null) {
+                    //     url = url + '?limit=' + limit + '&count=1&order=-updatedAt&skip=' + skip;
+                    // }
 
                     $http({
                         method: 'GET',
@@ -316,7 +318,7 @@
                 });
             }
 
-            function deleteDocuments(className, appId, objectIds, callback) {
+            function deleteDocuments(documents, className, appId, objectIds, callback) {
                 var data = {
                     'requests': []
                 };
@@ -336,6 +338,13 @@
                     },
                     data: data
                 }).then(function(response) {
+                    objectIds.forEach(function(objectId, index) {
+                        documents.some(function(_document, index) {
+                            if (_document.objectId === objectId) {
+                                documents.splice(index, 1);
+                            }
+                        });
+                    });
                     callback(null, objectIds);
                 }, function(response) {
                     callback(response);

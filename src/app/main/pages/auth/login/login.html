@@ -7,11 +7,11 @@
             <div class="title">Log into your Dashboard</div>
             <form name="loginForm" novalidate>
                 <md-input-container class="md-block" md-no-float>
-                    <label>Username</label>
-                    <input type="text" name="username" ng-model="vm.username" required>
-                    <div ng-messages="loginForm.username.$error" role="alert" multiple>
+                    <label>Email</label>
+                    <input type="text" name="email" ng-model="vm.email" required>
+                    <div ng-messages="loginForm.email.$error" role="alert" multiple>
                         <div ng-message="required">
-                            <span>User Name field is required</span>
+                            <span>Email is required</span>
                         </div>
                     </div>
                 </md-input-container>
@@ -20,7 +20,7 @@
                     <input type="password" name="password" ng-model="vm.password" required>
                     <div ng-messages="loginForm.password.$error" role="alert">
                         <div ng-message="required">
-                            <span>Password field is required</span>
+                            <span>Password is required</span>
                         </div>
                     </div>
                 </md-input-container>
@@ -36,10 +36,10 @@
         </md-button>
         <div class="register" layout="row" layout-sm="column" layout-align="center center">
             <span class="text" translate="LOGIN.DONT_HAVE_ACCOUNT">Don't have an account?</span>&nbsp;
-            <a class="link" ui-sref="app.pages_auth_register" translate="LOGIN.CREATE_ACCOUNT">Create an account</a>
+            <a class="link" ui-sref="app.pages_auth_register" translate="LOGIN.CREATE_ACCOUNT">Create new account</a>
         </div>
         <div layout="row" layout-sm="column" layout-align="center center">
-            <a class="link" ui-sref="app.pages_homescreen" >Back to home</a>
+            <a class="link" ui-sref="app.pages_homescreen" >Back to Homepage</a>
         </div>
     </div>
 </div>

@@ -2,15 +2,16 @@
     <!-- HEADER -->
     <div class="header md-accent-bg" layout="row" layout-align="space-between">
         <div layout="column" layout-align="center start">
-            <div class="title">{{title}}</div>
+            <div class="sub-title">Class</div>
+            <div class="title">{{title}} <span class="title-info">{{documents.length}} objects</span></div>
         </div>
         <div layout="row" layout-align="start center">
-            <md-button aria-label="" class="md-primary md-raised" ng-click="showFilterDialog($event)">
+            <md-button aria-label="" ng-click="showFilterDialog($event)">
                 <md-icon md-font-icon="icon-filter"></md-icon>
                 <span>Filter</span>
             </md-button>
             <md-menu id="projects-menu">
-                <md-button aria-label="" class="md-primary md-raised" ng-click="$mdOpenMenu()" md-position-mode="target-right target">
+                <md-button aria-label="" ng-click="$mdOpenMenu()" md-position-mode="target-right target">
                     <span>Edit</span>
                     <md-icon md-font-icon="icon-dots-horizontal"></md-icon>
                 </md-button>
@@ -22,7 +23,7 @@
                         </md-button>
                     </md-menu-item>
                     <md-menu-item>
-                        <md-button ng-click="showAddRow()" aria-label="">
+                        <md-button ng-click="addRow()" aria-label="">
                             <md-icon md-font-icon="icon-plus"></md-icon>
                             <span>Add new row</span>
                         </md-button>
@@ -62,12 +63,12 @@
         <table class="dataTable row-border" border="1">
             <thead>
                 <tr>
-                    <!--                     <th>
+                    <th>
                         <md-checkbox aria-label=" " ng-checked="isChecked()" md-indeterminate="isIndeterminate()" ng-click="toggleAll()"></md-checkbox>
-                    </th> -->
+                    </th>
                     <th ng-repeat="(key, value) in schemas" class="no-select">
-                        <div class="be-header">
-                            {{key}} 
+                        <div id="header_{{$index}}" class="be-header" draggable="true" ondragstart="angular.element(this).scope().handleDragStart(event)" ondragend="angular.element(this).scope().handleDragEnd(event)" ondragover="angular.element(this).scope().handleDragOver(event)" ondragenter="angular.element(this).scope().handleDragEnter(event)" ondragleave="angular.element(this).scope().handleDragLeave(event)" ondrop="angular.element(this).scope().handleDrop(event)">
+                            {{key}}
                             <span ng-if="schemas[key].type != 'Pointer'">{{schemas[key].type}}</span>
                             <span ng-if="schemas[key].type == 'Pointer'">
                                 {{schemas[key].type}} <{{schemas[key].targetClass}}>
@@ -80,7 +81,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-if="addNewSchema">
+<!--                 <tr ng-if="addNewSchema">
+                    <td></td>
                     <td></td>
                     <td>
                         <md-button aria-label="" class="md-raised md-accent" ng-click="addRow()">
@@ -103,34 +105,76 @@
                             <label for="input-file-id" class="md-button md-raised md-primary">Choose File</label>
                         </div>
                     </td>
-                </tr>
+                </tr> -->
                 <tr ng-repeat="document in documents" ng-init="position = $index">
-                    <!--                    <td>
+                    <td>
                         <md-checkbox aria-label=" " ng-checked="exists(document.objectId)" ng-click="toggle(document.objectId)"></md-checkbox>
-                    </td> -->
-                    <td ng-repeat="(key, value) in schemas" ng-style="{'width': width{{$index}} }" ng-dblclick="goEditMode((position + 1 + '') + ($index + ''), document[key])">
+                    </td>
+                    <td ng-repeat="(key, value) in schemas" id="cell_{{(position + 1 + '') + ($index + '')}}" class="cell_{{$index}}" ng-dblclick="goEditMode((position + 1 + '') + ($index + ''), document, key)">
                         <div ng-if="!editable(key)" class="be-cell">
                             <span class="disable-text" ng-model="document[key]">{{document[key]}}</span>
                         </div>
-                        <div ng-if="editable(key)">
+                        <div ng-if="editable(key)" class="be-cell">
                             <!-- String, Datetime, Number, Boolean Type -->
-                            <div ng-if="schemas[key].type == 'String' || schemas[key].type == 'Date' || schemas[key].type == 'Number' || schemas[key].type == 'Boolean'">
-                                <div ng-if="!editMode[(position + 1 + '') + ($index + '')]" class="be-cell">
-                                    <span ng-if="document[key]" id="doc-input-{{(position + 1 + '') + ($index + '')}}" name="schemavalue" ng-model="document[key]">
+                            <div ng-if="checkFieldType(key, 'String') || checkFieldType(key, 'Date') || checkFieldType(key, 'Number') || checkFieldType(key, 'Boolean') || checkFieldType(key, 'Array')">
+                                <div ng-if="!editMode[(position + 1 + '') + ($index + '')]" class="ellipsis-text">
+                                    <span ng-if="document[key]" name="schemavalue" ng-model="document[key]">
                                         {{document[key]}}
                                     </span>
                                     <span class="undefined-text" ng-if="!document[key]" id="doc-input-{{(position + 1 + '') + ($index + '')}}" name="schemavalue" ng-model="document[key]">
                                         (undefined)
                                     </span>
                                 </div>
-                                <div ng-if="editMode[(position + 1 + '') + ($index + '')]" class="be-cell">
-                                    <textarea id="doc-textarea-{{(position + 1 + '') + ($index + '')}}" aria-label=" " ng-blur="updateValues((position + 1 + '') + ($index + ''), document, key)" ng-model="document[key]" rows="10" autofocus></textarea>
+                                <div ng-if="editMode[(position + 1 + '') + ($index + '')]" class="ellipsis-text">
+                                    <div ng-form name="vm.editForm" onkeydown="angular.element(this).scope().updateOnEnter(event)">
+                                        <!-- Edit for String Type -->
+                                        <div ng-if="checkFieldType(key, 'String')">
+                                            <textarea aria-label=" " ng-model="document[key]" rows="3" autofocus></textarea>
+                                        </div>
+                                        <!-- / Edit for String Type -->
+                                        <!-- Edit for Number Type -->
+                                        <div ng-if="checkFieldType(key, 'Number')">
+                                            <input type="number" aria-label=" " ng-model="document[key]" autofocus>
+                                        </div>
+                                        <!-- / Edit for Number Type -->
+                                        <!-- Edit for Array Type -->
+                                        <div ng-if="checkFieldType(key, 'Array')">
+                                            <textarea aria-label=" " ng-model="document[key]" rows="3" autofocus></textarea>
+                                        </div>
+                                        <!-- / Edit for Array Type -->
+                                    </div>
                                 </div>
                             </div>
                             <!-- / String, Datetime, Number, Boolean Type -->
+                            <!-- GeoPoint Type -->
+                            <div ng-if="checkFieldType(key, 'GeoPoint')">
+                                <div ng-if="!editMode[(position + 1 + '') + ($index + '')]">
+                                    <div ng-if="!document[key]" class="ellipsis-text">
+                                        <span class="undefined-text" ng-model="document[key]">
+                                            (undefined)
+                                        </span>
+                                    </div>
+                                    <div ng-if="document[key]" class="ellipsis-text">
+                                        <span>
+                                            ({{document[key].latitude}}, {{document[key].longitude}})
+                                        </span>
+                                    </div>
+                                </div>
+                                <div ng-if="editMode[(position + 1 + '') + ($index + '')]">
+                                    <div layout="row" ng-form name="vm.editForm" onkeydown="angular.element(this).scope().updateOnEnter(event)">
+                                        <md-input-container md-no-float class="no-error-check-input">
+                                            <input ng-model="document[key].latitude" type="text" name="latitude" placeholder="Latitude" class="ellipsis-text" autofocus>
+                                        </md-input-container>
+                                        <md-input-container md-no-float class="no-error-check-input">
+                                            <input ng-model="document[key].longitude" type="text" name="longitude" placeholder="Longitude" class="ellipsis-text">
+                                        </md-input-container>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / GeoPoint Type -->
                             <!-- File Type -->
-                            <div ng-if="schemas[key].type == 'File'">
-                                <md-input-container ng-if="editable(key)" md-no-float class="md-block ">
+                            <div ng-if="checkFieldType(key, 'File')">
+                                <md-input-container md-no-float class="md-block ">
                                     <a ng-href="{{document[key].url}}" target="_blank" layout="row" layout-align="center center" class="pt-5">
                                         {{getFileType(document[key].name)}}
                                     </a>
@@ -138,22 +182,19 @@
                             </div>
                             <!-- / File Type -->
                             <!-- Pointer Type -->
-                            <div ng-if="schemas[key].type == 'Pointer'">
+                            <div ng-if="checkFieldType(key, 'Pointer')">
                                 <md-input-container ng-if="editable(key)" md-no-float class="md-block ">
-                                    <a href="" ng-click="gotoPointerClass(document[key].className, document[key].objectId)" layout="row" layout-align="center center" class="pt-5">
+                                    <a href="javascript:void(0)" ng-click="gotoPointerClass(document[key].className, document[key].objectId)" layout="row" layout-align="center center" class="pt-5">
                                         <span>{{document[key].objectId}}</span>
                                     </a>
                                 </md-input-container>
                             </div>
                             <!-- / Pointer Type -->
                         </div>
-                        <!-- <md-button aria-label=" " ng-if="editable(key) && schemas[key].type=='File' " ng-href="{{document[key].url}} " target="_blank " style="margin-bottom: 20px ">{{getFileType(document[key].name)}}</md-button> -->
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <!-- <uib-pagination total-items="totalItems " ng-model="currentPage " max-size="5 " boundary-links="true " items-per-page="numPerPage " class="pagination-sm "></uib-pagination> -->
-    <!-- </div> -->
     <!-- / CONTENT -->
 </div>

@@ -4,13 +4,14 @@
     angular
         .module('app.application.classes')
         .controller('ClassesController', function($scope, $http, $cookies, $window, $state,
-            $stateParams, $mdDialog, $document, $rootScope, $timeout, msSchemasService, msDialogService,
-            msToastService, msUserService, msApplicationService) {
+            $stateParams, $mdDialog, $document, $rootScope, $timeout, msSchemasService,
+            msDialogService, msToastService, msUserService, msApplicationService) {
 
             if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');
             }
 
+            var vm = this;
             var appId = $stateParams.appId;
             var appName = $stateParams.appName;
             var className = $stateParams.className;
@@ -25,6 +26,7 @@
             var imageExtension = 'png,jpg';
             var audioExtension = 'mp3,mp4';
             var textExtension = 'txt';
+            var editing = false;
 
             // $scope.className = className;
             $scope.columnName = '';
@@ -36,7 +38,6 @@
             $scope.editMode = [];
             $scope.updatedValue = '';
             $scope.jsFileImport;
-            $scope.types = ['String', 'Number', 'Boolean', 'Array', 'File'];
 
             var skip;
             $scope.numPerPage = 10;
@@ -53,9 +54,6 @@
 
                     appId = msSchemasService.getAppId();
                     $scope.schemas = results.fields;
-
-                    console.log($scope.schemas);
-
                     var fields = Object.getOwnPropertyNames(results.fields);
                     $scope.allFields = [].concat(fields);
                     fields.splice(0, 3);
@@ -73,6 +71,7 @@
                             }
 
                             $scope.documents = results.documents;
+
                             $scope.documents.forEach(function(_document, index) {
                                 objectIdList.push(_document.objectId);
                             });
@@ -93,35 +92,37 @@
                 filterCriteria.forEach(function(criteria, index) {
                     var field = criteria.field;
 
-                    convertToType(criteria.value, $scope.schemas[field].type,
-                        function(error, results) {
+                    if (field) {
+                        convertToType(criteria.value, $scope.schemas[field].type,
+                            function(error, results) {
 
-                            if (error) {
-                                console.log(error);
-                            }
+                                if (error) {
+                                    console.log(error);
+                                }
 
-                            var value = results;
+                                var value = results;
 
-                            if (criteria.operation === 'exists') {
-                                preparedCriteria[field] = {
-                                    '$exists': true
+                                if (criteria.operation === 'exists') {
+                                    preparedCriteria[field] = {
+                                        '$exists': true
+                                    }
+                                } else if (criteria.operation === 'does not exist') {
+                                    preparedCriteria[field] = {
+                                        '$exists': false
+                                    }
+                                } else if (criteria.operation === 'does not equal') {
+                                    preparedCriteria[field] = {
+                                        '$ne': value
+                                    }
+                                } else if (criteria.operation === 'starts with') {
+                                    preparedCriteria[field] = {
+                                        '$regex': '^' + value
+                                    }
+                                } else {
+                                    preparedCriteria[criteria.field] = value;
                                 }
-                            } else if (criteria.operation === 'does not exist') {
-                                preparedCriteria[field] = {
-                                    '$exists': false
-                                }
-                            } else if (criteria.operation === 'does not equal') {
-                                preparedCriteria[field] = {
-                                    '$ne': value
-                                }
-                            } else if (criteria.operation === 'starts with') {
-                                preparedCriteria[field] = {
-                                    '$regex': '^' + value
-                                }
-                            } else {
-                                preparedCriteria[criteria.field] = value;
-                            }
-                        });
+                            });
+                    }
                 });
 
                 msSchemasService.filter(appId, className, preparedCriteria, function(error, results) {
@@ -144,6 +145,7 @@
                         }
 
                         $scope.documents = results
+
                         $scope.documents.forEach(function(_document) {
                             objectIdList.push(_document.objectId);
                         });
@@ -167,52 +169,121 @@
 
             var convertToType = function(value, type, callback) {
                 if (value) {
-                    if (type === 'Number') {
-                        if (!Number(value) && value) {
-                            return callback(true, null);
-                        } else {
-                            value = Number(value);
-                        }
+                    switch (type) {
+                        case 'Number':
+                            if (!Number(value)) {
+                                return callback(true, null);
+                            } else {
+                                value = Number(value);
+                            }
+                            break;
+                        case 'Array':
+                            try {
+                                value = JSON.parse(value);
+                            } catch (e) {
+                                return callback(true, null);
+                            }
+                            break;
+                        case 'Boolean':
+                            value = (value.toLowerCase() === 'true');
+                            break;
+                        case 'GeoPoint':
+                            var lat = value.latitude;
+                            var long = value.longitude
+                            if (!Number(lat) || !Number(long)) {
+                                return callback(true, null);
+                            } else {
+                                value.latitude = Number(lat);
+                                value.longitude = Number(long);
+                            }
+                            break;
                     }
-
-                    if (type === 'Array' && value.length > 0) {
-
-                        value = value.split(',');
-                        value = value.map(function(v) {
-                            return v.trim();
-                        });
-                    }
-
-                    if (type === 'Boolean') {
-                        value = (value.toLowerCase() === 'true');
+                } else if (type === 'Number') {
+                    if ($scope.updatingObject.updatedValue) {
+                        return callback(null, $scope.updatingObject.updatedValue);
                     }
                 }
 
                 return callback(null, value);
             };
 
-            var toggleEditMode = function(index) {
-                $scope.editMode[index] = !$scope.editMode[index];
-            };
+            // var toggleEditMode = function(index) {
+            //     $scope.editMode[index] = !$scope.editMode[index];
+            // };
 
-            var showDialog = function(ev, path) {
-                $mdDialog.show({
-                    controller: 'ClassesController',
-                    controllerAs: 'vm',
-                    templateUrl: path,
-                    parent: angular.element($document.body),
-                    targetEvent: ev,
-                    clickOutsideToClose: false
-                });
+            $scope.checkFieldType = function(fieldName, fieldType) {
+                return $scope.schemas[fieldName].type === fieldType;
             };
 
             $scope.closeDialog = function() {
                 $mdDialog.hide();
             };
 
-            $scope.goEditMode = function(index, value) {
-                $scope.updatedValue = value;
-                toggleEditMode(index);
+            $scope.goEditMode = function(index, _document, key) {
+                if ($scope.schemas[key].type === 'Array') {
+                    _document[key] = JSON.stringify(_document[key]);
+                }
+
+                $scope.updatingObject = {
+                    index: index,
+                    document: _document,
+                    field: key,
+                    updatedValue: _document[key]
+                };
+                $scope.editMode[index] = true;
+                editing = true;
+            };
+
+            document.addEventListener('click', function(e) {
+                if (editing) {
+                    var curTarget = getParentByTagName(e.target, 'td');
+                    if (!curTarget || (curTarget.id.split('_')[1] !== $scope.updatingObject.index)) {
+                        $scope.updateValues($scope.updatingObject.index,
+                            $scope.updatingObject.document, $scope.updatingObject.field,
+                            $scope.updatingObject.updatedValue);
+                    }
+                }
+            });
+
+            $scope.updateValues = function(index, _document, field, updatedValue) {
+                $timeout(function() {
+                    $scope.editMode[index] = false;
+                    editing = false;
+                });
+
+                if (vm.editForm.$dirty) {
+                    var objectId = _document.objectId;
+                    var value = _document[field];
+                    var type = $scope.schemas[field].type;
+                    var data = {};
+                    convertToType(value, type, function(error, results) {
+                        if (error) {
+                            var titleMessage = 'Add New Row Fail';
+                            var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
+                            msDialogService.showAlertDialog(titleMessage, errorMessage);
+                            if ($scope.schemas[field].type === 'Array') {
+                                _document[field] = JSON.parse(updatedValue);
+                            } else {
+                                _document[field] = updatedValue;
+                            }
+                        } else {
+                            data[field] = results;
+                            msSchemasService.updateValues(className, appId, objectId, field, data,
+                                function(results) {});
+                        }
+                    });
+                } else if ($scope.schemas[field].type === 'Array') {
+                    _document[field] = JSON.parse(_document[field]);
+                }
+
+            };
+
+            $scope.updateOnEnter = function(e) {
+                if (e.keyCode === 13) {
+                    $scope.updateValues($scope.updatingObject.index,
+                        $scope.updatingObject.document, $scope.updatingObject.field,
+                        $scope.updatingObject.updatedValue);
+                }
             };
 
             $scope.getFileType = function(fileName) {
@@ -265,22 +336,6 @@
                 $state.go('app.application_classes_' + _className, { 'appId': appId, 'className': _className, 'objectId': _objectId });
             };
 
-            // $scope.$watch('currentPage + numPerPage', function() {
-            //     pagination();
-            //     checked = [];
-            // });
-
-            // $rootScope.$on('fields-change', function(event, args) {
-            //     var fields = Object.getOwnPropertyNames(args.fields);
-            //     $scope.allFields = [].concat(fields);
-            //     fields.splice(0, 3)
-            //     $scope.fields = [].concat(fields);
-            //     $scope.fields_add = [].concat(fields);
-            //     // $scope.fields_add.splice(0, 3);
-
-            //     pagination();
-            // });
-
             var uneditableFileds = ['objectId', 'createdAt', 'updatedAt'];
             $scope.editable = function(field) {
                 return uneditableFileds.indexOf(field) === -1;
@@ -297,7 +352,7 @@
                     templateUrl: 'app/main/dashboard/application/classes/dialogs/filterDialog.html',
                     parent: angular.element($document.body),
                     targetEvent: ev,
-                    clickOutsideToClose: false,
+                    clickOutsideToClose: true,
                     locals: {
                         schemas: $scope.schemas,
                         appId: appId,
@@ -327,8 +382,8 @@
 
                     if (!$scope.filterCriteria || $scope.filterCriteria.length == 0) {
                         $scope.filterCriteria = [{
-                            field: allFields[0],
-                            operation: $scope.stringFilterOperations[0],
+                            field: '',
+                            operation: 'exists',
                         }];
                     }
 
@@ -344,11 +399,13 @@
                         $scope.filterCriteria.splice(0, $scope.filterCriteria.length);
                     }
 
-                    $scope.addFilterCriteria = function() {
-                        $scope.filterCriteria.push({
-                            field: allFields[0],
-                            operation: $scope.stringFilterOperations[0],
-                        });
+                    $scope.addFilterCriteria = function(field) {
+                        if (!field) {
+                            $scope.filterCriteria.push({
+                                field: '',
+                                operation: 'exists',
+                            });
+                        }
                     }
 
                     $scope.deleteCriteria = function(field) {
@@ -369,26 +426,47 @@
 
 
             $scope.showAddColumnDialog = function(ev) {
-                showDialog(ev, 'app/main/dashboard/application/classes/dialogs/addColumnDialog.html');
-            };
+                $mdDialog.show({
+                    controller: AddColumnDialogController,
+                    controllerAs: 'vm',
+                    templateUrl: 'app/main/dashboard/application/classes/dialogs/addColumnDialog.html',
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false,
+                    escapeToClose: false,
+                    locals: {
+                        schemas: $scope.schemas
+                    }
+                });
 
-            $scope.addColumn = function() {
-                if (!$scope.columnName || !$scope.type) {
-                    msDialogService.showAlertDialog('Add New Column Fail', 'Name and Type not allow null');
-                } else {
-                    msSchemasService.addField(className, appId, $scope.columnName, $scope.type,
-                        function(error, results) {
-                            if (error) {
-                                if (error.status === 401) {
-                                    return $state.go('app.pages_auth_login');
+                function AddColumnDialogController($scope, schemas) {
+                    var pattern = new RegExp('^[a-zA-Z0-9]+[a-zA-Z0-9_]*$');
+
+                    $scope.schemas = schemas;
+                    $scope.types = ['String', 'Number', 'Boolean', 'Array', 'File', 'GeoPoint'];
+
+                    $scope.closeDialog = function() {
+                        $mdDialog.hide();
+                    };
+
+                    $scope.validColumnName = function() {
+                        return pattern.test($scope.columnName);
+                    };
+
+                    $scope.addColumn = function() {
+                        msSchemasService.addField(className, appId, $scope.columnName, $scope.type,
+                            function(error, results) {
+                                if (error) {
+                                    if (error.status === 401) {
+                                        return $state.go('app.pages_auth_login');
+                                    }
+
+                                    return alert(error.statusText);
                                 }
-
-                                return alert(error.statusText);
-                                // msDialogService.showAlertDialog('Add New Column Fail', 'Column exists');
-                            }
-                        });
-                    $scope.closeDialog();
-                }
+                            });
+                        $scope.closeDialog();
+                    };
+                };
             };
 
             $scope.showDeleteColumnDialog = function(ev) {
@@ -550,26 +628,6 @@
                 };
             };
 
-            $scope.updateValues = function(index, _document, field) {
-                toggleEditMode(index);
-                var objectId = _document.objectId;
-                var value = _document[field];
-                var type = $scope.schemas[field].type;
-                var data = {};
-                convertToType(value, type, function(error, results) {
-                    if (error) {
-                        var titleMessage = 'Add New Row Fail';
-                        var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
-                        msDialogService.showAlertDialog(titleMessage, errorMessage);
-                        _document[field] = $scope.updatedValue;
-                    } else {
-                        data[field] = results;
-                        msSchemasService.updateValues(className, appId, objectId, field, data,
-                            function(results) {});
-                    }
-                });
-            };
-
             $scope.toggle = function(objectId) {
                 var index = checked.indexOf(objectId);
 
@@ -616,7 +674,7 @@
                     .cancel('No');
 
                 $mdDialog.show(confirm).then(function() {
-                    msSchemasService.deleteDocuments(className, appId, checked,
+                    msSchemasService.deleteDocuments($scope.documents, className, appId, checked,
                         function(error, results) {
                             if (error) {
                                 return alert(error.statusText);
@@ -630,44 +688,49 @@
 
             $scope.addRow = function() {
                 var newSchema = {};
-                var checkType = true;
-                var errorMessage;
-                var titleMessage;
+                // var checkType = true;
+                // var errorMessage;
+                // var titleMessage;
 
-                for (var field in $scope.schemas) {
-                    if (field != 'objectId' && field != 'createdAt' &&
-                        field != 'updatedAt') {
+                // for (var field in $scope.schemas) {
+                //     if (field != 'objectId' && field != 'createdAt' &&
+                //         field != 'updatedAt') {
 
-                        var value = $scope.add[field];
-                        var type = $scope.schemas[field].type;
+                //         var value = $scope.add[field];
+                //         var type = $scope.schemas[field].type;
 
-                        convertToType(value, type, function(error, results) {
-                            if (error) {
-                                checkType = false;
-                                var titleMessage = 'Add New Row Fail';
-                                var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
-                                return msDialogService.showAlertDialog(titleMessage, errorMessage);
-                            }
+                //         convertToType(value, type, function(error, results) {
+                //             if (error) {
+                //                 checkType = false;
+                //                 var titleMessage = 'Add New Row Fail';
+                //                 var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
+                //                 return msDialogService.showAlertDialog(titleMessage, errorMessage);
+                //             }
 
-                            newSchema[field] = results;
-                        });
+                //             newSchema[field] = results;
+                //         });
+                //     }
+                // };
+
+                // if (checkType) {
+
+                // console.log($scope.schemas);
+                for (var schema in $scope.schemas) {
+                    if (editable(schema)) {
+                        newSchema[schema] = undefined;
                     }
-                };
-
-                if (checkType) {
-                    msSchemasService.createDocument(className, appId, newSchema,
-                        function(error, results) {
-                            if (error) {
-                                return alert(error.statusText);
-                            }
-                            $scope.add = [];
-
-                            pagination();
-
-                            objectIdList.push(results.objectId);
-                        });
-                    $scope.addNewSchema = false;
                 }
+
+                msSchemasService.createDocument(className, appId, newSchema,
+                    function(error, results) {
+                        if (error) {
+                            return alert(error.statusText);
+                        }
+
+                        pagination();
+                        objectIdList.push(results.objectId);
+                    });
+                // }
             };
 
             $scope.showAddRow = function() {
@@ -702,14 +765,134 @@
                     }
 
                     curTH.style.width = offset + 'px';
-                    $timeout(function() {
-                        $scope['width' + curIndex] = offset + 'px';
-                    });
                 }
             });
 
             document.addEventListener('mouseup', function() {
                 curTH = undefined;
             });
+
+            var dragSrcEl = null;
+            var columnsOrder = [];
+            var getParentByTagName = function(node, tagName) {
+                if (!node || !tagName) {
+                    return null;
+                }
+
+                var parent = node.parentNode;
+                tagName = tagName.toUpperCase();
+
+                while (parent.tagName !== tagName) {
+                    if (parent.tagName === 'HTML') {
+                        return null;
+                    }
+
+                    parent = parent.parentNode;
+                }
+
+                return parent;
+            };
+
+            var swapEls = function(obj1, obj2) {
+                var parent2 = obj2.parentNode;
+                var next2 = obj2.nextSibling;
+
+                if (next2 === obj1) {
+                    parent2.insertBefore(obj1, obj2);
+                } else {
+                    obj1.parentNode.insertBefore(obj2, obj1);
+                    if (next2) {
+                        parent2.insertBefore(obj1, next2);
+                    } else {
+                        parent2.appendChild(obj1);
+                    }
+                }
+            };
+
+            $scope.handleDragStart = function(e) {
+                var thisEl = e.target;
+                if (thisEl.tagName !== 'DIV') {
+                    thisEl = getParentByTagName(thisEl, 'div');
+                }
+
+                thisEl.style.opacity = '0.4';
+                dragSrcEl = thisEl;
+
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', thisEl.innerHTML);
+            };
+
+            $scope.handleDragEnd = function(e) {
+                dragSrcEl.style.opacity = '1';
+            };
+
+            $scope.handleDragOver = function(e) {
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+
+                e.dataTransfer.dropEffect = 'move';
+
+                return false;
+            };
+
+            $scope.handleDragEnter = function(e) {
+                var thisEl = e.target;
+                if (thisEl.tagName !== 'TH') {
+                    thisEl = getParentByTagName(thisEl, 'th');
+                }
+
+                if (dragSrcEl != thisEl) {
+                    thisEl.classList.add('be-drag-over');
+                }
+            };
+
+            $scope.handleDragLeave = function(e) {
+                var thisEl = e.target;
+                if (thisEl.tagName !== 'TH') {
+                    thisEl = getParentByTagName(thisEl, 'th');
+                }
+
+                thisEl.classList.remove('be-drag-over');
+            };
+
+            $scope.handleDrop = function(e) {
+                var thisEl = e.target;
+
+                if (e.stopPropagation) {
+                    e.stopPropagation();
+                }
+
+                if (thisEl.tagName !== 'DIV') {
+                    thisEl = getParentByTagName(thisEl, 'div');
+                }
+
+                if (dragSrcEl != thisEl) {
+
+                    swapEls(dragSrcEl, thisEl);
+
+                    var fromColIndex = (dragSrcEl.id).split('_')[1];
+                    var toColIndex = (thisEl.id).split('_')[1];
+
+                    var fromColClassName = '.cell_' + fromColIndex;
+                    var toColClassName = '.cell_' + toColIndex;
+                    var fromColCellList = document.querySelectorAll(fromColClassName);
+                    var toColCellList = document.querySelectorAll(toColClassName);
+
+                    fromColCellList.forEach(function(fromColCell, index) {
+                        var toColCell = toColCellList[index];
+                        swapEls(fromColCell, toColCell);
+                    });
+                }
+
+                thisEl = getParentByTagName(thisEl, 'th');
+                thisEl.classList.remove('be-drag-over');
+                dragSrcEl.style.opacity = '1';
+                dragSrcEl = getParentByTagName(dragSrcEl, 'th');
+                dragSrcEl.classList.remove('be-drag-over');
+
+                return false;
+            };
+
         });
 })();

@@ -13,16 +13,17 @@
         vm.register = function() {
             vm.dataLoading = true;
             if (vm.passwordConfirm != vm.password) {
-                vm.error = 'These passwords do not match. Try again?';
+                vm.error = 'Password Confirm does not match';
             } else {
                 vm.error = '';
-                msUserService.register(vm.username, vm.password, vm.email, function(response) {
+                msUserService.register(vm.email, vm.password, function(response) {
                     if (response.status != 200) {
                         vm.error = response.data.message;
                     } else {
-                        msUserService.login(vm.username, vm.password, function(response) {
-                            $state.go('app.dashboard_applications');
-                        });
+                        $state.go('app.pages_auth_login');
+                        // msUserService.login(vm.username, vm.password, function(response) {
+                        //     $state.go('app.dashboard_applications');
+                        // });
                     }
                 });
             }

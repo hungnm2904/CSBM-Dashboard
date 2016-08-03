@@ -20,23 +20,24 @@
                 register: register,
                 getCurrentUser: getCurrentUser,
                 getAccessToken: getAccessToken,
-                getCurrentUsername: getCurrentUsername
+                getCurrentEmail: getCurrentEmail,
+                removeCurrentUser: removeCurrentUser
             }
 
             return service;
 
-            function login(username, password, callback) {
+            function login(email, password, callback) {
                 $http({
                     method: 'POST',
                     url: _domain + '/login',
                     data: {
-                        username: username,
+                        email: email,
                         password: password
                     }
                 }).then(function(response) {
                     var user = {
                         'userId': response.data.data.userId,
-                        'username': response.data.data.name,
+                        'email': response.data.data.email,
                         'accessToken': response.data.data.token
                     }
 
@@ -59,29 +60,28 @@
                         'Authorization': 'Bearer ' + accessToken
                     }
                 }).then(function(response) {
-                    _deleteCurrentUser();
+                    removeCurrentUser();
                     callback(null, response);
                 }, function(response) {
                     callback(response);
                 });
             };
 
-            function register(username, password, email, callback) {
+            function register(email, password, callback) {
                 $http({
                     method: 'POST',
                     url: _domain + '/signup',
                     data: {
-                        username: username,
-                        password: password,
-                        email: email
+                        email: email,
+                        password: password
                     }
                 }).then(function(response) {
-                    var obj = {
-                        currentUser: {
-                            userId: response.data.data.userId,
-                            token: response.data.data.token
-                        }
-                    };
+                    // var obj = {
+                    //     currentUser: {
+                    //         userId: response.data.data.userId,
+                    //         token: response.data.data.token
+                    //     }
+                    // };
                     callback(response);
                 }, function(response) {
                     callback(response);
@@ -120,21 +120,21 @@
                 return null;
             }
 
-            function getCurrentUsername() {
+            function getCurrentEmail() {
                 if (_currentUser) {
-                    return _currentUser.username;
+                    return _currentUser.email;
                 }
 
                 var user = $cookies.getObject('USER');
                 if (user) {
                     _setCurrentUser(user);
-                    return _currentUser.username;
+                    return _currentUser.email;
                 }
 
                 return null;
             }
 
-            function _deleteCurrentUser() {
+            function removeCurrentUser() {
                 _currentUser = null;
                 $cookies.remove('USER');
             };

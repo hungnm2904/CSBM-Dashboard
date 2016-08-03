@@ -150,7 +150,7 @@
                         icon: 'icon-library-plus',
                         group: true,
                         button: {
-                            title: 'Create a class',
+                            title: 'Create new class',
                             function: function(ev) {
                                 msDialogService.showDialog(ev, 'app/core/services/dialogs/addClassDialog.html');
                             }

@@ -1,8 +1,8 @@
-<md-dialog class="compose-dialog" aria-label="New Message">
+<md-dialog class="compose-dialog" aria-label="Create new application">
     <form class="md-inline-form">
         <md-toolbar class="md-accent md-hue-2">
             <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-                <span class="title" translate="NEW APPLICATION">New Application</span>
+                <span class="title">Create a new application</span>
                 <md-button class="md-icon-button" ng-click="closeDialog()" aria-label="Close dialog" tranlate translate-aria-label="CLOSE DIALOG">
                     <md-icon md-font-icon="icon-close"></md-icon>
                 </md-button>
@@ -16,8 +16,8 @@
         </md-dialog-content>
         <md-dialog-actions layout="row" layout-align="space-between center">
             <div layout="row" layout-align="start center">
-                <md-button ng-disabled="applicationNames.includes(applicationName)" ng-click="createApplication()" class="send-button md-accent md-raised" aria-label="Create" translate="CREATE APPLICATION" translate-attr-aria-label="CREATE APPLICATION">
-                    SEND
+                <md-button ng-disabled="!applicationName || applicationNames.includes(applicationName)" ng-click="createApplication()" class="send-button md-accent md-raised" aria-label="Create">
+                    Create
                 </md-button>
             </div>
         </md-dialog-actions>

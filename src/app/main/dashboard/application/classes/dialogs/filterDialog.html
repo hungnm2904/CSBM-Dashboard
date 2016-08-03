@@ -3,7 +3,7 @@
         <md-toolbar class="md-accent md-hue-2">
             <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
                 <span class="title">FILTER THIS CLASS</span>
-<!--                 <md-button class="md-icon-button" ng-click="closeDialog()" aria-label="Close dialog" tranlate translate-aria-label="CLOSE DIALOG">
+                <!--                 <md-button class="md-icon-button" ng-click="closeDialog()" aria-label="Close dialog" tranlate translate-aria-label="CLOSE DIALOG">
                     <md-icon md-font-icon="icon-close"></md-icon>
                 </md-button> -->
             </div>
@@ -12,7 +12,7 @@
             <div layout="row" ng-repeat="criteria in filterCriteria">
                 <md-input-container flex="30">
                     <label>Field</label>
-                    <md-select ng-model="criteria.field">
+                    <md-select aria-label=" " ng-model="criteria.field" ng-change="addFilterCriteria('{{criteria.field}}')">
                         <md-option ng-repeat="(key, value) in schemas" value="{{key}}">
                             {{key}}
                         </md-option>
@@ -23,7 +23,7 @@
                     <!-- Operations -->
                     <md-input-container class="md-block" flex>
                         <label>Operation</label>
-                        <md-select ng-model="criteria.operation">
+                        <md-select aria-label=" " ng-model="criteria.operation">
                             <md-option ng-repeat="operation in stringFilterOperations" value="{{operation}}">
                                 {{operation}}
                             </md-option>
@@ -43,7 +43,7 @@
                     <!-- Operations -->
                     <md-input-container class="md-block" flex>
                         <label>Operation</label>
-                        <md-select ng-model="criteria.operation">
+                        <md-select aria-label=" " ng-model="criteria.operation">
                             <md-option ng-repeat="operation in numberFilterOperations" value="{{operation}}">
                                 {{operation}}
                             </md-option>
@@ -63,7 +63,7 @@
                     <!-- Operations -->
                     <md-input-container class="md-block" flex>
                         <label>Operation</label>
-                        <md-select ng-model="criteria.operation">
+                        <md-select aria-label=" " ng-model="criteria.operation">
                             <md-option ng-repeat="operation in booleanFilterOperations" value="{{operation}}">
                                 {{operation}}
                             </md-option>
@@ -73,7 +73,7 @@
                     <!-- Input -->
                     <md-input-container ng-if="operationWithInput(criteria.operation)" class="md-block no-error-check" flex>
                         <label>Value</label>
-                        <md-select ng-model="criteria.value">
+                        <md-select aria-label=" " ng-model="criteria.value">
                             <md-option ng-repeat="boolean in [true, false]" value="{{boolean}}">
                                 {{boolean}}
                             </md-option>
@@ -89,11 +89,8 @@
         </md-dialog-content>
         <md-dialog-actions layout="row" layout-align="start center">
             <div layout="row" layout-align="start center">
-                <md-button ng-disabled="filterCriteria.length == 0" ng-click="clearAllFilterCriteria()" class="send-button md-accent md-raised" aria-label=" ">
+                <md-button class="be-button-no-bg md-primary" ng-disabled="filterCriteria.length == 1" ng-click="clearAllFilterCriteria()">
                     Clear all
-                </md-button>
-                <md-button ng-click="addFilterCriteria()" class="send-button md-accent md-raised" aria-label=" ">
-                    Add filter
                 </md-button>
                 <md-button ng-click="filter()" class="send-button md-accent md-raised" aria-label=" ">
                     Apply these filters

@@ -14,10 +14,48 @@
     <!-- / HEADER -->
     <!-- CONTENT -->
     <div class="content" md-background-bg layout="row" layout-wrap>
-        <div ng-repeat="application in applications track by $index" flex="33">
-            <!-- MS-CARD -->
-            <ms-card template="'app/core/directives/ms-card/templates/template-7/template-7.html'" ng-model="application" ng-click="goToAppManagement(application._id, application.name)"></ms-card>
-            <!-- / MS-CARD -->
+        <div ng-repeat="application in applications track by $index" flex="50" class="be-app-card" layout="row" layout-align="center stretch">
+            <div class="ph-10 pv-5 md-primary-bg be-app-card-header" ng-model="application" ng-click="goToAppManagement(application._id, application.name)" flex="50">
+                <div>
+                    <div class="name h1" ng-if="application.name">
+                        {{application.name}}
+                    </div>
+                </div>
+                <div>
+                    <span>Created</span><span>6 days ago</span>
+                </div>
+            </div>
+            <div class="ph-10 pv-5 md-primary-bg be-app-card-info" flex="50" layout="column" layout-align="space-around">
+                <div>
+                    <span>At a glance</span>
+                </div>
+                <div layout="row" layout-align="space-between" class="mt-5">
+                    <div layout="column">
+                        <div>
+                            227
+                        </div>
+                        <div>
+                            requests
+                        </div>
+                    </div>
+                    <div layout="column">
+                        <div>
+                            2
+                        </div>
+                        <div>
+                            users
+                        </div>
+                    </div>
+                    <div layout="column">
+                        <div>
+                            4
+                        </div>
+                        <div>
+                            installations
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- / CONTENT -->

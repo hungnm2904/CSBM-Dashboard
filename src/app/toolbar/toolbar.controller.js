@@ -66,7 +66,7 @@
         vm.setUserStatus = setUserStatus;
         vm.toggleHorizontalMobileMenu = toggleHorizontalMobileMenu;
 
-        vm.name = msUserService.getCurrentUsername();
+        vm.email = msUserService.getCurrentEmail();
 
         //////////
 

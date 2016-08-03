@@ -7,9 +7,6 @@
 
     function LoginController($state, msUserService) {
         var vm = this;
-        // if ($state.params.error) {
-        //     vm.error = error;
-        // }
 
         msUserService.getCurrentUser(function(user) {
             if (user) {
@@ -19,12 +16,13 @@
 
         vm.login = function() {
             vm.dataLoading = true;
-            msUserService.login(vm.username, vm.password, function(error, results) {
+            msUserService.login(vm.email, vm.password, function(error, results) {
                 if (error) {
+                    console.log(error);
                     return vm.error = error.data.message;
                 }
                 $state.go('app.management_applications');
-                var user = msUserService.getCurrentUsername();
+                // var user = msUserService.getCurrentUsername();
             });
         };
     };

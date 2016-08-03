@@ -38,7 +38,8 @@
                 locals: {
                     applicationNames: $scope.applicationNames
                 },
-                clickOutsideToClose: false
+                clickOutsideToClose: false,
+                escapeToClose: false
             });
 
             function AddApplicationDialogController($scope, $state, applicationNames) {
