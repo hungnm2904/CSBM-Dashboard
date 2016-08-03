@@ -159,8 +159,6 @@
 
                     var schemas = results;
 
-                    console.log(schemas);
-
                     for (var i = 0; i < schemas.length; i++) {
                         var schema = schemas[i];
                         var title = schema.className;

@@ -25,6 +25,11 @@
 
             $scope.applications.forEach(function(application) {
                 $scope.applicationNames.push(application.name);
+
+                var createdAt = new Date(application.created_at);
+                createdAt = new Date(createdAt.getTime() + (createdAt.getTimezoneOffset() * 60000));
+
+                application.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
             });
         });
 

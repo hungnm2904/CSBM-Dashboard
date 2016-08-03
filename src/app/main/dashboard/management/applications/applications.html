@@ -14,7 +14,7 @@
     <!-- / HEADER -->
     <!-- CONTENT -->
     <div class="content" md-background-bg layout="row" layout-wrap>
-        <div ng-repeat="application in applications track by $index" flex="50" class="be-app-card" layout="row" layout-align="center stretch">
+        <div ng-repeat="application in applications track by $index" flex="50" layout-padding class="be-app-card" layout="row" layout-align="center stretch">
             <div class="ph-10 pv-5 md-primary-bg be-app-card-header" ng-model="application" ng-click="goToAppManagement(application._id, application.name)" flex="50">
                 <div>
                     <div class="name h1" ng-if="application.name">
@@ -22,14 +22,14 @@
                     </div>
                 </div>
                 <div>
-                    <span>Created</span><span>6 days ago</span>
+                    <span>Created at </span><span>{{application.created_at}}</span>
                 </div>
             </div>
             <div class="ph-10 pv-5 md-primary-bg be-app-card-info" flex="50" layout="column" layout-align="space-around">
                 <div>
                     <span>At a glance</span>
                 </div>
-                <div layout="row" layout-align="space-between" class="mt-5">
+                <div layout="row" layout-align="space-between" class="mt-5" style="text-align: center">
                     <div layout="column">
                         <div>
                             227

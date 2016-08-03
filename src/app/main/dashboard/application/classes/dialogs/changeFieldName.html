@@ -2,7 +2,7 @@
     <form class="md-inline-form">
         <md-toolbar class="md-accent md-hue-2">
             <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-                <span class="title" translate="UPDATE FIELD">Update Field Name</span>
+                <span class="title">Update Field Name</span>
                 <md-button class="md-icon-button" ng-click="closeDialog()" aria-label="Close dialog" tranlate translate-aria-label="CLOSE DIALOG">
                     <md-icon md-font-icon="icon-close"></md-icon>
                 </md-button>
@@ -26,8 +26,8 @@
         </md-dialog-content>
         <md-dialog-actions layout="row" layout-align="start center">
             <div layout="row" layout-align="start center">
-                <md-button ng-click="updateFieldName()" class="send-button md-accent md-raised" aria-label="Delete" translate="UPDATE FIELD" translate-attr-aria-label="UPDATE FIELD">
-                    UPDATE FIELD NAME
+                <md-button ng-click="updateFieldName()" class="send-button md-accent md-raised" aria-label="Delete" ng-disabled="!field || !newFieldName || schemas[newFieldName]">
+                    Update
                 </md-button>
             </div>
         </md-dialog-actions>
