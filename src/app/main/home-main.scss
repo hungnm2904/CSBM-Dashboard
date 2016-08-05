@@ -1,0 +1,30 @@
+   #layout-content-without-toolbar {
+       md-toolbar {
+           background: transparent;
+       }
+       md-content {
+           position: absolute;
+           top: 0;
+           right: 0;
+           bottom: 0;
+           left: 0;
+       }
+       .logo-text,
+       .navigation-link,
+       .logo-image {
+           color: #fff;
+           font-size: 0.7em;
+           font-weight: 500;
+       }
+       .logo-image {
+           display: block;
+           background: #039BE5;
+           width: 32px;
+           min-width: 32px;
+           height: 32px;
+           line-height: 32px;
+           text-align: center;
+           border-radius: 10%;
+           margin-right: 10px;
+       }
+   }

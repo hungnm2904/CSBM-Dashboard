@@ -1,5 +1,5 @@
 #applications {
-    background: #d6d6da;
+    background: #EEEEEE;
     .header {
         height: 80px;
         min-height: 80px;
@@ -7,15 +7,58 @@
     }
     .be-app-card {
         cursor: pointer;
+        min-height: 110px;
+        /*background: #193040;*/
+        background: #fff;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 2px 1px -1px rgba( 0, 0, 0, .12);
+        border-radius: 5px;
         .be-app-card-header {
             border-top-left-radius: 5px;
             border-bottom-left-radius: 5px;
+            border-right: 1px solid #BDBDBD;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            color: rgba(0,0,0,0.87);
+            .card-title {
+                font-size: 2em;
+                font-weight: 300;
+            }
+        }
+        .be-app-card-devider {
+            border-left: 1px solid #38546d;
+            border-right: 1px solid #16222c;
+            height: 80px;
         }
         .be-app-card-info {
-        	height: 100%;
-        	margin-left: 1px;
-        	border-top-right-radius: 5px;
+            margin-left: 1px;
+            border-top-right-radius: 5px;
             border-bottom-right-radius: 5px;
+            font-size: 1.1em;
+            color: rgba(0,0,0,0.87);
+            .app-card-info-icon {
+                border: 1px solid #BDBDBD;
+                border-radius: 100%;
+                padding: 10px;
+                md-icon {
+                    color: rgba(0,0,0,0.87);
+                    font-size: 25px;
+                    width: 25px;
+                    height: 25px;
+                    line-height: 25px;
+                }
+            }
+            .app-card-info-number {
+                font-size: 1.6em;
+                font-weight: 300;
+            }
+        }
+        .be-app-card-add {
+            border: 2px dashed rgba(0,0,0,0.87);
+            border-radius: 5px;
+            span {
+                 font-size: 1.5em;
+                 color: rgba(0,0,0,0.87);
+            }
         }
     }
 }

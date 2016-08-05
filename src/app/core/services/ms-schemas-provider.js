@@ -35,7 +35,8 @@
                 updateValues: updateValues,
                 changeFieldName: changeFieldName,
                 filter: filter,
-                deleteClass: deleteClass
+                deleteClass: deleteClass,
+                countObjectInClass: countObjectInClass
             }
 
             return service;
@@ -572,24 +573,24 @@
                             'X-CSBM-Master-Key': masterKey
                         }
                     }).then(function(response) {
-                        _schemas.some(function(schema, index) {
-                            if (schema.className === className) {
-                                var filteredDocuments = response.data.results;
-                                if (schema.documents && schema.documents.length > 0) {
-                                    schema.documents.splice(0, schema.documents.length);
-                                    filteredDocuments.forEach(function(_document) {
-                                        schema.documents.push(_document);
-                                    });
-                                } else {
-                                    schema.documents = filteredDocuments;
-                                }
+                        // _schemas.some(function(schema, index) {
+                        //     if (schema.className === className) {
+                        //         var filteredDocuments = response.data.results;
+                        //         if (schema.documents && schema.documents.length > 0) {
+                        //             schema.documents.splice(0, schema.documents.length);
+                        //             filteredDocuments.forEach(function(_document) {
+                        //                 schema.documents.push(_document);
+                        //             });
+                        //         } else {
+                        //             schema.documents = filteredDocuments;
+                        //         }
 
-                                callback(null, schema);
-                                return true;
-                            }
-                        });
+                        //         callback(null, schema);
+                        //         return true;
+                        //     }
+                        // });
 
-                        // callback(null, response.data);
+                        callback(null, response.data.results);
                     }, function(response) {
                         callback(response);
                     });
@@ -622,6 +623,29 @@
 
                         $rootScope.$broadcast('schemas-changed', { 'appId': _appId, 'appName': appName, 'className': '_User' });
                         callback(null, response);
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            };
+
+            function countObjectInClass(appId, className, callback) {
+
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'GET',
+                        url: _domain + '/csbm/classes/' + className + '?count=1&limit=0',
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey
+                        }
+                    }).then(function(response) {
+                        callback(null, response.data);
                     }, function(response) {
                         callback(response);
                     });

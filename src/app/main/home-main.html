@@ -1,0 +1,31 @@
+<div id="layout-content-without-toolbar" class="template-layout" layout="column" flex>
+    <md-toolbar id="toolbar" class="md-menu-toolbar md-whiteframe-1dp" ui-view="toolbar">
+        <div layout="row" layout-align="space-between center">
+            <div flex="5">
+            </div>
+            <div layout="row" layout-align="start center" flex>
+                <div ng-click="goToHome()" class="logo" layout="row" layout-align="start center">
+                    <span class="logo-image">M</span>
+                    <span class="logo-text">MASAMUNE</span>
+                </div>
+                <!--                 <md-progress-circular id="toolbar-progress" ng-if="$root.loadingProgress" class="md-accent" md-mode="indeterminate" md-diameter="64">
+                </md-progress-circular> -->
+            </div>
+            <div flex>
+            </div>
+            <div layout="row" layout-align="end center" layout-padding flex>
+                <div flex>
+                </div>
+                <div flex>
+                    <a class="navigation-link" ui-sref="app.docs">Docs</a>
+                </div>
+                <div flex>
+                    <a class="navigation-link" href="javascript:void(0)" ng-click="gotoDashboard()">Dashboard</a>
+                </div>
+                <div flex>
+                </div>
+            </div>
+        </div>
+    </md-toolbar>
+    <md-content id="content" class="animate-slide-up md-background md-hue-1" ui-view="content" flex></md-content>
+</div>

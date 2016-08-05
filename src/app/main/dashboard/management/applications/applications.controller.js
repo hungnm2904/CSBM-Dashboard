@@ -6,11 +6,14 @@
         .controller('ApplicationsController', ApplicationsController);
 
     function ApplicationsController($scope, $rootScope, $state, $mdDialog, $document, msUserService,
-        msApplicationService, msSchemasService, msDialogService, msModeService) {
+        $http, msApplicationService, msSchemasService, msModeService, msMasterKeyService,
+        msConfigService) {
 
         if (!msUserService.getAccessToken()) {
             $state.go('app.pages_auth_login');
         }
+
+        var _domain = (msConfigService.getConfig()).domain;
 
         $scope.applications = msApplicationService.applications();
         $scope.applicationNames = [];
@@ -24,12 +27,53 @@
             }
 
             $scope.applications.forEach(function(application) {
-                $scope.applicationNames.push(application.name);
+                var appId = application._id;
+                var appName = application.name;
+
+                $scope.applicationNames.push(appName);
 
                 var createdAt = new Date(application.created_at);
                 createdAt = new Date(createdAt.getTime() + (createdAt.getTimezoneOffset() * 60000));
 
                 application.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
+
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'GET',
+                        url: _domain + '/csbm/schemas',
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey
+                        }
+                    }).then(function(response) {
+                        application['totalClasses'] = response.data.results.length;
+                    }, function(response) {
+                        console.log(response);
+                    });
+                });
+
+                msSchemasService.countObjectInClass(appId, '_User',
+                    function(error, results) {
+                        if (error) {
+                            console.log(error);
+                        }
+
+                        application['totalUsers'] = results.count
+                    });
+
+                msSchemasService.countObjectInClass(appId, '_Installation',
+                    function(error, results) {
+                        if (error) {
+                            console.log(error);
+                        }
+
+                        application['totalInstallations'] = results.count
+                    });
             });
         });
 

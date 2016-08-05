@@ -21,7 +21,6 @@
             }
             var _objectId = $stateParams.objectId;
 
-            var checked = [];
             var objectIdList = [];
             var imageExtension = 'png,jpg';
             var audioExtension = 'mp3,mp4';
@@ -34,10 +33,13 @@
             $scope.fields_add = [];
             $scope.documents = [];
             $scope.add = [];
+            $scope.checked = [];
             $scope.addNewSchema = false;
             $scope.editMode = [];
             $scope.updatedValue = '';
             $scope.jsFileImport;
+            $scope.filteredDocuments;
+            $scope.allDocuments;
 
             var skip;
             $scope.numPerPage = 10;
@@ -127,7 +129,9 @@
 
                 msSchemasService.filter(appId, className, preparedCriteria, function(error, results) {
                     if (error) {
-                        return alert(error.statusText);
+                        alert(error.statusText);
+                    } else {
+                        $scope.documents = angular.copy(results);
                     }
                 });
             }
@@ -145,6 +149,7 @@
                         }
 
                         $scope.documents = results
+                        $scope.allDocuments = angular.copy(results);
 
                         $scope.documents.forEach(function(_document) {
                             objectIdList.push(_document.objectId);
@@ -325,9 +330,9 @@
                                         $scope.closeDialog();
                                     });
                             }
-
                         };
                     })(file);
+
                     reader.readAsText(file);
                 }
             };
@@ -360,6 +365,9 @@
                         filterCriteria: $scope.filterCriteria
                     }
                 }).then(function(filterCriteria) {
+                    if (filterCriteria.length === 0) {
+                        $scope.documents = $scope.allDocuments;
+                    }
                     $scope.filterCriteria = filterCriteria;
                 });
 
@@ -397,6 +405,7 @@
 
                     $scope.clearAllFilterCriteria = function() {
                         $scope.filterCriteria.splice(0, $scope.filterCriteria.length);
+                        $scope.closeDialog($scope.filterCriteria);
                     }
 
                     $scope.addFilterCriteria = function(field) {
@@ -632,52 +641,56 @@
             };
 
             $scope.toggle = function(objectId) {
-                var index = checked.indexOf(objectId);
+                var index = $scope.checked.indexOf(objectId);
 
                 if (index === -1) {
-                    checked.push(objectId);
+                    $scope.checked.push(objectId);
                 } else {
-                    checked.splice(index, 1);
+                    $scope.checked.splice(index, 1);
                 }
             };
 
             $scope.exists = function(objectId) {
-                return checked.indexOf(objectId) > -1;
+                return $scope.checked.indexOf(objectId) > -1;
             };
 
             $scope.isIndeterminate = function() {
-                return (checked.length !== 0 &&
-                    checked.length !== objectIdList.length);
+                return ($scope.checked.length !== 0 &&
+                    $scope.checked.length !== objectIdList.length);
             };
 
             $scope.isChecked = function() {
                 if (objectIdList != 0) {
-                    return checked.length === objectIdList.length;
+                    return $scope.checked.length === objectIdList.length;
                 } else {
                     return false;
                 }
             };
 
             $scope.toggleAll = function() {
-                if (checked.length === objectIdList.length) {
-                    checked = [];
-                } else if (checked.length === 0 || checked.length > 0) {
-                    checked = objectIdList.slice(0);
+                if ($scope.checked.length === objectIdList.length) {
+                    $scope.checked = [];
+                } else if ($scope.checked.length === 0 || $scope.checked.length > 0) {
+                    $scope.checked = objectIdList.slice(0);
                 }
             };
 
             $scope.checkList = function() {
-                return checked.length;
+                return $scope.checked.length;
             }
 
             $scope.deleteRow = function() {
+                var confirmMessage = 'Are you sure to delete these rows ?'
+                if ($scope.checked.length === 1) {
+                    confirmMessage = 'Are you sure to delete this row ?'
+                }
                 var confirm = $mdDialog.confirm()
-                    .title('Are you sure to delete these rows ?')
+                    .title(confirmMessage)
                     .ok('Yes')
                     .cancel('No');
 
                 $mdDialog.show(confirm).then(function() {
-                    msSchemasService.deleteDocuments($scope.documents, className, appId, checked,
+                    msSchemasService.deleteDocuments($scope.documents, className, appId, $scope.checked,
                         function(error, results) {
                             if (error) {
                                 return alert(error.statusText);
@@ -691,33 +704,6 @@
 
             $scope.addRow = function() {
                 var newSchema = {};
-                // var checkType = true;
-                // var errorMessage;
-                // var titleMessage;
-
-                // for (var field in $scope.schemas) {
-                //     if (field != 'objectId' && field != 'createdAt' &&
-                //         field != 'updatedAt') {
-
-                //         var value = $scope.add[field];
-                //         var type = $scope.schemas[field].type;
-
-                //         convertToType(value, type, function(error, results) {
-                //             if (error) {
-                //                 checkType = false;
-                //                 var titleMessage = 'Add New Row Fail';
-                //                 var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
-                //                 return msDialogService.showAlertDialog(titleMessage, errorMessage);
-                //             }
-
-                //             newSchema[field] = results;
-                //         });
-                //     }
-                // };
-
-                // if (checkType) {
-
-                // console.log($scope.schemas);
                 for (var schema in $scope.schemas) {
                     if (editable(schema)) {
                         newSchema[schema] = undefined;
@@ -733,7 +719,6 @@
                         pagination();
                         objectIdList.push(results.objectId);
                     });
-                // }
             };
 
             $scope.showAddRow = function() {

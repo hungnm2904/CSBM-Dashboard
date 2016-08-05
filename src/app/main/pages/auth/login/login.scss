@@ -1,18 +1,44 @@
 #login {
+    md-toolbar {
+        display: none;
+    }
+    md-content: {
+        top: 0;
+    }
     height: 100%;
-    background: url('/assets/images/backgrounds/darkblue.jpg') no-repeat;
-    background-size: cover;
+    background: #555572;
+    img {
+        height: 100%;
+        width: 100%;
+    }
     #login-form-wrapper {
-        flex: 1 0 auto;
         padding: 32px;
-        .logo {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        .home-text {
             width: auto;
             height: 128px;
             line-height: 128px;
-            font-size: 86px;
-            font-weight: 500;
+            font-size: 6em;
+            font-weight: 300;
             color: #FFFFFF;
             border-radius: 2px;
+        }
+        .description {
+            font-size: 2em;
+            font-weight: 300;
+            color: #fff;
+            blockquote {
+                border-left: 3px solid rgba(255, 255, 255, 0.6);
+                p {
+                    padding: 0;
+                    margin: 0;
+                }
+            }
         }
         #login-form {
             width: 384px;

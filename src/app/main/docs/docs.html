@@ -7,56 +7,11 @@
                 <span class="md-subhead">We’ve got comprehensive guides for each platform that should help out with anything you need. You can also take a look at the detailed API references and tutorials for a better idea of how it all comes together.</span>
             </div>
         </div>
-        <div layout="row" layout-margin layout-align="center" layout-wrap>
-            <!-- Android Doc -->
-            <div class="be-docs-card">
-                <div class="be-card-header" layout="row" layout-align="space-between center" layout-padding>
-                    <div class="be-card-title">
-                        Android
-                    </div>
-                    <div></div>
-                    <div class="be-card-icon">
-                        <i class="icon icon-android" style="color: #00c26e"></i>
-                    </div>
-                </div>
-                <div class="be-card-content">
-                    <div class="be-card-item" layout="row" layout-align="space-between center" layout-padding ng-click="goToGuideDoc('android')">
-                        <div>
-                            Guide
-                        </div>
-                        <div></div>
-                        <div>
-                            <i class="icon icon-chevron-right"></i>
-                        </div>
-                    </div>
-                    <div class="be-card-item" layout="row" layout-align="space-between center" layout-padding>
-                        <div>
-                            API References
-                        </div>
-                        <div></div>
-                        <div>
-                            <i class="icon icon-chevron-right"></i>
-                        </div>
-                    </div>
-                    <div class="be-card-item" layout="row" layout-align="space-between center" layout-padding>
-                        <div>
-                            Tutorials
-                        </div>
-                        <div></div>
-                        <div>
-                            <i class="icon icon-chevron-right"></i>
-                        </div>
-                    </div>
-                    <div layout="column" layout-align="center stretch">
-                        <a href="http://localhost:1337/files/framework/android" class="be-button-no-bg md-button md-primary">
-                            Download
-                        </a>
-                    </div>
-                </div>
+        <div layout="row" layout-margin layout-align="center center" layout-xs="column" layout-align-xs="center stretch" layout-wrap>
+            <div hide show-gt-sm hide flex>
             </div>
-            <!-- / Android Doc -->
             <!-- iOS Doc -->
-            <div class="be-docs-card">
+            <div class="be-docs-card" flex>
                 <div class="be-card-header" layout="row" layout-align="space-between center" layout-padding>
                     <div class="be-card-title">
                         iOS
@@ -102,6 +57,55 @@
                 </div>
             </div>
             <!-- iOS Doc -->
+            <!-- Android Doc -->
+            <div class="be-docs-card" flex>
+                <div class="be-card-header" layout="row" layout-align="space-between center" layout-padding>
+                    <div class="be-card-title">
+                        Android
+                    </div>
+                    <div></div>
+                    <div class="be-card-icon">
+                        <i class="icon icon-android" style="color: #00c26e"></i>
+                    </div>
+                </div>
+                <div class="be-card-content">
+                    <div class="be-card-item" layout="row" layout-align="space-between center" layout-padding ng-click="goToGuideDoc('android')">
+                        <div>
+                            Guide
+                        </div>
+                        <div></div>
+                        <div>
+                            <i class="icon icon-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="be-card-item" layout="row" layout-align="space-between center" layout-padding>
+                        <div>
+                            API References
+                        </div>
+                        <div></div>
+                        <div>
+                            <i class="icon icon-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="be-card-item" layout="row" layout-align="space-between center" layout-padding>
+                        <div>
+                            Tutorials
+                        </div>
+                        <div></div>
+                        <div>
+                            <i class="icon icon-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div layout="column" layout-align="center stretch">
+                        <a href="http://localhost:1337/files/framework/android" class="be-button-no-bg md-button md-primary">
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- / Android Doc -->
+            <div hide show-gt-sm flex>
+            </div>
         </div>
     </div>
 </div>

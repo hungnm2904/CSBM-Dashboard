@@ -28,6 +28,14 @@
                             <span>Add new row</span>
                         </md-button>
                     </md-menu-item>
+                     <md-divider></md-divider>
+                    <md-menu-item>
+                        <md-button ng-click="showUpdateFieldNameDialog($event)" aria-label="">
+                            <md-icon md-font-icon="icon-table-edit"></md-icon>
+                            <span>Update field name</span>
+                        </md-button>
+                    </md-menu-item>
+                    <md-divider></md-divider>
                     <md-menu-item>
                         <md-button ng-click="showDeleteColumnDialog($event)" aria-label="">
                             <md-icon md-font-icon="icon-delete"></md-icon>
@@ -37,19 +45,14 @@
                     <md-menu-item>
                         <md-button ng-click="deleteRow()" aria-label="" ng-disabled="checkList() == 0">
                             <md-icon md-font-icon="icon-delete"></md-icon>
-                            <span>Delete Rows</span>
-                        </md-button>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <md-button ng-click="showUpdateFieldNameDialog($event)" aria-label="">
-                            <md-icon md-font-icon="icon-table-edit"></md-icon>
-                            <span>Update Field Name</span>
+                            <span aria-label="delete this row" ng-if="checked.length == 1">Delete this rows</span>
+                            <span aria-label="delete these rows" ng-if="checked.length != 1">Delete these rows</span>
                         </md-button>
                     </md-menu-item>
                     <md-menu-item>
                         <md-button ng-click="showDeleteClassDialog($event)" aria-label="">
                             <md-icon md-font-icon="icon-delete"></md-icon>
-                            <span>Delete This Class</span>
+                            <span>Delete this class</span>
                         </md-button>
                     </md-menu-item>
                 </md-menu-content>
@@ -60,7 +63,7 @@
     <!-- CONTENT -->
     <!-- <div class="content" md-background-bg> -->
     <div class="ms-responsive-be-table-wrapper">
-        <table class="dataTable row-border" border="1">
+        <table class="dataTable">
             <thead>
                 <tr>
                     <th>
@@ -81,7 +84,7 @@
                 </tr>
             </thead>
             <tbody>
-<!--                 <tr ng-if="addNewSchema">
+                <!--                 <tr ng-if="addNewSchema">
                     <td></td>
                     <td></td>
                     <td>

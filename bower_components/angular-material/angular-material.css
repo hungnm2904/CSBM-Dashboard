@@ -3001,7 +3001,7 @@ md-menu-content {
       -ms-flex-direction: column;
           flex-direction: column;
   padding: 8px 0;
-  max-height: 304px;
+  max-height: 400px;
   overflow-y: auto; }
   md-menu-content.md-dense {
     max-height: 208px; }

@@ -12,7 +12,7 @@
             url: '/',
             views: {
                 'main@': {
-                    templateUrl: 'app/main/main.html',
+                    templateUrl: 'app/main/home-main.html',
                     controller: 'MainController as vm'
                 },
                 'content@app.pages_homescreen': {

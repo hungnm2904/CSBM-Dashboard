@@ -1,6 +1,6 @@
 <div id="applications" class="page-layout simple fullwidth doc-page">
     <!-- HEADER -->
-    <div class="header md-accent-bg" layout="row" layout-align="start center">
+    <!-- <div class="header md-accent-bg" layout="row" layout-align="start center">
         <div layout="column" layout-align="start" flex>
             <div class="title">Applications</div>
         </div>
@@ -10,53 +10,83 @@
                 <span>Create new application</span>
             </md-button>
         </div>
-    </div>
+    </div> -->
     <!-- / HEADER -->
     <!-- CONTENT -->
     <div class="content" md-background-bg layout="row" layout-wrap>
-        <div ng-repeat="application in applications track by $index" flex="50" layout-padding class="be-app-card" layout="row" layout-align="center stretch">
-            <div class="ph-10 pv-5 md-primary-bg be-app-card-header" ng-model="application" ng-click="goToAppManagement(application._id, application.name)" flex="50">
-                <div>
-                    <div class="name h1" ng-if="application.name">
+        <!-- Create a new application button -->
+        <md-button ng-click="showAddDialog($event)">Create a new application</md-button>
+        <!-- / Create a new application button -->
+        <!-- Applications -->
+        <div ng-repeat="application in applications track by $index" class="be-app-card" layout="row" layout-align="center center" layout-margin ng-click="goToAppManagement(application._id, application.name)" flex="90">
+            <div class="ph-10 pv-5 be-app-card-header" ng-model="application" layout="row" layout-align="start center" flex="40" layout-wrap>
+                <div class="ellipsis-text" flex="100">
+                    <div class="card-title" ng-if="application.name">
                         {{application.name}}
                     </div>
                 </div>
-                <div>
+                <div flex="100">
                     <span>Created at </span><span>{{application.created_at}}</span>
                 </div>
             </div>
-            <div class="ph-10 pv-5 md-primary-bg be-app-card-info" flex="50" layout="column" layout-align="space-around">
-                <div>
+            <div class="ph-10 pv-5 be-app-card-info" flex="60" layout="column" layout-align="start">
+                <!--                 <div>
                     <span>At a glance</span>
-                </div>
-                <div layout="row" layout-align="space-between" class="mt-5" style="text-align: center">
-                    <div layout="column">
-                        <div>
-                            227
+                </div> -->
+                <div layout="row" layout-align="space-between" class="mt-5">
+                    <div layout="row" layout-align="start center" layout-margin>
+                        <!-- icon-server icon-table -->
+                        <div class="app-card-info-icon" flex>
+                            <md-icon md-font-icon="icon-table"></md-icon>
                         </div>
-                        <div>
-                            requests
-                        </div>
-                    </div>
-                    <div layout="column">
-                        <div>
-                            2
-                        </div>
-                        <div>
-                            users
+                        <div class="app-card-info-detail" layout="column">
+                            <div class="app-card-info-number">
+                                {{application.totalClasses}}
+                            </div>
+                            <div>
+                                classes
+                            </div>
                         </div>
                     </div>
-                    <div layout="column">
-                        <div>
-                            4
+                    <div layout="row" layout-align="start center" layout-margin>
+                        <!-- icon-account-circle -->
+                        <div class="app-card-info-icon" flex>
+                            <md-icon md-font-icon="icon-account"></md-icon>
                         </div>
-                        <div>
-                            installations
+                        <div class="app-card-info-detail" layout="column">
+                            <div class="app-card-info-number">
+                                {{application.totalUsers}}
+                            </div>
+                            <div>
+                                users
+                            </div>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" layout-margin>
+                        <!-- icon-cellphone icon-package-down-->
+                        <div class="app-card-info-icon" flex>
+                            <md-icon md-font-icon="icon-cellphone icon-package-down"></md-icon>
+                        </div>
+                        <div class="app-card-info-detail" layout="column">
+                            <div class="app-card-info-number">
+                                {{application.totalInstallations}}
+                            </div>
+                            <div>
+                                installations
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- / Applications -->
+        <!-- Add a new application button -->
+        <div class="be-app-card" layout="row" layout-align="center stretch" layout-margin ng-click="showAddDialog($event)" flex="90">
+            <div class="be-app-card-add " layout="row" layout-align="center center" flex>
+                <span style="text-align: center">Create a new application</span>
+            </div>
+        </div>
+        <!-- / Add a new application button -->
     </div>
     <!-- / CONTENT -->
 </div>
