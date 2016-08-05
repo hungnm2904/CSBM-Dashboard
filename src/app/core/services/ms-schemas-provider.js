@@ -27,6 +27,7 @@
                 addSchema: addSchema,
                 setDocuments: setDocuments,
                 getDocuments: getDocuments,
+                getDocumentsFromServer: getDocumentsFromServer,
                 createDocument: createDocument,
                 createDocuments: createDocuments,
                 addField: addField,
@@ -192,22 +193,7 @@
                 });
             };
 
-            function getDocuments(appId, className, limit, skip, callback) {
-                var findInLocal = false;
-                _schemas.some(function(schema, index) {
-                    if (schema.className === className) {
-                        if (schema.documents) {
-                            callback(null, _schemas[index].documents, null);
-                            findInLocal = true;
-                            return true;
-                        }
-                    }
-                });
-
-                if (findInLocal) {
-                    return true;
-                }
-
+            function getDocumentsFromServer(appId, className, callback) {
                 msMasterKeyService.getMasterKey(appId, function(error, results) {
                     if (error) {
                         return callback(error);
@@ -233,6 +219,51 @@
                         callback(response);
                     });
                 });
+            };
+
+            function getDocuments(appId, className, limit, skip, callback) {
+                var findInLocal = false;
+                _schemas.some(function(schema, index) {
+                    if (schema.className === className) {
+                        if (schema.documents) {
+                            callback(null, _schemas[index].documents, null);
+                            findInLocal = true;
+                            return true;
+                        }
+                    }
+                });
+
+                if (findInLocal) {
+                    return true;
+                }
+
+                getDocumentsFromServer(appId, className, callback);
+
+                // msMasterKeyService.getMasterKey(appId, function(error, results) {
+                //     if (error) {
+                //         return callback(error);
+                //     }
+
+                //     var masterKey = results;
+                //     var url = _domain + '/csbm/classes/' + className + '?order=-createdAt';
+
+                //     $http({
+                //         method: 'GET',
+                //         url: url,
+                //         headers: {
+                //             'X-CSBM-Application-Id': appId,
+                //             'X-CSBM-Master-Key': masterKey
+                //         }
+                //     }).then(function(response) {
+                //         var documents = response.data.results;
+                //         var count = response.data.count;
+
+                //         setDocuments(className, documents);
+                //         callback(null, documents, count);
+                //     }, function(response) {
+                //         callback(response);
+                //     });
+                // });
             };
 
             function addDocument(className, _document) {
@@ -410,7 +441,7 @@
                 });
             };
 
-            function deleteField(className, appId, columnName, callback) {
+            function deleteField(fields, documents, className, appId, columnName, callback) {
                 var accessToken = msUserService.getAccessToken();
 
                 var data = {
@@ -437,11 +468,15 @@
                         },
                         data: data
                     }).then(function(response) {
-                        _schemas.forEach(function(schema) {
-                            if (schema.className === className) {
-                                delete schema.fields[columnName];
-                            }
-                        });
+                        // _schemas.forEach(function(schema) {
+                        //     if (schema.className === className) {
+                        //         delete schema.fields[columnName];
+                        //     }
+                        // });
+
+                        delete fields[columnName];
+                        delete documents[columnName];
+
                         callback(null, response.data);
                     }, function(response) {
                         callback(response);

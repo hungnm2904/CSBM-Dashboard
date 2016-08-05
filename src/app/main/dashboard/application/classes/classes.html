@@ -6,6 +6,10 @@
             <div class="title">{{title}} <span class="title-info">{{documents.length}} objects</span></div>
         </div>
         <div layout="row" layout-align="start center">
+            <md-button aria-label="refresh button" ng-click="refreshDocuments()">
+                <md-icon md-font-icon="icon-refresh"></md-icon>
+                <span>Refresh</span>
+            </md-button>
             <md-button aria-label="" ng-click="showFilterDialog($event)">
                 <md-icon md-font-icon="icon-filter"></md-icon>
                 <span>Filter</span>
@@ -28,7 +32,7 @@
                             <span>Add new row</span>
                         </md-button>
                     </md-menu-item>
-                     <md-divider></md-divider>
+                    <md-divider></md-divider>
                     <md-menu-item>
                         <md-button ng-click="showUpdateFieldNameDialog($event)" aria-label="">
                             <md-icon md-font-icon="icon-table-edit"></md-icon>
@@ -43,7 +47,7 @@
                         </md-button>
                     </md-menu-item>
                     <md-menu-item>
-                        <md-button ng-click="deleteRow()" aria-label="" ng-disabled="checkList() == 0">
+                        <md-button ng-click="deleteRow()" aria-label="delete rows" ng-disabled="checkList() == 0">
                             <md-icon md-font-icon="icon-delete"></md-icon>
                             <span aria-label="delete this row" ng-if="checked.length == 1">Delete this rows</span>
                             <span aria-label="delete these rows" ng-if="checked.length != 1">Delete these rows</span>
@@ -84,31 +88,6 @@
                 </tr>
             </thead>
             <tbody>
-                <!--                 <tr ng-if="addNewSchema">
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <md-button aria-label="" class="md-raised md-accent" ng-click="addRow()">
-                            <md-icon md-font-icon="icon-plus"></md-icon>
-                            <span>Add</span>
-                        </md-button>
-                    </td>
-                    <td>
-                        <md-button class="md-raised md-warn md-default-theme" ng-click="cancelAddRow()">
-                            <md-icon md-font-icon="icon-close"></md-icon>
-                            <span>Cancel</span>
-                        </md-button>
-                    </td>
-                    <td ng-repeat="(key, value) in schemas" ng-if="editable(key)">
-                        <md-input-container ng-if="value.type != 'File'" md-no-float class="md-block">
-                            <input placeholder="Value" name="val" type="text" ng-model="add[key]" />
-                        </md-input-container>
-                        <div ng-if="value.type == 'File'">
-                            <input class="ng-hide" id="input-file-id" type="file" />
-                            <label for="input-file-id" class="md-button md-raised md-primary">Choose File</label>
-                        </div>
-                    </td>
-                </tr> -->
                 <tr ng-repeat="document in documents" ng-init="position = $index">
                     <td>
                         <md-checkbox aria-label=" " ng-checked="exists(document.objectId)" ng-click="toggle(document.objectId)"></md-checkbox>
@@ -177,20 +156,59 @@
                             <!-- / GeoPoint Type -->
                             <!-- File Type -->
                             <div ng-if="checkFieldType(key, 'File')">
-                                <md-input-container md-no-float class="md-block ">
-                                    <a ng-href="{{document[key].url}}" target="_blank" layout="row" layout-align="center center" class="pt-5">
-                                        {{getFileType(document[key].name)}}
-                                    </a>
-                                </md-input-container>
+                                <div ng-if="!editMode[(position + 1 + '') + ($index + '')]">
+                                    <div ng-if="!document[key] || document[key].name == 'deleted'" class="ellipsis-text">
+                                        <span class="undefined-text" ng-model="document[key]">
+                                            (undefined)
+                                        </span>
+                                    </div>
+                                    <div ng-if="document[key] && document[key].name != 'deleted'" class="ellipsis-text">
+                                        <md-input-container md-no-float class="md-block ">
+                                            <a ng-href="{{document[key].url}}" target="_blank" layout="row" layout-align="center center" class="pt-5">
+                                                {{getFileType(document[key].name)}}
+                                            </a>
+                                        </md-input-container>
+                                    </div>
+                                </div>
+                                <div ng-if="editMode[(position + 1 + '') + ($index + '')]">
+                                    <div ng-form name="vm.editForm">
+                                        <div class="upload-file-wrapper" ng-if="!document[key] || document[key].name == 'deleted'" class="ellipsis-text">
+                                            <input class="ng-hide" id="js-file" type="file" onchange="angular.element(this).scope().uploadFile(this)" />
+                                            <label for="js-file" class="md-button md-raised md-primary">Upload file</label>
+                                        </div>
+                                        <div class="upload-file-wrapper" ng-if="document[key] && document[key].name != 'deleted'" class="ellipsis-text" layout="column">
+                                            <div flex>
+                                                <input class="ng-hide" id="updateFile" type="file" onchange="angular.element(this).scope().uploadFile(this)" />
+                                                <label for="updateFile" class="md-button md-raised md-accent">Replace file</label>
+                                            </div>
+                                            <div flex>
+                                                <md-button class="md-raised md-warn" ng-click="deleteFile(document, key)">Delete file</md-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <!-- / File Type -->
                             <!-- Pointer Type -->
                             <div ng-if="checkFieldType(key, 'Pointer')">
-                                <md-input-container ng-if="editable(key)" md-no-float class="md-block ">
-                                    <a href="javascript:void(0)" ng-click="gotoPointerClass(document[key].className, document[key].objectId)" layout="row" layout-align="center center" class="pt-5">
-                                        <span>{{document[key].objectId}}</span>
-                                    </a>
-                                </md-input-container>
+                                <div ng-if="!editMode[(position + 1 + '') + ($index + '')]">
+                                    <div ng-if="!document[key]" class="ellipsis-text">
+                                        <span class="undefined-text" ng-model="document[key]">
+                                            (undefined)
+                                        </span>
+                                    </div>
+                                    <div ng-if="document[key]" class="ellipsis-text">
+                                        <md-input-container ng-if="editable(key)" md-no-float class="md-block ">
+                                            <a href="javascript:void(0)" ng-click="gotoPointerClass(document[key].className, document[key].objectId)" layout="row" layout-align="center center" class="pt-5">
+                                                <span>{{document[key].objectId}}</span>
+                                            </a>
+                                        </md-input-container>
+                                    </div>
+                                </div>
+                                <div ng-if="editMode[(position + 1 + '') + ($index + '')]">
+                                    <div ng-form name="vm.editForm">
+                                    </div>
+                                </div>
                             </div>
                             <!-- / Pointer Type -->
                         </div>

@@ -5,7 +5,8 @@
         .module('app.application.classes')
         .controller('ClassesController', function($scope, $http, $cookies, $window, $state,
             $stateParams, $mdDialog, $document, $rootScope, $timeout, msSchemasService,
-            msDialogService, msToastService, msUserService, msApplicationService) {
+            msDialogService, msToastService, msUserService, msApplicationService,
+            msFileUploadService) {
 
             if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');
@@ -44,7 +45,7 @@
             var skip;
             $scope.numPerPage = 10;
 
-            var renderClass = function() {
+            var renderClass = function(refresh) {
                 msSchemasService.getSchema(appId, appName, className, function(error, results) {
                     if (error) {
                         if (error.status === 401) {
@@ -55,12 +56,25 @@
                     }
 
                     appId = msSchemasService.getAppId();
-                    $scope.schemas = results.fields;
-                    var fields = Object.getOwnPropertyNames(results.fields);
-                    $scope.allFields = [].concat(fields);
-                    fields.splice(0, 3);
-                    $scope.fields = [].concat(fields);
-                    $scope.fields_add = [].concat(fields);
+
+                    if (refresh) {
+                        $timeout(function() {
+                            $scope.schemas = [];
+                        }).then(function() {
+                            $timeout(function() {
+                                $scope.schemas = results.fields;
+                            });
+                        });
+
+                    } else {
+                        $scope.schemas = results.fields;
+                    }
+
+                    // var fields = Object.getOwnPropertyNames(results.fields);
+                    // $scope.allFields = [].concat(fields);
+                    // fields.splice(0, 3);
+                    // $scope.fields = [].concat(fields);
+                    // $scope.fields_add = [].concat(fields);
 
                     if (_objectId) {
                         var preparedCriteria = {
@@ -84,7 +98,7 @@
                             }];
                         });
                     } else {
-                        pagination();
+                        pagination(refresh);
                     }
                 });
             };
@@ -136,14 +150,14 @@
                 });
             }
 
-            var pagination = function() {
+            var pagination = function(refresh) {
                 // if ($scope.currentPage === 1) {
                 //     skip = 0;
                 // } else {
                 //     skip = ($scope.currentPage - 1) * $scope.numPerPage;
                 // }
-                msSchemasService.getDocuments(appId, className, null, null,
-                    function(error, results, count) {
+                if (refresh) {
+                    msSchemasService.getDocumentsFromServer(appId, className, function(error, results) {
                         if (error) {
                             return alert(error.statusText);
                         }
@@ -154,9 +168,24 @@
                         $scope.documents.forEach(function(_document) {
                             objectIdList.push(_document.objectId);
                         });
-
-                        // $scope.totalItems = count;
                     });
+                } else {
+                    msSchemasService.getDocuments(appId, className, null, null,
+                        function(error, results, count) {
+                            if (error) {
+                                return alert(error.statusText);
+                            }
+
+                            $scope.documents = results
+                            $scope.allDocuments = angular.copy(results);
+
+                            $scope.documents.forEach(function(_document) {
+                                objectIdList.push(_document.objectId);
+                            });
+
+                            // $scope.totalItems = count;
+                        });
+                }
             }
 
             // var sort = function() {
@@ -200,6 +229,12 @@
                             } else {
                                 value.latitude = Number(lat);
                                 value.longitude = Number(long);
+                            }
+                            break;
+                        case 'File':
+                            value = {
+                                'name': value,
+                                '__type': 'File'
                             }
                             break;
                     }
@@ -257,6 +292,9 @@
                 });
 
                 if (vm.editForm.$dirty) {
+
+                    console.log('Update ne');
+
                     var objectId = _document.objectId;
                     var value = _document[field];
                     var type = $scope.schemas[field].type;
@@ -273,8 +311,17 @@
                             }
                         } else {
                             data[field] = results;
+
+                            console.log(data);
+
                             msSchemasService.updateValues(className, appId, objectId, field, data,
-                                function(results) {});
+                                function(results) {
+                                    if (type === 'File') {
+                                        data[field]['url'] = 'http://localhost:1337/csbm/files/' + appId + '/' + data[field].name;
+                                        _document[field] = data[field];
+                                        $scope.allDocuments = angular.copy($scope.documents);
+                                    }
+                                });
                         }
                     });
                 } else if ($scope.schemas[field].type === 'Array') {
@@ -337,6 +384,26 @@
                 }
             };
 
+            $scope.uploadFile = function(el) {
+                var file = el.files[0];
+                msFileUploadService.uploadFile(appId, file, function(error, results) {
+                    vm.editForm.$setDirty();
+                    $scope.updatingObject.document[$scope.updatingObject.field] = results.data.name;
+                    $scope.updateValues($scope.updatingObject.index,
+                        $scope.updatingObject.document, $scope.updatingObject.field,
+                        $scope.updatingObject.updatedValue);
+                });
+            };
+
+            $scope.deleteFile = function(_document, key) {
+                // console.log(_document[key]);
+                vm.editForm.$setDirty();
+                $scope.updatingObject.document[$scope.updatingObject.field] = "deleted";
+                $scope.updateValues($scope.updatingObject.index,
+                    $scope.updatingObject.document, $scope.updatingObject.field,
+                    $scope.updatingObject.updatedValue);
+            };
+
             $scope.gotoPointerClass = function(_className, _objectId) {
                 $state.go('app.application_classes_' + _className, { 'appId': appId, 'className': _className, 'objectId': _objectId });
             };
@@ -348,6 +415,10 @@
 
             var editable = function(field) {
                 return uneditableFileds.indexOf(field) === -1;
+            };
+
+            $scope.refreshDocuments = function() {
+                renderClass(true);
             };
 
             $scope.showFilterDialog = function(ev) {
@@ -489,11 +560,12 @@
                     targetEvent: ev,
                     clickOutsideToClose: false,
                     locals: {
-                        schemas: $scope.schemas
+                        schemas: $scope.schemas,
+                        documents: $scope.documents
                     }
                 });
 
-                function DeleteDialogController($scope, schemas) {
+                function DeleteDialogController($scope, schemas, documents) {
                     var uneditableFileds = ['objectId', 'createdAt', 'updatedAt'];
 
                     $scope.schemas = schemas;
@@ -516,7 +588,7 @@
                                 .cancel('No');
 
                             $mdDialog.show(confirm).then(function() {
-                                msSchemasService.deleteField(className, appId, $scope.columnName,
+                                msSchemasService.deleteField(schemas, documents, className, appId, $scope.columnName,
                                     function(error, results) {
                                         if (error) {
                                             if (error.status === 401) {
@@ -525,6 +597,9 @@
 
                                             return alert(error.statusText);
                                         }
+
+                                        // console.log($scope.schemas);
+
                                     });
                                 $scope.closeDialog();
                             }, function() {
@@ -732,7 +807,6 @@
                 });
             };
 
-
             var curTH;
             var startOffset;
             var curIndex;
@@ -856,11 +930,16 @@
                 }
 
                 if (dragSrcEl != thisEl) {
+                    var fromRealColIndex = getParentByTagName(dragSrcEl, 'th').cellIndex - 1;
+                    var toRealColIndex = getParentByTagName(thisEl, 'th').cellIndex - 1;
+
+                    console.log();
 
                     swapEls(dragSrcEl, thisEl);
 
                     var fromColIndex = (dragSrcEl.id).split('_')[1];
                     var toColIndex = (thisEl.id).split('_')[1];
+
 
                     var fromColClassName = '.cell_' + fromColIndex;
                     var toColClassName = '.cell_' + toColIndex;
