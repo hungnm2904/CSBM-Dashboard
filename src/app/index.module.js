@@ -28,6 +28,9 @@
             // Application
             'app.application',
 
+            //Admin
+            'app.admin',
+
             // Documents for frameworks
             'app.docs'
         ]);

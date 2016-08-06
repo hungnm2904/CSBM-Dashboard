@@ -78,6 +78,29 @@
                     icon: 'icon-apps',
                     state: 'app.management_applications'
                 });
+
+                renderAdminNavigations();
+            };
+
+            function renderAdminNavigations() {
+                // msNavigationService.clearNavigation();
+                msNavigationService.saveItem('admin', {
+                    title: 'Admin',
+                    group: true,
+                    weight: 1
+                });
+
+                msNavigationService.saveItem('admin.applications', {
+                    title: 'Applications',
+                    icon: 'icon-apps',
+                    state: 'app.admin_manageApplications'
+                });
+
+                msNavigationService.saveItem('admin.users', {
+                    title: 'User',
+                    icon: 'icon-apps',
+                    state: 'app.admin_users'
+                });
             };
 
             function _checkState(states, name, callback) {

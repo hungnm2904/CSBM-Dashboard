@@ -1,0 +1,44 @@
+<div id="admin-applications" class="page-layout simple fullwidth doc-page">
+    <!-- HEADER -->
+    <div class="header md-accent-bg" layout="row" layout-align="space-between">
+        <div layout="column" layout-align="center start">
+            <div class="sub-title"></div>
+            <div class="title">Applications<span class="title-info"></span></div>
+        </div>
+        <div layout="row" layout-align="start center">
+            <md-button aria-label="refresh button" ng-click="">
+                <md-icon md-font-icon="icon-refresh"></md-icon>
+                <span>Refresh</span>
+            </md-button>
+        </div>
+    </div>
+    <!-- / HEADER -->
+    <!-- CONTENT -->
+    <div class="content">
+        <div class="white-bg md-whiteframe-4dp">
+            <table class="dataTable row-border hover" datatable="ng" dt-options="dtOptions">
+                <thead>
+                    <tr>
+                        <th ng-repeat="(key, value) in headers" class="secondary-text">
+                            <div class="table-header">
+                                <span class="column-title">{{key}}</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="document in documents">
+                        <td>{{document.objectId}}</td>
+                        <td>{{document.createdAt}}</td>
+                        <td>{{document.updatedAt}}</td>
+                        <td>
+                            <md-switch class="md-primary" aria-label="Switch" ng-model="document.active" ng-change="onChange(document.objectId, document.active)">
+                            </md-switch>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- / CONTENT -->
+</div>
