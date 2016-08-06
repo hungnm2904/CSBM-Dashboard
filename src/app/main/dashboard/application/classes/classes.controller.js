@@ -86,7 +86,7 @@
                                 return alert(error.statusText);
                             }
 
-                            $scope.documents = results.documents;
+                            $scope.documents = results;
 
                             $scope.documents.forEach(function(_document, index) {
                                 objectIdList.push(_document.objectId);
@@ -405,7 +405,14 @@
             };
 
             $scope.gotoPointerClass = function(_className, _objectId) {
-                $state.go('app.application_classes_' + _className, { 'appId': appId, 'className': _className, 'objectId': _objectId });
+                console.log(_className);
+                console.log(_objectId);
+                $state.go('app.application_classes_' + _className, {
+                    'appId': appId,
+                    'appName': appName,
+                    'className': _className,
+                    'objectId': _objectId
+                });
             };
 
             var uneditableFileds = ['objectId', 'createdAt', 'updatedAt'];
