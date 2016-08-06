@@ -46,61 +46,58 @@
             $scope.numPerPage = 10;
 
             var renderClass = function(refresh) {
-                msSchemasService.getSchema(appId, appName, className, function(error, results) {
-                    if (error) {
-                        if (error.status === 401) {
-                            return $state.go('app.pages_auth_login');
-                        }
-
-                        return alert(error.statusText);
-                    }
-
-                    appId = msSchemasService.getAppId();
-
-                    if (refresh) {
-                        $timeout(function() {
-                            $scope.schemas = [];
-                        }).then(function() {
-                            $timeout(function() {
-                                $scope.schemas = results.fields;
-                            });
-                        });
-
-                    } else {
+                if (refresh) {
+                    msSchemasService.getSchemaFromServer(appId, appName, className, function(error, results) {
+                        // $timeout(function() {
+                        //     $scope.schemas = [];
+                        // }).then(function() {
+                        //     $timeout(function() {
+                        //         $scope.schemas = results.fields;
+                        //     });
+                        // });
                         $scope.schemas = results.fields;
-                    }
-
-                    // var fields = Object.getOwnPropertyNames(results.fields);
-                    // $scope.allFields = [].concat(fields);
-                    // fields.splice(0, 3);
-                    // $scope.fields = [].concat(fields);
-                    // $scope.fields_add = [].concat(fields);
-
-                    if (_objectId) {
-                        var preparedCriteria = {
-                            'objectId': _objectId
-                        };
-
-                        msSchemasService.filter(appId, className, preparedCriteria, function(error, results) {
-                            if (error) {
-                                return alert(error.statusText);
+                        pagination(refresh);
+                    });
+                } else {
+                    msSchemasService.getSchema(appId, appName, className, function(error, results) {
+                        if (error) {
+                            if (error.status === 401) {
+                                return $state.go('app.pages_auth_login');
                             }
 
-                            $scope.documents = results;
+                            return alert(error.statusText);
+                        }
 
-                            $scope.documents.forEach(function(_document, index) {
-                                objectIdList.push(_document.objectId);
+                        appId = msSchemasService.getAppId();
+
+                        $scope.schemas = results.fields;
+
+                        if (_objectId) {
+                            var preparedCriteria = {
+                                'objectId': _objectId
+                            };
+
+                            msSchemasService.filter(appId, className, preparedCriteria, function(error, results) {
+                                if (error) {
+                                    return alert(error.statusText);
+                                }
+
+                                $scope.documents = results;
+
+                                $scope.documents.forEach(function(_document, index) {
+                                    objectIdList.push(_document.objectId);
+                                });
+                                $scope.filterCriteria = [{
+                                    field: 'objectId',
+                                    operation: 'equals',
+                                    value: _objectId
+                                }];
                             });
-                            $scope.filterCriteria = [{
-                                field: 'objectId',
-                                operation: 'equals',
-                                value: _objectId
-                            }];
-                        });
-                    } else {
-                        pagination(refresh);
-                    }
-                });
+                        } else {
+                            pagination();
+                        }
+                    });
+                }
             };
 
             var filter = function(filterCriteria) {
@@ -218,9 +215,9 @@
                                 return callback(true, null);
                             }
                             break;
-                        case 'Boolean':
-                            value = (value.toLowerCase() === 'true');
-                            break;
+                        // case 'Boolean':
+                        //     value = (value.toLowerCase() === 'true');
+                        //     break;
                         case 'GeoPoint':
                             var lat = value.latitude;
                             var long = value.longitude
@@ -260,18 +257,20 @@
             };
 
             $scope.goEditMode = function(index, _document, key) {
-                if ($scope.schemas[key].type === 'Array') {
-                    _document[key] = JSON.stringify(_document[key]);
-                }
+                if (!editing) {
+                    if ($scope.schemas[key].type === 'Array') {
+                        _document[key] = JSON.stringify(_document[key]);
+                    }
 
-                $scope.updatingObject = {
-                    index: index,
-                    document: _document,
-                    field: key,
-                    updatedValue: _document[key]
-                };
-                $scope.editMode[index] = true;
-                editing = true;
+                    $scope.updatingObject = {
+                        index: index,
+                        document: _document,
+                        field: key,
+                        updatedValue: _document[key]
+                    };
+                    $scope.editMode[index] = true;
+                    editing = true;
+                }
             };
 
             document.addEventListener('click', function(e) {
@@ -292,9 +291,6 @@
                 });
 
                 if (vm.editForm.$dirty) {
-
-                    console.log('Update ne');
-
                     var objectId = _document.objectId;
                     var value = _document[field];
                     var type = $scope.schemas[field].type;
@@ -557,8 +553,6 @@
             };
 
             $scope.showDeleteColumnDialog = function(ev) {
-                // msDialogService
-                //     .showDialog(ev, 'app/core/services/dialogs/deleteColumnDialog.html');
                 $mdDialog.show({
                     controller: DeleteDialogController,
                     controllerAs: 'vm',
@@ -604,13 +598,10 @@
 
                                             return alert(error.statusText);
                                         }
-
-                                        // console.log($scope.schemas);
-
                                     });
-                                $scope.closeDialog();
+                                $scope.closeDialog(documents);
                             }, function() {
-                                $scope.closeDialog();
+                                $scope.closeDialog(documents);
                             });
                         }
                     };
@@ -878,95 +869,95 @@
                 }
             };
 
-            $scope.handleDragStart = function(e) {
-                var thisEl = e.target;
-                if (thisEl.tagName !== 'DIV') {
-                    thisEl = getParentByTagName(thisEl, 'div');
-                }
+            // $scope.handleDragStart = function(e) {
+            //     var thisEl = e.target;
+            //     if (thisEl.tagName !== 'DIV') {
+            //         thisEl = getParentByTagName(thisEl, 'div');
+            //     }
 
-                thisEl.style.opacity = '0.4';
-                dragSrcEl = thisEl;
+            //     thisEl.style.opacity = '0.4';
+            //     dragSrcEl = thisEl;
 
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/html', thisEl.innerHTML);
-            };
+            //     e.dataTransfer.effectAllowed = 'move';
+            //     e.dataTransfer.setData('text/html', thisEl.innerHTML);
+            // };
 
-            $scope.handleDragEnd = function(e) {
-                dragSrcEl.style.opacity = '1';
-            };
+            // $scope.handleDragEnd = function(e) {
+            //     dragSrcEl.style.opacity = '1';
+            // };
 
-            $scope.handleDragOver = function(e) {
-                if (e.preventDefault) {
-                    e.preventDefault();
-                }
+            // $scope.handleDragOver = function(e) {
+            //     if (e.preventDefault) {
+            //         e.preventDefault();
+            //     }
 
-                e.dataTransfer.dropEffect = 'move';
+            //     e.dataTransfer.dropEffect = 'move';
 
-                return false;
-            };
+            //     return false;
+            // };
 
-            $scope.handleDragEnter = function(e) {
-                var thisEl = e.target;
-                if (thisEl.tagName !== 'TH') {
-                    thisEl = getParentByTagName(thisEl, 'th');
-                }
+            // $scope.handleDragEnter = function(e) {
+            //     var thisEl = e.target;
+            //     if (thisEl.tagName !== 'TH') {
+            //         thisEl = getParentByTagName(thisEl, 'th');
+            //     }
 
-                if (dragSrcEl != thisEl) {
-                    thisEl.classList.add('be-drag-over');
-                }
-            };
+            //     if (dragSrcEl != thisEl) {
+            //         thisEl.classList.add('be-drag-over');
+            //     }
+            // };
 
-            $scope.handleDragLeave = function(e) {
-                var thisEl = e.target;
-                if (thisEl.tagName !== 'TH') {
-                    thisEl = getParentByTagName(thisEl, 'th');
-                }
+            // $scope.handleDragLeave = function(e) {
+            //     var thisEl = e.target;
+            //     if (thisEl.tagName !== 'TH') {
+            //         thisEl = getParentByTagName(thisEl, 'th');
+            //     }
 
-                thisEl.classList.remove('be-drag-over');
-            };
+            //     thisEl.classList.remove('be-drag-over');
+            // };
 
-            $scope.handleDrop = function(e) {
-                var thisEl = e.target;
+            // $scope.handleDrop = function(e) {
+            //     var thisEl = e.target;
 
-                if (e.stopPropagation) {
-                    e.stopPropagation();
-                }
+            //     if (e.stopPropagation) {
+            //         e.stopPropagation();
+            //     }
 
-                if (thisEl.tagName !== 'DIV') {
-                    thisEl = getParentByTagName(thisEl, 'div');
-                }
+            //     if (thisEl.tagName !== 'DIV') {
+            //         thisEl = getParentByTagName(thisEl, 'div');
+            //     }
 
-                if (dragSrcEl != thisEl) {
-                    var fromRealColIndex = getParentByTagName(dragSrcEl, 'th').cellIndex - 1;
-                    var toRealColIndex = getParentByTagName(thisEl, 'th').cellIndex - 1;
+            //     if (dragSrcEl != thisEl) {
+            //         var fromRealColIndex = getParentByTagName(dragSrcEl, 'th').cellIndex - 1;
+            //         var toRealColIndex = getParentByTagName(thisEl, 'th').cellIndex - 1;
 
-                    console.log();
+            //         console.log();
 
-                    swapEls(dragSrcEl, thisEl);
+            //         swapEls(dragSrcEl, thisEl);
 
-                    var fromColIndex = (dragSrcEl.id).split('_')[1];
-                    var toColIndex = (thisEl.id).split('_')[1];
+            //         var fromColIndex = (dragSrcEl.id).split('_')[1];
+            //         var toColIndex = (thisEl.id).split('_')[1];
 
 
-                    var fromColClassName = '.cell_' + fromColIndex;
-                    var toColClassName = '.cell_' + toColIndex;
-                    var fromColCellList = document.querySelectorAll(fromColClassName);
-                    var toColCellList = document.querySelectorAll(toColClassName);
+            //         var fromColClassName = '.cell_' + fromColIndex;
+            //         var toColClassName = '.cell_' + toColIndex;
+            //         var fromColCellList = document.querySelectorAll(fromColClassName);
+            //         var toColCellList = document.querySelectorAll(toColClassName);
 
-                    fromColCellList.forEach(function(fromColCell, index) {
-                        var toColCell = toColCellList[index];
-                        swapEls(fromColCell, toColCell);
-                    });
-                }
+            //         fromColCellList.forEach(function(fromColCell, index) {
+            //             var toColCell = toColCellList[index];
+            //             swapEls(fromColCell, toColCell);
+            //         });
+            //     }
 
-                thisEl = getParentByTagName(thisEl, 'th');
-                thisEl.classList.remove('be-drag-over');
-                dragSrcEl.style.opacity = '1';
-                dragSrcEl = getParentByTagName(dragSrcEl, 'th');
-                dragSrcEl.classList.remove('be-drag-over');
+            //     thisEl = getParentByTagName(thisEl, 'th');
+            //     thisEl.classList.remove('be-drag-over');
+            //     dragSrcEl.style.opacity = '1';
+            //     dragSrcEl = getParentByTagName(dragSrcEl, 'th');
+            //     dragSrcEl.classList.remove('be-drag-over');
 
-                return false;
-            };
+            //     return false;
+            // };
 
         });
 })();

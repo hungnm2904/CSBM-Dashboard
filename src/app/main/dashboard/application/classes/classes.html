@@ -74,7 +74,7 @@
                         <md-checkbox aria-label=" " ng-checked="isChecked()" md-indeterminate="isIndeterminate()" ng-click="toggleAll()"></md-checkbox>
                     </th>
                     <th ng-repeat="(key, value) in schemas" class="no-select">
-                        <div id="header_{{$index}}" class="be-header" draggable="true" ondragstart="angular.element(this).scope().handleDragStart(event)" ondragend="angular.element(this).scope().handleDragEnd(event)" ondragover="angular.element(this).scope().handleDragOver(event)" ondragenter="angular.element(this).scope().handleDragEnter(event)" ondragleave="angular.element(this).scope().handleDragLeave(event)" ondrop="angular.element(this).scope().handleDrop(event)">
+                        <div id="header_{{$index}}" class="be-header" draggable="false" ondragstart="angular.element(this).scope().handleDragStart(event)" ondragend="angular.element(this).scope().handleDragEnd(event)" ondragover="angular.element(this).scope().handleDragOver(event)" ondragenter="angular.element(this).scope().handleDragEnter(event)" ondragleave="angular.element(this).scope().handleDragLeave(event)" ondrop="angular.element(this).scope().handleDrop(event)">
                             {{key}}
                             <span ng-if="schemas[key].type != 'Pointer'">{{schemas[key].type}}</span>
                             <span ng-if="schemas[key].type == 'Pointer'">
@@ -100,10 +100,10 @@
                             <!-- String, Datetime, Number, Boolean Type -->
                             <div ng-if="checkFieldType(key, 'String') || checkFieldType(key, 'Date') || checkFieldType(key, 'Number') || checkFieldType(key, 'Boolean') || checkFieldType(key, 'Array')">
                                 <div ng-if="!editMode[(position + 1 + '') + ($index + '')]" class="ellipsis-text">
-                                    <span ng-if="document[key]" name="schemavalue" ng-model="document[key]">
+                                    <span ng-if="document[key] != undefined" name="schemavalue" ng-model="document[key]">
                                         {{document[key]}}
                                     </span>
-                                    <span class="undefined-text" ng-if="!document[key]" id="doc-input-{{(position + 1 + '') + ($index + '')}}" name="schemavalue" ng-model="document[key]">
+                                    <span class="undefined-text" ng-if="document[key] == undefined" id="doc-input-{{(position + 1 + '') + ($index + '')}}" name="schemavalue" ng-model="document[key]">
                                         (undefined)
                                     </span>
                                 </div>
@@ -116,9 +116,17 @@
                                         <!-- / Edit for String Type -->
                                         <!-- Edit for Number Type -->
                                         <div ng-if="checkFieldType(key, 'Number')">
-                                            <input type="number" aria-label=" " ng-model="document[key]" autofocus>
+                                            <input type="number" aria-label=" " ng-model="document[key]">
                                         </div>
                                         <!-- / Edit for Number Type -->
+                                        <!-- Edit for Boolean Type -->
+                                        <div class="boolean-text" ng-if="checkFieldType(key, 'Boolean')" layout="row" layout-align="space-between center">
+                                            <span class="no-select" ng-class="{'be-active': document[key] == false}">False</span>
+                                            <md-switch ng-model="document[key]" aria-label="boolean type">
+                                            </md-switch>
+                                            <span class="no-select" ng-class="{'be-active': document[key] == true}">True</span>
+                                        </div>
+                                        <!-- / Edit for Boolean Type -->
                                         <!-- Edit for Array Type -->
                                         <div ng-if="checkFieldType(key, 'Array')">
                                             <textarea aria-label=" " ng-model="document[key]" rows="3" autofocus></textarea>
@@ -162,27 +170,27 @@
                                             (undefined)
                                         </span>
                                     </div>
-                                    <div ng-if="document[key] && document[key].name != 'deleted'" class="ellipsis-text">
-                                        <md-input-container md-no-float class="md-block ">
-                                            <a ng-href="{{document[key].url}}" target="_blank" layout="row" layout-align="center center" class="pt-5">
-                                                {{getFileType(document[key].name)}}
+                                    <div ng-if="document[key] && document[key].name != 'deleted'">
+                                        <div layout="column" layout-align="center stretch">
+                                            <a ng-href="{{document[key].url}}" target="_blank" class="be-button be-button-blue">
+                                                {{document[key].name.substr((document[key].name).indexOf('_') + 1, document[key].name.length)}}
                                             </a>
-                                        </md-input-container>
+                                        </div>
                                     </div>
                                 </div>
                                 <div ng-if="editMode[(position + 1 + '') + ($index + '')]">
                                     <div ng-form name="vm.editForm">
                                         <div class="upload-file-wrapper" ng-if="!document[key] || document[key].name == 'deleted'" class="ellipsis-text">
                                             <input class="ng-hide" id="js-file" type="file" onchange="angular.element(this).scope().uploadFile(this)" />
-                                            <label for="js-file" class="md-button md-raised md-primary">Upload file</label>
+                                            <label for="js-file" class="be-button be-button-blue no-select">Upload file</label>
                                         </div>
-                                        <div class="upload-file-wrapper" ng-if="document[key] && document[key].name != 'deleted'" class="ellipsis-text" layout="column">
+                                        <div class="upload-file-wrapper" ng-if="document[key] && document[key].name != 'deleted'" layout="column" layout-align="center stretch" layout-padding>
                                             <div flex>
                                                 <input class="ng-hide" id="updateFile" type="file" onchange="angular.element(this).scope().uploadFile(this)" />
-                                                <label for="updateFile" class="md-button md-raised md-accent">Replace file</label>
+                                                <label for="updateFile" class="be-button be-button-blue no-select">Replace file</label>
                                             </div>
                                             <div flex>
-                                                <md-button class="md-raised md-warn" ng-click="deleteFile(document, key)">Delete file</md-button>
+                                                <button type="button" class="be-button be-button-red no-select" ng-click="deleteFile(document, key)">Delete file</button>
                                             </div>
                                         </div>
                                     </div>
@@ -198,11 +206,9 @@
                                         </span>
                                     </div>
                                     <div ng-if="document[key]" class="ellipsis-text">
-                                        <md-input-container ng-if="editable(key)" md-no-float class="md-block ">
-                                            <a href="javascript:void(0)" ng-click="gotoPointerClass(document[key].className, document[key].objectId)" layout="row" layout-align="center center" class="pt-5">
-                                                <span>{{document[key].objectId}}</span>
-                                            </a>
-                                        </md-input-container>
+                                        <a href="javascript:void(0)" ng-click="gotoPointerClass(document[key].className, document[key].objectId)" class="be-button be-button-blue">
+                                            <span>{{document[key].objectId}}</span>
+                                        </a>
                                     </div>
                                 </div>
                                 <div ng-if="editMode[(position + 1 + '') + ($index + '')]">

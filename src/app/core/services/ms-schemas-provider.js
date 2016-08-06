@@ -18,16 +18,20 @@
 
             var service = {
                 setSchemas: setSchemas,
+                getSchemasFromLocal: getSchemasFromLocal,
+                getSchemasFromServer: getSchemasFromServer,
                 getSchemas: getSchemas,
+                clearSchemas: clearSchemas,
+                getSchemaFromLocal: getSchemaFromLocal,
+                getSchemaFromServer: getSchemaFromServer,
+                getSchema: getSchema,
+                setDocuments: setDocuments,
+                getDocumentsFromServer: getDocumentsFromServer,
+                getDocuments: getDocuments,
                 getAppId: getAppId,
                 setAppId: setAppId,
-                clearSchemas: clearSchemas,
-                getSchema: getSchema,
                 createSchema: createSchema,
                 addSchema: addSchema,
-                setDocuments: setDocuments,
-                getDocuments: getDocuments,
-                getDocumentsFromServer: getDocumentsFromServer,
                 createDocument: createDocument,
                 createDocuments: createDocuments,
                 addField: addField,
@@ -52,11 +56,11 @@
                 // $rootScope.$broadcast('schemas-changed', { 'appId': appId, 'className': className });
             };
 
-            function getSchemas(appId, appName, className, callback) {
-                if (_schemas.length > 0 && _appId === appId) {
-                    return callback(null, _schemas);
-                }
+            function getSchemasFromLocal(callback) {
+                return callback(null, _schemas);
+            };
 
+            function getSchemasFromServer(appId, appName, className, callback) {
                 msMasterKeyService.getMasterKey(appId, function(error, results) {
                     if (error) {
                         return callback(error);
@@ -72,11 +76,73 @@
                         }
                     }).then(function(response) {
                         setSchemas(appId, appName, className, response.data.results);
-                        callback(null, _schemas);
+                        callback(null, response.data.results);
                     }, function(response) {
                         callback(response);
                     });
                 });
+            };
+
+            function getSchemas(appId, appName, className, callback) {
+                if (_schemas.length > 0 && _appId === appId) {
+                    getSchemasFromLocal(callback);
+                } else {
+                    getSchemasFromServer(appId, appName, className, callback);
+                }
+            };
+
+            function getSchemaFromLocal(className, callback) {
+                _schemas.some(function(schema) {
+                    if (schema.className === className) {
+                        callback(null, schema);
+
+                        return true;
+                    }
+                });
+            };
+
+            function getSchemaFromServer(appId, appName, className, callback) {
+                getSchemasFromServer(appId, appName, className, function(error, results) {
+                    if (error) {
+                        callback(error);
+                    } else {
+                        getSchemaFromLocal(className, callback);
+                    }
+                });
+            };
+
+            function getSchema(appId, appName, className, callback) {
+                if (appId) {
+                    if (_schemas.length > 0 && _appId === appId) {
+                        getSchemaFromLocal(className, callback);
+                    } else {
+                        getSchemasFromServer(appId, appName, className, function(error, results) {
+                            if (error) {
+                                callback(error);
+                            } else {
+                                getSchemaFromLocal(className, callback);
+                            }
+                        });
+                    }
+                } else {
+                    if (_appId) {
+                        getSchemaFromLocal(className, callback);
+                    } else {
+                        msApplicationService.getAppId(appName, function(error, results) {
+                            if (error) {
+                                return callback(error);
+                            }
+
+                            getSchemasFromServer(appId, appName, className, function(error, results) {
+                                if (error) {
+                                    return callback(error);
+                                }
+
+                                getSchemaFromLocal(className, callback);
+                            });
+                        });
+                    }
+                }
             };
 
             function clearSchemas() {
@@ -90,66 +156,6 @@
             function setAppId(appId) {
                 _appId = appId;
             }
-
-            function getSchema(appId, appName, className, callback) {
-                if (appId) {
-                    if (_schemas.length > 0 && _appId === appId) {
-                        _schemas.some(function(schema) {
-                            if (schema.className === className) {
-                                callback(null, schema);
-
-                                return true;
-                            }
-                        });
-                    } else {
-                        service.getSchemas(appId, appName, className, function(error, results) {
-                            if (error) {
-                                return callback(error);
-                            }
-
-                            _schemas.some(function(schema) {
-                                if (schema.className === className) {
-                                    callback(null, schema);
-
-                                    return true;
-                                }
-                            });
-                        });
-                    }
-                } else {
-                    if (_appId) {
-                        console.log('!appId && _appId');
-                        _schemas.some(function(schema) {
-                            if (schema.className === className) {
-                                callback(null, schema);
-
-                                return true;
-                            }
-                        });
-                    } else {
-                        console.log('!appId && !_appId');
-                        msApplicationService.getAppId(appName, function(error, results) {
-                            if (error) {
-                                return callback(error);
-                            }
-
-                            service.getSchemas(results.appId, appName, className, function(error, results) {
-                                if (error) {
-                                    return callback(error);
-                                }
-
-                                _schemas.some(function(schema) {
-                                    if (schema.className === className) {
-                                        callback(null, schema);
-
-                                        return true;
-                                    }
-                                });
-                            });
-                        });
-                    }
-                }
-            };
 
             function createSchema(className, appName, callback) {
                 msMasterKeyService.getMasterKey(_appId, function(error, results) {
@@ -475,7 +481,9 @@
                         // });
 
                         delete fields[columnName];
-                        delete documents[columnName];
+                        documents.forEach(function(_document, index) {
+                            delete _document[columnName];
+                        });
 
                         callback(null, response.data);
                     }, function(response) {

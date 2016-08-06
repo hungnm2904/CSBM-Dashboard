@@ -12,7 +12,7 @@
     right: 10px;
     overflow-x: auto;
     overflow-y: hidden;
-    background: rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.1);
     table {
         table-layout: fixed;
         width: 0;
@@ -54,6 +54,8 @@
         }
         td {
             padding: 0 !important;
+            min-height: 40px;
+            height: 40px;
             .be-cell {
                 text-overflow: ellipsis;
                 overflow: hidden;
@@ -65,7 +67,6 @@
             input {
                 width: 100%;
             }
-
         }
     }
     thead {
