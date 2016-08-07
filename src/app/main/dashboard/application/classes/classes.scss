@@ -25,3 +25,25 @@
         color: #BDBDBD;
     }
 }
+
+#acl {
+    width: 100%;
+    border-collapse: collapse;
+    .acl-public-row {
+        background: #BBDEFB;
+    }
+    tr {
+        th,
+        td {
+            &:first-child {
+                width: 60%;
+            }
+            &:not(:first-child) {
+                padding: 0 10px;
+            }
+            &:nth-child(even) {
+                background: rgba(0,0,0,0.1);
+            }
+        }
+    }
+}

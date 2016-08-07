@@ -1,0 +1,62 @@
+<md-dialog class="compose-dialog" aria-label="ACL Settings">
+    <form class="md-inline-form">
+        <md-toolbar class="md-accent md-hue-2">
+            <div class="md-toolbar-tools" layout="row" layout-align="center center">
+                <span class="title">Edit Access Control List (ACL)</span>
+            </div>
+        </md-toolbar>
+        <md-dialog-content ms-scroll>
+            <table id="acl">
+                <thead>
+                    <tr class="acl-public-row">
+                        <th>Public</th>
+                        <th>
+                            <md-checkbox aria-label="Public read" ng-checked="publicRead" ng-click="togglePublicRead()">
+                                Read
+                            </md-checkbox>
+                        </th>
+                        <th>
+                            <md-checkbox aria-label="Public write" ng-checked="publicWrite" ng-click="togglePublicWrite()">
+                                Write
+                            </md-checkbox>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="acl in acls">
+                        <td>
+                            <md-input-container md-no-float class="md-block no-error-check-input">
+                                <input placeholder="UserId or Role" ng-model="acl.key" value="{{acl.key}}">
+                            </md-input-container>
+                        </td>
+                        <td>
+                            <md-checkbox ng-checked="acl.value.read" ng-click="toggleRead(acl)">
+                                Read
+                            </md-checkbox>
+                        </td>
+                        <td>
+                            <md-checkbox ng-checked="acl.value.write" ng-click="toggleWrite(acl)">
+                                Write
+                            </md-checkbox>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </md-dialog-content>
+        <md-dialog-actions layout="row" layout-align="start center">
+            <div layout="row" layout-align="start center">
+                <md-button class="be-button-no-bg md-primary" ng-click="cancel()" aria-label="Cancel">
+                    Cancel
+                </md-button>
+                <md-button ng-click="cancel()" class="send-button md-accent md-raised" aria-label="Save ACl">
+                    Add UserId or Role
+                </md-button>
+                <md-button ng-click="saveACL()" class="send-button md-accent md-raised" aria-label="Save ACl">
+                    Save ACL
+                </md-button>
+            </div>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

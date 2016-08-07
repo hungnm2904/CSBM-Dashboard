@@ -215,9 +215,9 @@
                                 return callback(true, null);
                             }
                             break;
-                        // case 'Boolean':
-                        //     value = (value.toLowerCase() === 'true');
-                        //     break;
+                            // case 'Boolean':
+                            //     value = (value.toLowerCase() === 'true');
+                            //     break;
                         case 'GeoPoint':
                             var lat = value.latitude;
                             var long = value.longitude
@@ -256,20 +256,24 @@
                 $mdDialog.hide();
             };
 
-            $scope.goEditMode = function(index, _document, key) {
-                if (!editing) {
-                    if ($scope.schemas[key].type === 'Array') {
-                        _document[key] = JSON.stringify(_document[key]);
-                    }
+            $scope.goEditMode = function(index, _document, key, ev) {
+                if ($scope.checkFieldType(key, 'ACL')) {
+                    $scope.showACLDialog(ev, _document);
+                } else {
+                    if (!editing) {
+                        if ($scope.schemas[key].type === 'Array') {
+                            _document[key] = JSON.stringify(_document[key]);
+                        }
 
-                    $scope.updatingObject = {
-                        index: index,
-                        document: _document,
-                        field: key,
-                        updatedValue: _document[key]
-                    };
-                    $scope.editMode[index] = true;
-                    editing = true;
+                        $scope.updatingObject = {
+                            index: index,
+                            document: _document,
+                            field: key,
+                            updatedValue: _document[key]
+                        };
+                        $scope.editMode[index] = true;
+                        editing = true;
+                    }
                 }
             };
 
@@ -712,6 +716,94 @@
 
                 };
             };
+
+            $scope.showACLDialog = function(ev, _document) {
+                var objectId = _document.objectId;
+                var acls = [];
+                var publicRead;
+                var publicWrite;
+
+                for (var key in _document.ACL) {
+                    if (key !== '*') {
+                        var acl = {
+                            'key': key,
+                            'value': _document.ACL[key]
+                        };
+                        acls.push(acl);
+                    } else {
+                        publicRead = _document.ACL[key].read;
+                        publicWrite = _document.ACL[key].write;
+                    }
+                };
+
+                $mdDialog.show({
+                    controller: ACLDialogController,
+                    controllerAs: 'vm',
+                    templateUrl: 'app/main/dashboard/application/classes/dialogs/ACLDialog.html',
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false,
+                    escapeToClose: false,
+                    locals: {
+                        objectId: objectId,
+                        acls: acls,
+                        publicRead: publicRead,
+                        publicWrite: publicWrite
+                    }
+                });
+
+                function ACLDialogController($scope, objectId, acls, publicRead, publicWrite) {
+                    $scope.acls = angular.copy(acls);
+                    $scope.publicRead = angular.copy(publicRead);
+                    $scope.publicWrite = angular.copy(publicWrite);
+
+                    $scope.closeDialog = function() {
+                        $mdDialog.hide();
+                    };
+
+                    $scope.toggleRead = function(acl) {
+                        acl.value.read = !acl.value.read;
+                    };
+
+                    $scope.toggleWrite = function(acl) {
+                        acl.value.write = !acl.value.write;
+                    };
+
+                    $scope.togglePublicRead = function() {
+                        $scope.publicRead = !$scope.publicRead;
+                    };
+
+                    $scope.togglePublicWrite = function() {
+                        $scope.publicWrite = !$scope.publicWrite;
+                    };
+
+                    $scope.cancel = function() {
+                        $scope.closeDialog();
+                    };
+
+                    $scope.saveACL = function() {
+                        var ACL = {};
+                        $scope.acls.forEach(function(acl, index) {
+                            var key = acl.key;
+                            var value = acl.value;
+                            ACL[key] = value;
+                        });
+
+                        ACL['*'] = {
+                            'read': $scope.publicRead || false,
+                            'write': $scope.publicWrite || false
+                        }
+
+                        var data = {
+                            'ACL': ACL
+                        };
+                        msSchemasService.updateValues(className, appId, objectId, 'ACL', data,
+                            function(results) {
+                                $scope.closeDialog();
+                            });
+                    };
+                };
+            }
 
             $scope.toggle = function(objectId) {
                 var index = $scope.checked.indexOf(objectId);

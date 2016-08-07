@@ -47,9 +47,6 @@
             return service;
 
             function setSchemas(appId, appName, className, schemas) {
-                schemas.forEach(function(schema) {
-                    delete schema.fields.ACL;
-                });
                 _schemas = schemas;
                 _appId = appId;
 
@@ -185,7 +182,6 @@
             };
 
             function addSchema(appName, schema) {
-                delete schema.fields.ACL
                 _schemas.push(schema);
 
                 $rootScope.$broadcast('schemas-changed', { 'appId': _appId, 'appName': appName });
@@ -493,7 +489,6 @@
             };
 
             function updateField(schema) {
-                delete schema.fields.ACL;
                 var className = schema.className;
                 var fields = schema.fields
 

@@ -10,12 +10,13 @@
                 $state.go('app.pages_auth_login');
             }
 
-            var getIndexByClassName = function(className) {
-                return Number($scope.schemas.some(function(schema, index) {
-                    if (schema.className === className) {
-                        return index;
+            var getIndexByClassName = function(name, list) {
+                for (var i = 0; i < list.length; i++) {
+                    var item = list[i];
+                    if (item.name === name) {
+                        return item.key;
                     }
-                }))
+                }
             };
 
             var initDiagram = function() {
@@ -52,7 +53,6 @@
                     }
                 }
 
-                // the item template for properties
                 var propertyTemplate =
                     $(go.Panel, "Horizontal",
                         // property visibility/access
@@ -78,7 +78,6 @@
                             }))
                     );
 
-                // the item template for methods
                 var methodTemplate =
                     $(go.Panel, "Horizontal",
                         // method visibility/access
@@ -111,8 +110,6 @@
                             new go.Binding("text", "type").makeTwoWay())
                     );
 
-                // this simple template does not have any buttons to permit adding or
-                // removing properties or methods, but it could!
                 myDiagram.nodeTemplate =
                     $(go.Node, "Auto", {
                             locationSpot: go.Spot.Center,
@@ -207,7 +204,6 @@
                             new go.Binding("toArrow", "relationship", convertToArrow))
                     );
 
-                // setup a few example class nodes and relationships
                 var nodedata = [];
                 var linkdata = [];
                 $scope.schemas.forEach(function(schema, index) {
@@ -224,11 +220,20 @@
                             type: fields[key].type,
                             visibility: 'public'
                         });
+                    }
+                });
 
+                console.log(nodedata);
+
+                $scope.schemas.forEach(function(schema, index) {
+                    var fields = schema.fields
+                    for (var key in fields) {
                         if (fields[key].type === 'Pointer') {
-                            var toIndex = getIndexByClassName(fields[key].targetClass);
+                            var fromIndex = getIndexByClassName(schema.className, nodedata);
+                            var toIndex = getIndexByClassName(fields[key].targetClass, nodedata);
+
                             linkdata.push({
-                                from: index,
+                                from: fromIndex,
                                 to: toIndex,
                                 relationship: "association"
                             });
@@ -271,7 +276,6 @@
                     }
 
                     $scope.schemas = results;
-                    console.log($scope.schemas);
                     initDiagram();
                 });
             };

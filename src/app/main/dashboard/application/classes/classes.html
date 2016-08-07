@@ -92,7 +92,7 @@
                     <td>
                         <md-checkbox aria-label=" " ng-checked="exists(document.objectId)" ng-click="toggle(document.objectId)"></md-checkbox>
                     </td>
-                    <td ng-repeat="(key, value) in schemas" id="cell_{{(position + 1 + '') + ($index + '')}}" class="cell_{{$index}}" ng-dblclick="goEditMode((position + 1 + '') + ($index + ''), document, key)">
+                    <td ng-repeat="(key, value) in schemas" id="cell_{{(position + 1 + '') + ($index + '')}}" class="cell_{{$index}}" ng-dblclick="goEditMode((position + 1 + '') + ($index + ''), document, key, $event)">
                         <div ng-if="!editable(key)" class="be-cell">
                             <span class="disable-text" ng-model="document[key]">{{document[key]}}</span>
                         </div>
@@ -217,6 +217,37 @@
                                 </div>
                             </div>
                             <!-- / Pointer Type -->
+                            <!-- ACL Type -->
+                            <div ng-if="checkFieldType(key, 'ACL')">
+                                <div ng-if="!editMode[(position + 1 + '') + ($index + '')]" class="ellipsis-text">
+                                    <span ng-repeat="(aclKey, aclValue) in document[key]">
+                                        <span ng-if="aclKey == '*'">
+                                            Public
+                                            <span ng-repeat="(perKey, perValue) in aclValue">
+                                                <span ng-if="$index == 1">
+                                                    &nbsp;+
+                                                </span>
+                                                <span ng-if="perValue">
+                                                    {{ perKey}}
+                                                </span>
+                                                <span ng-if="$index == 1">
+                                                    &nbsp;,
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span ng-if="aclKey != '*'">
+                                            <span ng-if="$index != 0">,&nbsp;</span>
+                                            <span>{{aclKey}}</span>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div ng-if="editMode[(position + 1 + '') + ($index + '')]">
+                                    <div ng-form name="vm.editForm">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / ACL Type -->
                         </div>
                     </td>
                 </tr>
