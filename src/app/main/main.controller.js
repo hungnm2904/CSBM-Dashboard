@@ -13,8 +13,14 @@
         };
 
         $scope.gotoDashboard = function() {
-            msUserService.getAccessToken() ? $state.go('app.management_applications') :
+            var role = msUserService.getCurrentRole();
+            if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');
+            } else if (role === 'Dev') {
+                $state.go('app.management_applications');
+            } else if (role === 'Admin') {
+                $state.go('app.admin_applications');
+            }
         }
 
         $scope.gotoDocs = function() {

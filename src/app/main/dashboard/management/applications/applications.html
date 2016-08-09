@@ -15,7 +15,15 @@
     <!-- CONTENT -->
     <div class="content" md-background-bg layout="row" layout-wrap>
         <!-- Create a new application button -->
-        <md-button ng-click="showAddDialog($event)">Create a new application</md-button>
+        <div layout="row" layout-align="space-between center" flex="100">
+            <div>
+                <h1><strong>Applications</strong></h1>
+            </div>
+            <div></div>
+            <div>
+                <md-button ng-click="showAddDialog($event)">Create a new application</md-button>
+            </div>
+        </div>
         <!-- / Create a new application button -->
         <!-- Applications -->
         <div ng-repeat="application in applications track by $index" class="be-app-card" layout="row" layout-align="center center" layout-margin ng-click="goToAppManagement(application._id, application.name)" flex="90">
@@ -80,6 +88,74 @@
             </div>
         </div>
         <!-- / Applications -->
+        <!-- Collaborations -->
+        <div layout="row" layout-align="space-between center" flex="100">
+            <div>
+                <h1><strong>Collaborations</strong></h1>
+            </div>
+        </div>
+        <div ng-repeat="collaboration in collaborations track by $index" class="be-app-card" layout="row" layout-align="center center" layout-margin ng-click="goToAppManagement(collaboration._id, collaboration.name)" flex="90">
+            <div class="ph-10 pv-5 be-app-card-header" ng-model="collaboration" layout="row" layout-align="start center" flex="40" layout-wrap>
+                <div class="ellipsis-text" flex="100">
+                    <div class="card-title" ng-if="collaboration.name">
+                        {{collaboration.name}}
+                    </div>
+                </div>
+                <div flex="100">
+                    <span>Created at </span><span>{{collaboration.created_at}}</span>
+                </div>
+            </div>
+            <div class="ph-10 pv-5 be-app-card-info" flex="60" layout="column" layout-align="start">
+                <!--                 <div>
+                    <span>At a glance</span>
+                </div> -->
+                <div layout="row" layout-align="srart center" class="mt-5 ellipsis-text">
+                    <div layout="row" layout-align="start center" layout-margin>
+                        <!-- icon-server icon-table -->
+                        <div class="app-card-info-icon" flex>
+                            <md-icon md-font-icon="icon-table"></md-icon>
+                        </div>
+                        <div class="app-card-info-detail" layout="column">
+                            <div class="app-card-info-number">
+                                {{collaboration.totalClasses}}
+                            </div>
+                            <div>
+                                classes
+                            </div>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" layout-margin hide-xs>
+                        <!-- icon-account-circle -->
+                        <div class="app-card-info-icon" flex>
+                            <md-icon md-font-icon="icon-account"></md-icon>
+                        </div>
+                        <div class="app-card-info-detail" layout="column">
+                            <div class="app-card-info-number">
+                                {{collaboration.totalUsers}}
+                            </div>
+                            <div>
+                                users
+                            </div>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" layout-margin hide-xs>
+                        <!-- icon-cellphone icon-package-down-->
+                        <div class="app-card-info-icon" flex>
+                            <md-icon md-font-icon="icon-cellphone icon-package-down"></md-icon>
+                        </div>
+                        <div class="app-card-info-detail" layout="column">
+                            <div class="app-card-info-number">
+                                {{collaboration.totalInstallations}}
+                            </div>
+                            <div>
+                                installations
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- / Collaborations -->
         <!-- Add a new application button -->
         <div class="be-app-card" layout="row" layout-align="center stretch" layout-margin ng-click="showAddDialog($event)" flex="90">
             <div class="be-app-card-add " layout="row" layout-align="center center" flex>

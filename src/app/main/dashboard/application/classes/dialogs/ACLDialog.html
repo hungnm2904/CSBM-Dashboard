@@ -25,22 +25,45 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="acl in acls">
-                        <td>
+                        <td ng-if="acl.key">
+                            <div>
+                                <md-input-container md-no-float class="md-block no-error-check-input">
+                                    <input placeholder="UserId or Role" ng-model="acl.key" value="{{acl.key}}" disabled>
+                                </md-input-container>
+                            </div>
+                        </td>
+                        <td ng-if="$index == acls.length - 1" ng-class="{'user-or-role-error': userOrRoleError == true}">
                             <md-input-container md-no-float class="md-block no-error-check-input">
-                                <input placeholder="UserId or Role" ng-model="acl.key" value="{{acl.key}}">
+                                <input placeholder="UserId or Role" ng-model="newKey" ng-change=" checkUserOrRole(newKey)" value="{{}}" ng-model-options="{debounce:1000}">
                             </md-input-container>
                         </td>
                         <td>
-                            <md-checkbox ng-checked="acl.value.read" ng-click="toggleRead(acl)">
-                                Read
-                            </md-checkbox>
+                            <div ng-if="!publicRead">
+                                <md-checkbox ng-checked="acl.value.read" ng-click="toggleRead(acl)">
+                                    Read
+                                </md-checkbox>
+                            </div>
+                            <div ng-if="publicRead" layout="column" layout-align="center center">
+                                <md-icon class="public-access" md-font-icon="icon-check">
+                                </md-icon>
+                            </div>
                         </td>
                         <td>
-                            <md-checkbox ng-checked="acl.value.write" ng-click="toggleWrite(acl)">
-                                Write
-                            </md-checkbox>
+                            <div ng-if="!publicWrite">
+                                <md-checkbox ng-checked="acl.value.write" ng-click="toggleWrite(acl)">
+                                    Write
+                                </md-checkbox>
+                            </div>
+                            <div ng-if="publicWrite" layout="column" layout-align="center center">
+                                <md-icon class="public-access" md-font-icon="icon-check">
+                                </md-icon>
+                            </div>
                         </td>
-                        <td></td>
+                        <td>
+                            <div layout="row" layout-align="center center" ng-if="$index != acls.length - 1">
+                                <md-icon class="remove-acl" md-font-icon="icon-delete" ng-click="removeACL($index)"></md-icon>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -49,9 +72,6 @@
             <div layout="row" layout-align="start center">
                 <md-button class="be-button-no-bg md-primary" ng-click="cancel()" aria-label="Cancel">
                     Cancel
-                </md-button>
-                <md-button ng-click="cancel()" class="send-button md-accent md-raised" aria-label="Save ACl">
-                    Add UserId or Role
                 </md-button>
                 <md-button ng-click="saveACL()" class="send-button md-accent md-raised" aria-label="Save ACl">
                     Save ACL

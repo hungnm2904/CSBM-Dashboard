@@ -1,0 +1,28 @@
+#general {
+    #collaborators-table {
+        font-size: 1.1em;
+        width: 100%;
+        border-collapse: collapse;
+        tr {
+            th,
+            td {
+                padding: 10px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                &:first-child {
+                    width: 60%;
+                }
+                &:nth-child(even) {
+                    background: rgba(0, 0, 0, 0.1);
+                }
+            }
+            td {
+                md-select {
+                    margin: 0 !important;
+                }
+                md-icon {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}

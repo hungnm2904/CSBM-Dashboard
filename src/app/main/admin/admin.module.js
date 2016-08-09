@@ -12,11 +12,11 @@
     function config() {};
 
     function run($rootScope, msModeService) {
-        $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-            var appId = toParams.appId;
-            if (toState.name.includes('applications')) {
-                msModeService.renderManagementNavigations();
-            }
-        });
+        // $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+        //     var appId = toParams.appId;
+        //     if (toState.name.includes('applications')) {
+        //         msModeService.renderManagementNavigations();
+        //     }
+        // });
     };
 })();

@@ -35,6 +35,7 @@
     tr {
         th,
         td {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             &:first-child {
                 width: 60%;
             }
@@ -42,8 +43,23 @@
                 padding: 0 10px;
             }
             &:nth-child(even) {
-                background: rgba(0,0,0,0.1);
+                background: rgba(0, 0, 0, 0.1);
             }
         }
+    }
+    td {
+        &.user-or-role-error {
+            background: #FFCDD2;
+        }
+        .remove-acl {
+            cursor: pointer;
+        }
+    }
+    .public-access {
+        color: rgb(2, 136, 209);
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
     }
 }

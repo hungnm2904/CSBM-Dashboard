@@ -21,8 +21,12 @@
                     console.log(error);
                     return vm.error = error.data.message;
                 }
-                $state.go('app.management_applications');
-                // var user = msUserService.getCurrentUsername();
+
+                if (results.role === 'Dev') {
+                    $state.go('app.management_applications');
+                } else if (results.role === 'Admin') {
+                    $state.go('app.admin_applications');
+                }
             });
         };
     };

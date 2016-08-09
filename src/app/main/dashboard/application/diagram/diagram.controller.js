@@ -223,8 +223,6 @@
                     }
                 });
 
-                console.log(nodedata);
-
                 $scope.schemas.forEach(function(schema, index) {
                     var fields = schema.fields
                     for (var key in fields) {

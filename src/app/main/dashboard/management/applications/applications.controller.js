@@ -17,6 +17,32 @@
 
         $scope.applications = msApplicationService.applications();
         $scope.applicationNames = [];
+        $scope.collaborations = [];
+
+        var countInfo = function(application) {
+            msApplicationService.countTotalClasses(application._id, function(error, results) {
+                if (error) {
+                    return alert(error.statusText);
+                }
+                application['totalClasses'] = results;
+            })
+
+            msSchemasService.countObjectInClass(application._id, '_User', function(error, results) {
+                if (error) {
+                    console.log(error);
+                }
+
+                application['totalUsers'] = results.count
+            });
+
+            msSchemasService.countObjectInClass(application._id, '_Installation', function(error, results) {
+                if (error) {
+                    console.log(error);
+                }
+
+                application['totalInstallations'] = results.count
+            });
+        };
 
         msApplicationService.getAll(function(error) {
             if (error) {
@@ -37,43 +63,28 @@
 
                 application.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
 
-                msMasterKeyService.getMasterKey(appId, function(error, results) {
-                    if (error) {
-                        return callback(error);
-                    }
+                countInfo(application);
+            });
+        });
 
-                    var masterKey = results;
-                    $http({
-                        method: 'GET',
-                        url: _domain + '/csbm/schemas',
-                        headers: {
-                            'X-CSBM-Application-Id': appId,
-                            'X-CSBM-Master-Key': masterKey
-                        }
-                    }).then(function(response) {
-                        application['totalClasses'] = response.data.results.length;
-                    }, function(response) {
-                        console.log(response);
-                    });
-                });
+        msUserService.getCollaborations(function(error, results) {
+            if (error) {
+                return alert(error.statusText);
+            }
 
-                msSchemasService.countObjectInClass(appId, '_User',
-                    function(error, results) {
-                        if (error) {
-                            console.log(error);
-                        }
+            console.log(results.applications);
 
-                        application['totalUsers'] = results.count
-                    });
+            $scope.collaborations = angular.copy(results.applications);
+            $scope.collaborations.forEach(function(collaboration) {
+                var appId = collaboration._id;
+                var appName = collaboration.name;
 
-                msSchemasService.countObjectInClass(appId, '_Installation',
-                    function(error, results) {
-                        if (error) {
-                            console.log(error);
-                        }
+                var createdAt = new Date(collaboration.created_at);
+                createdAt = new Date(createdAt.getTime() + (createdAt.getTimezoneOffset() * 60000));
 
-                        application['totalInstallations'] = results.count
-                    });
+                collaboration.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
+
+                countInfo(collaboration);
             });
         });
 
@@ -116,59 +127,8 @@
             };
         };
 
-        $scope.showDeleteDialog = function(ev) {
-            $mdDialog.show({
-                controller: DeleteApplicationDialogController,
-                controllerAs: 'vm',
-                templateUrl: 'app/main/dashboard/management/applications/dialogs/deleteApplicationDialog.html',
-                parent: angular.element($document.body),
-                targetEvent: ev,
-                clickOutsideToClose: false,
-                locals: {
-                    applications: $scope.applications
-                }
-            });
-
-            function DeleteApplicationDialogController($scope, $state, applications) {
-                $scope.applications = applications;
-
-                $scope.closeDialog = function() {
-                    $mdDialog.hide();
-                };
-
-                $scope.deleteApplication = function() {
-                    var application = JSON.parse($scope.application);
-                    var confirm = $mdDialog.confirm()
-                        .title('Are you sure to delete ' + '"' + application.name + '"' + ' ?')
-                        .ok('Yes')
-                        .cancel('No');
-
-                    $mdDialog.show(confirm).then(function() {
-                        msApplicationService.remove(application._id,
-                            function(error, results) {
-                                if (error) {
-                                    if (error.status === 401) {
-                                        return $state.go('app.pages_auth_login');
-                                    }
-                                    return alert(error.statusText);
-                                }
-                            });
-                        $mdDialog.hide();
-                    }, function() {
-                        $mdDialog.hide();
-                    });
-                }
-            };
-        }
-
         $scope.goToAppManagement = function(appId, appName) {
             msModeService.renderApplicationNavigations(appId, appName, '_User');
-            // $state.go('app.application_classes', {
-            //     'appId': appId,
-            //     'appName': appName,
-            //     'className': '_User',
-            //     'objectId': null
-            // });
         };
     }
 })();

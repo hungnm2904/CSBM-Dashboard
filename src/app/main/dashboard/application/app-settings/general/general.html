@@ -1,16 +1,105 @@
-<div id="classes" class="page-layout simple fullwidth doc-page">
+<div id="general" class="page-layout simple fullwidth doc-page">
     <!-- HEADER -->
-    <div class="header md-accent-bg" layout="row" layout-align="space-between">
+    <!--     <div class="header md-accent-bg" layout="row" layout-align="space-between">
         <div layout="column" layout-align="center start">
             <div class="title">General Settings</div>
         </div>
         <div layout="row" layout-align="start center">
         </div>
-    </div>
+    </div> -->
     <!-- / HEADER -->
     <!-- CONTENT -->
     <div class="content" md-background-bg>
-        <!-- Application keys -->
+        <!-- Application Information -->
+        <div layout="row" layout-align="center">
+            <div layout-margin style="text-align: center">
+                <h1><strong>Application Information</strong></h1>
+                <span class="md-subhead">Update general information about your application</span>
+            </div>
+        </div>
+        <div layout="row" layout-margin layout-align="center" layout-wrap>
+            <div flex="65" class="md-whiteframe-4dp">
+                <div layout="row">
+                    <div flex="60">
+                        <div layout="row" layout-margin layout-wrap>
+                            <h3 flex="100"><strong>Application name</strong></h3>
+                        </div>
+                    </div>
+                    <div flex="40" class="md-grey-300-bg ph-20" layout="column" layout-align="center strech">
+                        <md-input-container md-no-float class="md-block no-error-check-input">
+                            <input ng-model="appName" value="{{appName}}" placeholder="Application name can not be null" ng-change="changeAppName(appName)" ng-model-options="{debounce:500}" style="text-align: center; font-size: 1.3em">
+                        </md-input-container>
+                        <div ng-show="changed" layout="row" layout-align="center center">
+                            <md-button class="md-warn" ng-click="cancel()">
+                                Cancel
+                            </md-button>
+                            <md-button class="md-raised md-accent" ng-click="saveChanges()" ng-disabled="!appName">
+                                Save changes
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- / Application Information -->
+        <!-- Collaborators -->
+        <div layout="row" layout-align="center">
+            <div layout-margin style="text-align: center">
+                <h1><strong>Collaborators</strong></h1>
+                <span class="md-subhead">Team up and work together with other people</span>
+            </div>
+        </div>
+        <div layout="row" layout-margin layout-padding layout-align="center center" layout-wrap>
+            <div flex="65" class="md-whiteframe-4dp">
+                <table id="collaborators-table">
+                    <thead>
+                        <tr>
+                            <th colspan="3" style="text-align: center">
+                                <h4><b>Collaborators</b></h4>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="collaborator in collaborators">
+                            <td>{{collaborator.email}}</td>
+                            <td>
+                                <md-select aria-label="collaborators" class="no-error-check-input" " ng-model="collaborator.role" ng-change="changeRole(collaborator)">
+                                    <md-option ng-repeat="acceptedRole in acceptedRoles" ng-value="acceptedRole">
+                                        {{acceptedRole}}
+                                    </md-option>
+                                </md-select>
+                            </td>
+                            <td>
+                                <div layout="row " layout-align="center center ">
+                                    <md-icon md-font-icon="icon-close " ng-click="removeCollaborator(collaborator.email) "></md-icon>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div layout="row " layout-align="center center ">
+                    <md-input-container md-no-float class="md-block no-error-check-input ">
+                        <input ng-model="email " value="{{email}} " placeholder="Collaborator 's email" style="text-align: center; font-size: 1.3em">
+                    </md-input-container>
+                    <md-input-container class="md-block no-error-check-input" style=" font-size: 1.3em">
+                        <label>Role</label>
+                        <md-select ng-model="role">
+                            <md-option ng-value="'Dev '">
+                                Dev
+                            </md-option>
+                            <md-option ng-value="'Guest '">
+                                Guest
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-button class="md-raised md-accent" ng-click="addCollaborator()" ng-disabled="!appName">
+                        Add collaborator
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <!-- / Collaborators -->
+        <!-- Application Management -->
         <div layout="row" layout-align="center">
             <div layout-margin style="text-align: center">
                 <h1><strong>Application Management</strong></h1>
@@ -18,24 +107,24 @@
             </div>
         </div>
         <div layout="row" layout-margin layout-align="center" layout-wrap>
-            <div flex="85" class="md-whiteframe-4dp">
+            <div flex="65" class="md-whiteframe-4dp">
                 <div layout="row">
                     <div flex="60">
                         <div layout="row" layout-margin layout-wrap>
                             <h3 flex="100"><strong>Delete application</strong></h3>
                             <span flex="100">
-                                Completely remove any trace of this application's existence.
-                            </span>
-                        </div>
-                    </div>
-                    <div flex="40" class="md-grey-300-bg" layout="column" layout-align="center strech">
-                        <md-button ng-if="!!!masterKey" class="md-raised md-warn" ng-click="showDeleteDialog()">
-                            Delete this application
-                        </md-button>
-                    </div>
-                </div>
+                                Completely remove any trace of this application's existence. </span>
             </div>
         </div>
+        <div flex="40" class="md-grey-300-bg" layout="column" layout-align="center strech">
+            <md-button ng-if="!!!masterKey" class="md-raised md-warn" ng-click="showDeleteDialog()">
+                Delete this application
+            </md-button>
+        </div>
     </div>
-    <!-- / CONTENT -->
+</div>
+</div>
+<!-- / Application Management -->
+</div>
+<!-- / CONTENT -->
 </div>

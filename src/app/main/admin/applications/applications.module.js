@@ -6,7 +6,7 @@
         .config(config);
 
     function config($stateProvider, msApiProvider) {
-        $stateProvider.state('app.admin_manageApplications', {
+        $stateProvider.state('app.admin_applications', {
             url: '/admin/applications',
             views: {
                 'content@app': {

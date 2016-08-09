@@ -16,14 +16,11 @@
                 vm.error = 'Password Confirm does not match';
             } else {
                 vm.error = '';
-                msUserService.register(vm.email, vm.password, function(response) {
+                msUserService.register(vm.email, vm.password, 'Dev', function(response) {
                     if (response.status != 200) {
                         vm.error = response.data.message;
                     } else {
                         $state.go('app.pages_auth_login');
-                        // msUserService.login(vm.username, vm.password, function(response) {
-                        //     $state.go('app.dashboard_applications');
-                        // });
                     }
                 });
             }

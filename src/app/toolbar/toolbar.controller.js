@@ -7,7 +7,7 @@
 
     /** @ngInject */
     function ToolbarController($rootScope, $mdSidenav, $translate, $mdToast, $location,
-        $http, $cookies, $window, $state, msUserService) {
+        $http, $cookies, $window, $state, msUserService, msApplicationService) {
 
         var vm = this;
 
@@ -110,6 +110,7 @@
                     return alert(response.statusText);
                 }
 
+                msApplicationService.clearApplications();
                 $state.go('app.pages_auth_login');
             });
         }

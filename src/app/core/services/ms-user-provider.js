@@ -21,7 +21,9 @@
                 getCurrentUser: getCurrentUser,
                 getAccessToken: getAccessToken,
                 getCurrentEmail: getCurrentEmail,
-                removeCurrentUser: removeCurrentUser
+                getCurrentRole: getCurrentRole,
+                removeCurrentUser: removeCurrentUser,
+                getCollaborations: getCollaborations
             }
 
             return service;
@@ -37,6 +39,7 @@
                 }).then(function(response) {
                     var user = {
                         'userId': response.data.data.userId,
+                        'role': response.data.data.role,
                         'email': response.data.data.email,
                         'accessToken': response.data.data.token
                     }
@@ -45,6 +48,7 @@
                     expiresDate.setDate(expiresDate.getDate() + 1);
                     $cookies.putObject('USER', user, { expires: expiresDate });
                     _setCurrentUser(user);
+
                     callback(null, _currentUser);
                 }, function(response) {
                     callback(response);
@@ -67,21 +71,16 @@
                 });
             };
 
-            function register(email, password, callback) {
+            function register(email, password, role, callback) {
                 $http({
                     method: 'POST',
                     url: _domain + '/signup',
                     data: {
                         email: email,
-                        password: password
+                        password: password,
+                        role: role || undefined
                     }
                 }).then(function(response) {
-                    // var obj = {
-                    //     currentUser: {
-                    //         userId: response.data.data.userId,
-                    //         token: response.data.data.token
-                    //     }
-                    // };
                     callback(response);
                 }, function(response) {
                     callback(response);
@@ -132,12 +131,42 @@
                 }
 
                 return null;
-            }
+            };
+
+            function getCurrentRole() {
+                if (_currentUser) {
+                    return _currentUser.role;
+                }
+
+                var user = $cookies.getObject('USER');
+                if (user) {
+                    _setCurrentUser(user);
+                    return _currentUser.role;
+                }
+
+                return null;
+            };
 
             function removeCurrentUser() {
                 _currentUser = null;
                 $cookies.remove('USER');
             };
+
+            function getCollaborations(callback) {
+                var accessToken = getAccessToken();
+                $http({
+                    method: 'GET',
+                    url: _domain + '/collaborations',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken
+                    }
+                }).then(function(response) {
+                    callback(null, response.data.data);
+                }, function(response) {
+                    callback(response);
+                });
+            };
+
         };
     };
 })();

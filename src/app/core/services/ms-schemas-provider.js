@@ -49,8 +49,6 @@
             function setSchemas(appId, appName, className, schemas) {
                 _schemas = schemas;
                 _appId = appId;
-
-                // $rootScope.$broadcast('schemas-changed', { 'appId': appId, 'className': className });
             };
 
             function getSchemasFromLocal(callback) {

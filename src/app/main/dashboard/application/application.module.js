@@ -28,10 +28,11 @@
     };
 
     function run($rootScope, $state, $stateParams, $location, msSchemasService, msNavigationService,
-        msModeService, msApplicationService, msDialogService) {
+        msModeService, msApplicationService, msDialogService, msUserService) {
 
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
             var toAppName = toParams.appName;
+            var role = msUserService.getCurrentRole();
             if (toAppName) {
                 var fromAppName = fromParams.appName;
                 if (toAppName != fromAppName) {
@@ -58,7 +59,7 @@
             var appId = args.appId;
             var appName = args.appName;
             var className = args.className;
-            
+
             msModeService.renderApplicationNavigations(appId, appName, className);
         });
     };

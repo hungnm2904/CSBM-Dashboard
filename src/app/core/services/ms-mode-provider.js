@@ -59,48 +59,16 @@
                 isDocsMode: isDocsMode,
                 renderApplicationNavigations: renderApplicationNavigations,
                 renderiOSDocsGuideNavigations: renderiOSDocsGuideNavigations,
-                renderManagementNavigations: renderManagementNavigations,
+                renderDevManagementNavigations: renderDevManagementNavigations,
+                renderAdminManagementNavigations: renderAdminManagementNavigations,
+                renderGuestNavigations: renderGuestNavigations,
                 renderAndroidDocsGuideNavigations: renderAndroidDocsGuideNavigations
             }
 
             return service;
 
-            function renderManagementNavigations() {
+            function _clearNavigations(argument) {
                 msNavigationService.clearNavigation();
-                msNavigationService.saveItem('management', {
-                    title: 'Management',
-                    group: true,
-                    weight: 1
-                });
-
-                msNavigationService.saveItem('management.applications', {
-                    title: 'Applications',
-                    icon: 'icon-apps',
-                    state: 'app.management_applications'
-                });
-
-                renderAdminNavigations();
-            };
-
-            function renderAdminNavigations() {
-                // msNavigationService.clearNavigation();
-                msNavigationService.saveItem('admin', {
-                    title: 'Admin',
-                    group: true,
-                    weight: 1
-                });
-
-                msNavigationService.saveItem('admin.applications', {
-                    title: 'Applications',
-                    icon: 'icon-apps',
-                    state: 'app.admin_manageApplications'
-                });
-
-                msNavigationService.saveItem('admin.users', {
-                    title: 'User',
-                    icon: 'icon-apps',
-                    state: 'app.admin_users'
-                });
             };
 
             function _checkState(states, name, callback) {
@@ -113,51 +81,8 @@
                 callback(true);
             };
 
-            function _renderApplicationNavigations(appId, appName, className) {
+            function _renderClassesNavigations(appId, appName, className) {
                 var states = $state.get();
-
-                msNavigationService.saveItem('application', {
-                    title: appName,
-                    group: true,
-                    weight: 1
-                });
-
-                msNavigationService.saveItem('application.query', {
-                    title: 'Query',
-                    icon: 'icon-binoculars',
-                    state: 'app.application_query',
-                    stateParams: { 'appName': appName }
-                });
-
-                msNavigationService.saveItem('application.diagram', {
-                    title: 'Diagram',
-                    icon: 'icon-view-dashboard',
-                    state: 'app.application_diagram',
-                    stateParams: { 'appName': appName }
-                });
-
-                msNavigationService.saveItem('application.appsettings', {
-                    title: 'Application Settings',
-                    icon: 'icon-key'
-                });
-
-                msNavigationService.saveItem('application.appsettings.general', {
-                    title: 'General',
-                    state: 'app.application_appsettings_general',
-                    stateParams: { 'appName': appName }
-                });
-
-                msNavigationService.saveItem('application.appsettings.keys', {
-                    title: 'Keys',
-                    state: 'app.application_appsettings_keys',
-                    stateParams: { 'appName': appName }
-                });
-
-                msNavigationService.saveItem('application.appsettings.notifications', {
-                    title: 'Push Notifications',
-                    state: 'app.application_appsettings_notifications',
-                    stateParams: { 'appName': appName }
-                });
 
                 msSchemasService.getSchemas(appId, appName, null, function(error, results) {
                     if (error) {
@@ -232,10 +157,115 @@
                         });
                     }
                 });
+            };
+
+            function _renderQueryNavigations(appName) {
+                msNavigationService.saveItem('application.query', {
+                    title: 'Query',
+                    icon: 'icon-binoculars',
+                    state: 'app.application_query',
+                    stateParams: { 'appName': appName }
+                });
+            };
+
+            function _renderDiagramNavigations(appName) {
+                msNavigationService.saveItem('application.diagram', {
+                    title: 'Diagram',
+                    icon: 'icon-view-dashboard',
+                    state: 'app.application_diagram',
+                    stateParams: { 'appName': appName }
+                });
+            };
+
+            function _renderApplicationSettingsNavigations(appName) {
+                msNavigationService.saveItem('application.appsettings', {
+                    title: 'Application Settings',
+                    icon: 'icon-key'
+                });
+
+                msNavigationService.saveItem('application.appsettings.general', {
+                    title: 'General',
+                    state: 'app.application_appsettings_general',
+                    stateParams: { 'appName': appName }
+                });
+
+                msNavigationService.saveItem('application.appsettings.keys', {
+                    title: 'Keys',
+                    state: 'app.application_appsettings_keys',
+                    stateParams: { 'appName': appName }
+                });
+
+                msNavigationService.saveItem('application.appsettings.notifications', {
+                    title: 'Push Notifications',
+                    state: 'app.application_appsettings_notifications',
+                    stateParams: { 'appName': appName }
+                });
+            };
+
+            function _renderApplicationNavigations(appId, appName, className) {
+                msNavigationService.saveItem('application', {
+                    title: appName,
+                    group: true,
+                    weight: 1
+                });
+
+                _renderQueryNavigations(appName);
+                _renderDiagramNavigations(appName);
+                _renderApplicationSettingsNavigations(appName);
+                _renderClassesNavigations(appId, appName, className);
             }
 
+            function renderDevManagementNavigations() {
+                _clearNavigations();
+                msNavigationService.saveItem('management', {
+                    title: 'Management',
+                    group: true,
+                    weight: 1
+                });
+
+                msNavigationService.saveItem('management.applications', {
+                    title: 'Applications',
+                    icon: 'icon-apps',
+                    state: 'app.management_applications'
+                });
+            };
+
+            function renderAdminManagementNavigations() {
+                _clearNavigations()
+                msNavigationService.saveItem('admin', {
+                    title: 'Admin',
+                    group: true,
+                    weight: 1
+                });
+
+                msNavigationService.saveItem('admin.applications', {
+                    title: 'Applications',
+                    icon: 'icon-apps',
+                    state: 'app.admin_applications'
+                });
+
+                msNavigationService.saveItem('admin.users', {
+                    title: 'User',
+                    icon: 'icon-apps',
+                    state: 'app.admin_users'
+                });
+            };
+
+            function renderGuestNavigations(appName) {
+                _clearNavigations();
+
+                msNavigationService.saveItem('application', {
+                    title: appName,
+                    group: true,
+                    weight: 1
+                });
+
+                _renderQueryNavigations(appName);
+                _renderDiagramNavigations(appName);
+            };
+
             function renderApplicationNavigations(appId, appName, className) {
-                msNavigationService.clearNavigation();
+                _clearNavigations();
                 if (!appId) {
                     msApplicationService.getAppId(appName, function(error, results) {
                         if (error) {
@@ -253,7 +283,7 @@
             };
 
             function renderiOSDocsGuideNavigations() {
-                msNavigationService.clearNavigation();
+                _clearNavigations();
                 msNavigationService.saveItem('guide', {
                     title: 'Guide',
                     group: true,
@@ -276,7 +306,7 @@
             };
 
             function renderAndroidDocsGuideNavigations() {
-                msNavigationService.clearNavigation();
+                _clearNavigations();
                 msNavigationService.saveItem('guide', {
                     title: 'Guide',
                     group: true,

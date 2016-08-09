@@ -257,22 +257,24 @@
             };
 
             $scope.goEditMode = function(index, _document, key, ev) {
-                if ($scope.checkFieldType(key, 'ACL')) {
-                    $scope.showACLDialog(ev, _document);
-                } else {
-                    if (!editing) {
-                        if ($scope.schemas[key].type === 'Array') {
-                            _document[key] = JSON.stringify(_document[key]);
-                        }
+                if (editable(key)) {
+                    if ($scope.checkFieldType(key, 'ACL')) {
+                        $scope.showACLDialog(ev, _document);
+                    } else {
+                        if (!editing) {
+                            if ($scope.schemas[key].type === 'Array') {
+                                _document[key] = JSON.stringify(_document[key]);
+                            }
 
-                        $scope.updatingObject = {
-                            index: index,
-                            document: _document,
-                            field: key,
-                            updatedValue: _document[key]
-                        };
-                        $scope.editMode[index] = true;
-                        editing = true;
+                            $scope.updatingObject = {
+                                index: index,
+                                document: _document,
+                                field: key,
+                                updatedValue: _document[key]
+                            };
+                            $scope.editMode[index] = true;
+                            editing = true;
+                        }
                     }
                 }
             };
@@ -750,15 +752,30 @@
                         publicRead: publicRead,
                         publicWrite: publicWrite
                     }
+                }).then(function(acl) {
+                    if (acl) {
+                        _document.ACL = {};
+                        $timeout(function() {
+                            _document.ACL = acl;
+                        });
+                    }
+                }, function() {
+
                 });
 
                 function ACLDialogController($scope, objectId, acls, publicRead, publicWrite) {
+
                     $scope.acls = angular.copy(acls);
+                    $scope.acls.push({
+                        'key': '',
+                        'value': {}
+                    });
                     $scope.publicRead = angular.copy(publicRead);
                     $scope.publicWrite = angular.copy(publicWrite);
+                    $scope.userOrRoleError = false;
 
-                    $scope.closeDialog = function() {
-                        $mdDialog.hide();
+                    $scope.closeDialog = function(value) {
+                        $mdDialog.hide(value);
                     };
 
                     $scope.toggleRead = function(acl) {
@@ -781,7 +798,42 @@
                         $scope.closeDialog();
                     };
 
+                    $scope.checkUserOrRole = function(newKey) {
+                        var check = $scope.acls.some(function(acl, index) {
+                            return acl.key === newKey;
+                        });
+
+                        if (check) {
+                            console.log('check check');
+                            $scope.userOrRoleError = true;
+                        } else {
+                            msApplicationService.checkUserExistById(appId, newKey, function(error, resuls) {
+                                if (error) {
+                                    $scope.userOrRoleError = true;
+                                } else {
+                                    $scope.userOrRoleError = false;
+                                    $scope.acls[$scope.acls.length - 1] = {
+                                        'key': newKey,
+                                        'value': {
+                                            'read': true,
+                                            'write': true
+                                        }
+                                    }
+                                    $scope.acls.push({
+                                        'key': '',
+                                        'value': {}
+                                    });
+                                }
+                            });
+                        }
+                    };
+
+                    $scope.removeACL = function(index) {
+                        $scope.acls.splice(index, 1);
+                    };
+
                     $scope.saveACL = function() {
+                        $scope.acls.splice($scope.acls.length - 1, 1);
                         var ACL = {};
                         $scope.acls.forEach(function(acl, index) {
                             var key = acl.key;
@@ -797,9 +849,12 @@
                         var data = {
                             'ACL': ACL
                         };
+
+                        console.log(data);
+
                         msSchemasService.updateValues(className, appId, objectId, 'ACL', data,
                             function(results) {
-                                $scope.closeDialog();
+                                $scope.closeDialog(ACL);
                             });
                     };
                 };

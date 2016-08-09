@@ -8,45 +8,62 @@
     function msApplicationServiceProvider() {
         var _applications = [];
         // var service = this;
-        this.$get = function($http, $state, $cookies, msConfigService, msUserService) {
+        this.$get = function($http, $state, $cookies, msConfigService, msUserService,
+            msMasterKeyService) {
 
             var _domain = (msConfigService.getConfig()).domain;
-
-
             var service = {
                 applications: applications,
                 getAll: getAll,
+                clearApplications: clearApplications,
                 create: create,
                 remove: remove,
+                update: update,
                 getMasterkey: getMasterkey,
                 getAppName: getAppName,
-                getAppId: getAppId
+                getAppId: getAppId,
+                getCollaborators: getCollaborators,
+                checkUserExistById: checkUserExistById,
+                countTotalClasses: countTotalClasses
             };
 
             return service;
 
-            function applications() {
-                return _applications;
-            };
-
-            function setApplications(applications) {
-                // _applications = applications;
+            function _setApplications(applications) {
                 applications.forEach(function(application, index) {
                     _applications.push(application);
                 });
             };
 
-            function removeApplication(id) {
-                _applications.forEach(function(application, index) {
+            function _add(application) {
+                _applications.push(application);
+            };
+
+            function _updateApplication(id, data) {
+                _applications.some(function(application, index) {
                     if (application._id === id) {
-                        return _applications.splice(index, 1);
+                        for (var key in data) {
+                            application[key] = angular.copy(data[key]);
+                        }
+
+                        return true;
+                    }
+
+                });
+            };
+
+            function _removeApplication(id) {
+                _applications.some(function(application, index) {
+                    if (application._id === id) {
+                        _applications.splice(index, 1);
+
+                        return true;
                     }
                 });
             }
 
-            function add(application) {
-                _applications.push(application);
-                // $rootScope.$broadcast('app-added', { 'app': application })
+            function applications() {
+                return _applications;
             };
 
             function getAll(callback) {
@@ -62,11 +79,15 @@
                         'Authorization': 'Bearer ' + accessToken
                     }
                 }).then(function(response) {
-                    setApplications(response.data);
+                    _setApplications(response.data);
                     callback(null);
                 }, function(response) {
                     callback(response);
                 });
+            };
+
+            function clearApplications() {
+                _applications = [];
             };
 
             function create(name, callback) {
@@ -82,7 +103,7 @@
                     },
                     data: data
                 }).then(function(response) {
-                    add(response.data);
+                    _add(response.data);
                     callback(null, response.data);
                 }, function(response) {
                     callback(response);
@@ -103,7 +124,7 @@
                         "password": password
                     }
                 }).then(function(response) {
-                    removeApplication(id);
+                    _removeApplication(id);
                     callback(null, _applications);
                 }, function(response) {
                     callback(response);
@@ -118,6 +139,38 @@
                     });
                 } else {
                     _remove(id, password, callback);
+                }
+            };
+
+            function _update(id, data, callback) {
+                var accessToken = msUserService.getAccessToken();
+                $http({
+                    method: 'PUT',
+                    url: _domain + '/applications/' + id,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + accessToken
+                    },
+                    data: data
+                }).then(function(response) {
+                    _updateApplication(id, data);
+                    callback(null, response);
+                }, function(response) {
+                    callback(response);
+                });
+            };
+
+            function update(id, appName, data, callback) {
+                if (!id) {
+                    getAppId(appName, function(error, results) {
+                        if (error) {
+                            return callback(error);
+                        }
+                        id = results.appId;
+                        _update(id, data, callback);
+                    });
+                } else {
+                    _update(id, data, callback);
                 }
             };
 
@@ -167,7 +220,80 @@
                 }, function(response) {
                     callback(response);
                 });
-            }
+            };
+
+            function _getCollaborators(id, callback) {
+                var accessToken = msUserService.getAccessToken();
+                $http({
+                    method: 'GET',
+                    url: _domain + '/applications/collaborators/' + id,
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken
+                    }
+                }).then(function(response) {
+                    callback(null, response.data);
+                }, function(response) {
+                    callback(response);
+                });
+            };
+
+            function getCollaborators(id, appName, callback) {
+                if (!id) {
+                    getAppId(appName, function(error, results) {
+                        if (error) {
+                            return callback(error);
+                        }
+                        id = results.appId;
+                        _getCollaborators(id, callback);
+                    });
+                } else {
+                    _getCollaborators(id, callback);
+                }
+            };
+
+            function checkUserExistById(appId, id, callback) {
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'GET',
+                        url: _domain + '/csbm/users/' + id,
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey
+                        }
+                    }).then(function(response) {
+                        callback(null, response);
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            };
+
+            function countTotalClasses(appId, callback) {
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'GET',
+                        url: _domain + '/csbm/schemas',
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey
+                        }
+                    }).then(function(response) {
+                        callback(null, response.data.results.length);
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            };
         };
     };
 })();
