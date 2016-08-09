@@ -10,8 +10,6 @@
                 $state.go('app.pages_auth_login');
             }
 
-            msModeService.setToApplicationMode();
-
             var appId = $stateParams.appId;
             var _domain = (msConfigService.getConfig()).domain;
 

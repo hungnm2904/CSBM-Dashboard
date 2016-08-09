@@ -15,24 +15,25 @@
 
     /** @ngInject */
     function config($stateProvider, $urlRouterProvider) {
-        $urlRouterProvider.when('/apps/:appName/classes/:className', ['$state', '$stateParams', '$location', 'msModeService',
+        $urlRouterProvider.when('/:mode/:appName/classes/:className', ['$state', '$stateParams', '$location', 'msModeService',
             function($state, $stateParams, $location, msModeService) {
                 if (!$state.current.name) {
                     var path = $location.path().split('/');
+                    var mode = path[1];
                     var appName = path[2];
                     var className = path[4];
-                    msModeService.renderApplicationNavigations(null, appName, className);
+                    msModeService.renderApplicationNavigations(mode, null, appName, className);
                 }
             }
         ]);
     };
 
     function run($rootScope, $state, $stateParams, $location, msSchemasService, msNavigationService,
-        msModeService, msApplicationService, msDialogService, msUserService) {
+        msModeService, msApplicationService, msDialogService) {
 
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
             var toAppName = toParams.appName;
-            var role = msUserService.getCurrentRole();
+            var mode = toParams.mode;
             if (toAppName) {
                 var fromAppName = fromParams.appName;
                 if (toAppName != fromAppName) {
@@ -48,7 +49,54 @@
                             }
 
                             var appId = results.appId;
-                            msModeService.renderApplicationNavigations(appId, toAppName);
+
+                            if (mode === 'apps') {
+                                msModeService.renderApplicationNavigations(mode, appId, toAppName, '');
+                            } else {
+                                var collaborationRole = mode.split('--')[1];
+                                if (collaborationRole === 'dev') {
+                                    msModeService.getCollaborationRole(appId, toAppName,
+                                        function(error, results) {
+
+                                            if (error) {
+                                                if (error.status === 401) {
+                                                    return $state.go('app.pages_auth_login');
+                                                }
+
+                                                return alert(error.statusText);
+                                            }
+
+                                            if (!msModeService.isDevCollaborationRole()) {
+                                                $state.go('app.pages_auth_login');
+                                            } else {
+                                                msModeService.renderCollaborationNavigations(mode, appId, toAppName, '');
+                                            }
+                                        });
+                                } else if (collaborationRole === 'guest') {
+                                    msModeService.getCollaborationRole(appId, toAppName,
+                                        function(error, results) {
+
+                                            if (error) {
+                                                if (error.status === 401) {
+                                                    return $state.go('app.pages_auth_login');
+                                                }
+
+                                                return alert(error.statusText);
+                                            }
+
+                                            if (!msModeService.isGuestCollaborationRole()) {
+                                                $state.go('app.pages_auth_login');
+                                            } else {
+                                                var state = 'app.application_diagram';
+                                                if (path[3] === 'query') {
+                                                    state = 'app.application_query'
+                                                }
+
+                                                msModeService.renderGuestNavigations(mode, toAppName, state);
+                                            }
+                                        });
+                                }
+                            }
                         });
                     }
                 }

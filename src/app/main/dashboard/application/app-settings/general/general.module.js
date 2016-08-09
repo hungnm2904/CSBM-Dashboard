@@ -9,7 +9,7 @@
     /** @ngInject */
     function config($stateProvider) {
         $stateProvider.state('app.application_appsettings_general', {
-            url: '/apps/:appName/settings/general',
+            url: '/:mode/:appName/settings/general',
             views: {
                 'content@app': {
                     templateUrl: 'app/main/dashboard/application/app-settings/general/general.html',

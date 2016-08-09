@@ -30,7 +30,7 @@
     function run($rootScope, msModeService) {
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
             if (toState.name.includes('docs')) {
-                msModeService.setToDocsMode();
+                // msModeService.setToDocsMode();
                 if (!fromState.name.includes('ios') && !fromState.name.includes('android')) {
                     if (toState.name.includes('ios')) {
                         msModeService.renderiOSDocsGuideNavigations();

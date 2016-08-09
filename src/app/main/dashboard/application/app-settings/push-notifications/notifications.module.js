@@ -8,7 +8,7 @@
 
     function config($stateProvider) {
         $stateProvider.state('app.application_appsettings_notifications', {
-            url: '/apps/:appName/settings/notifications',
+            url: '/:mode/:appName/settings/notifications',
             views: {
                 'content@app': {
                     templateUrl: 'app/main/dashboard/application/app-settings/push-notifications/notifications.html',

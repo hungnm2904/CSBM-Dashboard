@@ -8,7 +8,7 @@
     /** @ngInject */
     function config($stateProvider) {
         $stateProvider.state('app.application_diagram', {
-            url: '/apps/:appName/diagram',
+            url: '/:mode/:appName/diagram',
             views: {
                 'content@app': {
                     templateUrl: 'app/main/dashboard/application/diagram/diagram.html',

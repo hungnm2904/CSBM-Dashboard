@@ -72,20 +72,21 @@
                 return alert(error.statusText);
             }
 
-            console.log(results.applications);
+            if (results) {
+                $scope.collaborations = angular.copy(results.applications);
+                $scope.collaborations.forEach(function(collaboration) {
+                    var appId = collaboration._id;
+                    var appName = collaboration.name;
 
-            $scope.collaborations = angular.copy(results.applications);
-            $scope.collaborations.forEach(function(collaboration) {
-                var appId = collaboration._id;
-                var appName = collaboration.name;
+                    var createdAt = new Date(collaboration.created_at);
+                    createdAt = new Date(createdAt.getTime() + (createdAt.getTimezoneOffset() * 60000));
 
-                var createdAt = new Date(collaboration.created_at);
-                createdAt = new Date(createdAt.getTime() + (createdAt.getTimezoneOffset() * 60000));
+                    collaboration.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
 
-                collaboration.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
+                    countInfo(collaboration);
+                });
+            }
 
-                countInfo(collaboration);
-            });
         });
 
         $scope.showAddDialog = function(ev) {
@@ -128,7 +129,19 @@
         };
 
         $scope.goToAppManagement = function(appId, appName) {
-            msModeService.renderApplicationNavigations(appId, appName, '_User');
+            msModeService.setToAppMode();
+            msModeService.renderApplicationNavigations('apps', appId, appName, '_User');
         };
+
+        $scope.goToCollaborationManagement = function(appId, appName, collaborationRole) {
+            msModeService.setToCollaborationMode();
+            msModeService.setCollaborationRole(collaborationRole);
+            if (collaborationRole === 'Dev') {
+                msModeService.renderCollaborationNavigations('collaboration--dev', appId, appName, '_User');
+            } else if (collaborationRole === 'Guest') {
+                msModeService.renderGuestNavigations('collaboration--guest', appName, 'app.application_diagram');
+            }
+        };
+
     }
 })();

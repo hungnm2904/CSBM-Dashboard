@@ -18,8 +18,6 @@
                 if (role === 'Dev') {
                     msModeService.renderDevManagementNavigations();
                 } else if (role === 'Admin') {
-                    console.log('Render Admin Navigations');
-
                     msModeService.renderAdminManagementNavigations();
                 }
             }

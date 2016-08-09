@@ -86,7 +86,16 @@
 
                                 $scope.documents.forEach(function(_document, index) {
                                     objectIdList.push(_document.objectId);
+                                    if (!_document.ACL) {
+                                        _document.ACL = {
+                                            '*': {
+                                                'read': true,
+                                                'write': true
+                                            }
+                                        }
+                                    }
                                 });
+
                                 $scope.filterCriteria = [{
                                     field: 'objectId',
                                     operation: 'equals',
@@ -164,6 +173,15 @@
 
                         $scope.documents.forEach(function(_document) {
                             objectIdList.push(_document.objectId);
+
+                            if (!_document.ACL) {
+                                _document.ACL = {
+                                    '*': {
+                                        'read': true,
+                                        'write': true
+                                    }
+                                }
+                            }
                         });
                     });
                 } else {
@@ -178,9 +196,16 @@
 
                             $scope.documents.forEach(function(_document) {
                                 objectIdList.push(_document.objectId);
-                            });
 
-                            // $scope.totalItems = count;
+                                if (!_document.ACL) {
+                                    _document.ACL = {
+                                        '*': {
+                                            'read': true,
+                                            'write': true
+                                        }
+                                    }
+                                }
+                            });
                         });
                 }
             }
@@ -407,8 +432,6 @@
             };
 
             $scope.gotoPointerClass = function(_className, _objectId) {
-                console.log(_className);
-                console.log(_objectId);
                 $state.go('app.application_classes_' + _className, {
                     'appId': appId,
                     'appName': appName,

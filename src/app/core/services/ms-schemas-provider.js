@@ -128,6 +128,7 @@
                                 return callback(error);
                             }
 
+                            appId = results.appId;
                             getSchemasFromServer(appId, appName, className, function(error, results) {
                                 if (error) {
                                     return callback(error);

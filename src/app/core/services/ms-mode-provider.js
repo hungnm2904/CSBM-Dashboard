@@ -6,63 +6,67 @@
         .provider('msModeService', msModeServiceProvider);
 
     function msModeServiceProvider($stateProvider) {
-        var _mode = 'user';
-        var _appName = '';
+
+        var _mode = 'application';
         var _applicationNavigationsExist = false;
+        var _collaborationRole = undefined;
         var service = this;
 
-        service.setToUserMode = setToUserMode;
-        service.setToApplicationMode = setToApplicationMode;
-        service.setToDocsMode = setToDocsMode;
-        service.isApplicationMode = isApplicationMode;
-        service.isUserMode = isUserMode;
-        service.isDocsMode = isDocsMode;
+        service.setToAppMode = setToAppMode;
+        service.setToCollaborationMode = setToCollaborationMode;
+        service.setCollaborationRole = setCollaborationRole;
+        service.isDevCollaborationRole = isDevCollaborationRole;
+        service.isGuestCollaborationRole = isGuestCollaborationRole;
+        service.isCollaborationMode = isCollaborationMode;
         service.addState = addState;
 
-        function setToUserMode() {
-            _mode = 'user';
+        function setToAppMode() {
+            _mode = 'application';
         };
 
-        function setToApplicationMode() {
-            _mode = 'application'
+        function setToCollaborationMode() {
+            _mode = 'collaboration';
         };
 
-        function setToDocsMode() {
-            _mode = 'docs'
+        function setCollaborationRole(role) {
+            _collaborationRole = role;
         };
 
-        function isUserMode() {
-            return _mode === 'user';
+        function isDevCollaborationRole() {
+            return _collaborationRole === 'Dev';
         };
 
-        function isApplicationMode() {
-            return _mode === 'application';
-        };
+        function isGuestCollaborationRole() {
+            return _collaborationRole === 'Guest';
+        }
 
-        function isDocsMode() {
-            return _mode === 'docs';
+        function isCollaborationMode() {
+            return _mode === 'collaboration';
         };
 
         function addState(name, state) {
             $stateProvider.state(name, state);
         };
 
-        this.$get = function($state, msNavigationService, msSchemasService, msDialogService,
-            msApplicationService) {
+        this.$get = function($state, $http, msNavigationService, msSchemasService, msDialogService,
+            msApplicationService, msConfigService, msUserService) {
 
+            var _domain = (msConfigService.getConfig()).domain;
             var service = {
-                setToUserMode: setToUserMode,
-                setToApplicationMode: setToApplicationMode,
-                setToDocsMode: setToDocsMode,
-                isApplicationMode: isApplicationMode,
-                isUserMode: isUserMode,
-                isDocsMode: isDocsMode,
+                setToAppMode: setToAppMode,
+                setToCollaborationMode: setToCollaborationMode,
+                setCollaborationRole: setCollaborationRole,
+                isDevCollaborationRole: isDevCollaborationRole,
+                isGuestCollaborationRole: isGuestCollaborationRole,
+                isCollaborationMode: isCollaborationMode,
                 renderApplicationNavigations: renderApplicationNavigations,
-                renderiOSDocsGuideNavigations: renderiOSDocsGuideNavigations,
+                renderCollaborationNavigations: renderCollaborationNavigations,
+                renderGuestNavigations: renderGuestNavigations,
                 renderDevManagementNavigations: renderDevManagementNavigations,
                 renderAdminManagementNavigations: renderAdminManagementNavigations,
-                renderGuestNavigations: renderGuestNavigations,
-                renderAndroidDocsGuideNavigations: renderAndroidDocsGuideNavigations
+                renderiOSDocsGuideNavigations: renderiOSDocsGuideNavigations,
+                renderAndroidDocsGuideNavigations: renderAndroidDocsGuideNavigations,
+                getCollaborationRole: getCollaborationRole
             }
 
             return service;
@@ -81,7 +85,7 @@
                 callback(true);
             };
 
-            function _renderClassesNavigations(appId, appName, className) {
+            function _renderClassesNavigations(mode, appId, appName, className) {
                 var states = $state.get();
 
                 msSchemasService.getSchemas(appId, appName, null, function(error, results) {
@@ -122,13 +126,14 @@
                                 'appName': appName,
                                 'className': schema.className,
                                 'appId': appId,
+                                'mode': mode,
                                 'objectId': null
                             }
                         });
 
                         var name = 'app.application_classes_' + schema.className;
                         var state = {
-                            url: '/apps/:appName/classes/:className',
+                            url: '/:mode/:appName/classes/:className',
                             params: {
                                 appId: null,
                                 objectId: null
@@ -153,31 +158,32 @@
                             'appId': appId,
                             'appName': appName,
                             'className': className,
+                            'mode': mode,
                             'objectId': null
                         });
                     }
                 });
             };
 
-            function _renderQueryNavigations(appName) {
+            function _renderQueryNavigations(mode, appName) {
                 msNavigationService.saveItem('application.query', {
                     title: 'Query',
                     icon: 'icon-binoculars',
                     state: 'app.application_query',
-                    stateParams: { 'appName': appName }
+                    stateParams: { 'mode': mode, 'appName': appName }
                 });
             };
 
-            function _renderDiagramNavigations(appName) {
+            function _renderDiagramNavigations(mode, appName) {
                 msNavigationService.saveItem('application.diagram', {
                     title: 'Diagram',
                     icon: 'icon-view-dashboard',
                     state: 'app.application_diagram',
-                    stateParams: { 'appName': appName }
+                    stateParams: { 'mode': mode, 'appName': appName }
                 });
             };
 
-            function _renderApplicationSettingsNavigations(appName) {
+            function _renderApplicationSettingsNavigations(mode, appName) {
                 msNavigationService.saveItem('application.appsettings', {
                     title: 'Application Settings',
                     icon: 'icon-key'
@@ -186,37 +192,37 @@
                 msNavigationService.saveItem('application.appsettings.general', {
                     title: 'General',
                     state: 'app.application_appsettings_general',
-                    stateParams: { 'appName': appName }
+                    stateParams: { 'mode': mode, 'appName': appName }
                 });
 
                 msNavigationService.saveItem('application.appsettings.keys', {
                     title: 'Keys',
                     state: 'app.application_appsettings_keys',
-                    stateParams: { 'appName': appName }
+                    stateParams: { 'mode': mode, 'appName': appName }
                 });
 
                 msNavigationService.saveItem('application.appsettings.notifications', {
                     title: 'Push Notifications',
                     state: 'app.application_appsettings_notifications',
-                    stateParams: { 'appName': appName }
+                    stateParams: { 'mode': mode, 'appName': appName }
                 });
             };
 
-            function _renderApplicationNavigations(appId, appName, className) {
+            function _renderApplicationNavigations(mode, appId, appName, className) {
                 msNavigationService.saveItem('application', {
                     title: appName,
                     group: true,
                     weight: 1
                 });
 
-                _renderQueryNavigations(appName);
-                _renderDiagramNavigations(appName);
-                _renderApplicationSettingsNavigations(appName);
-                _renderClassesNavigations(appId, appName, className);
+                _renderQueryNavigations(mode, appName);
+                _renderDiagramNavigations(mode, appName);
+                _renderApplicationSettingsNavigations(mode, appName);
+                _renderClassesNavigations(mode, appId, appName, className);
             }
 
             function renderDevManagementNavigations() {
-                _clearNavigations();
+                _clearNavigations()
                 msNavigationService.saveItem('management', {
                     title: 'Management',
                     group: true,
@@ -251,7 +257,7 @@
                 });
             };
 
-            function renderGuestNavigations(appName) {
+            function renderCollaborationNavigations(mode, appId, appName, className) {
                 _clearNavigations();
 
                 msNavigationService.saveItem('application', {
@@ -260,11 +266,26 @@
                     weight: 1
                 });
 
-                _renderQueryNavigations(appName);
-                _renderDiagramNavigations(appName);
+                _renderQueryNavigations(mode, appName);
+                _renderDiagramNavigations(mode, appName);
+                _renderClassesNavigations(mode, appId, appName, className);
             };
 
-            function renderApplicationNavigations(appId, appName, className) {
+            function renderGuestNavigations(mode, appName, state) {
+                _clearNavigations();
+
+                msNavigationService.saveItem('application', {
+                    title: appName,
+                    group: true,
+                    weight: 1
+                });
+
+                _renderQueryNavigations(mode, appName);
+                _renderDiagramNavigations(mode, appName);
+                $state.go(state, { 'mode': mode, 'appName': appName });
+            };
+
+            function renderApplicationNavigations(mode, appId, appName, className) {
                 _clearNavigations();
                 if (!appId) {
                     msApplicationService.getAppId(appName, function(error, results) {
@@ -273,11 +294,11 @@
                         }
 
                         appId = results.appId;
-                        _renderApplicationNavigations(appId, appName, className);
+                        _renderApplicationNavigations(mode, appId, appName, className);
                         _applicationNavigationsExist = true;
                     });
                 } else {
-                    _renderApplicationNavigations(appId, appName, className);
+                    _renderApplicationNavigations(mode, appId, appName, className);
                     _applicationNavigationsExist = true;
                 }
             };
@@ -318,6 +339,42 @@
                     state: 'app.docs_android_guide_getting-started'
                 });
             };
+
+            function _getCollaborationRole(appId, callback) {
+                var accessToken = msUserService.getAccessToken();
+                $http({
+                    method: 'GET',
+                    url: _domain + '/collaborations/' + appId,
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken
+                    }
+                }).then(function(response) {
+                    setCollaborationRole(response.data.role);
+                    callback(null, response.data.role);
+                }, function(response) {
+                    callback(response);
+                });
+            };
+
+            function getCollaborationRole(appId, appName, callback) {
+                if (_collaborationRole) {
+                    return _collaborationRole;
+                } else {
+                    if (appId) {
+                        _getCollaborationRole(appId, callback);
+                    } else {
+                        msApplicationService.getAppId(appName, function(error, results) {
+                            if (error) {
+                                return callback(error);
+                            }
+
+                            appId = results.appId;
+                            _getCollaborationRole(appId, callback);
+                        });
+                    }
+                }
+            };
+
         };
     };
 })();

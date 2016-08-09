@@ -17,7 +17,7 @@
         <!-- Create a new application button -->
         <div layout="row" layout-align="space-between center" flex="100">
             <div>
-                <h1><strong>Applications</strong></h1>
+                <h1><strong>Your Applications</strong></h1>
             </div>
             <div></div>
             <div>
@@ -87,14 +87,21 @@
                 </div>
             </div>
         </div>
+        <!-- Add a new application button -->
+        <div class="be-app-card" layout="row" layout-align="center stretch" layout-margin ng-click="showAddDialog($event)" flex="90">
+            <div class="be-app-card-add " layout="row" layout-align="center center" flex>
+                <span style="text-align: center">Create a new application</span>
+            </div>
+        </div>
+        <!-- / Add a new application button -->
         <!-- / Applications -->
         <!-- Collaborations -->
         <div layout="row" layout-align="space-between center" flex="100">
             <div>
-                <h1><strong>Collaborations</strong></h1>
+                <h1><strong>Applications you contribute to</strong></h1>
             </div>
         </div>
-        <div ng-repeat="collaboration in collaborations track by $index" class="be-app-card" layout="row" layout-align="center center" layout-margin ng-click="goToAppManagement(collaboration._id, collaboration.name)" flex="90">
+        <div ng-repeat="collaboration in collaborations track by $index" class="be-app-card" layout="row" layout-align="center center" layout-margin ng-click="goToCollaborationManagement(collaboration._id, collaboration.name, collaboration.role)" flex="90">
             <div class="ph-10 pv-5 be-app-card-header" ng-model="collaboration" layout="row" layout-align="start center" flex="40" layout-wrap>
                 <div class="ellipsis-text" flex="100">
                     <div class="card-title" ng-if="collaboration.name">
@@ -156,13 +163,6 @@
             </div>
         </div>
         <!-- / Collaborations -->
-        <!-- Add a new application button -->
-        <div class="be-app-card" layout="row" layout-align="center stretch" layout-margin ng-click="showAddDialog($event)" flex="90">
-            <div class="be-app-card-add " layout="row" layout-align="center center" flex>
-                <span style="text-align: center">Create a new application</span>
-            </div>
-        </div>
-        <!-- / Add a new application button -->
     </div>
     <!-- / CONTENT -->
 </div>
