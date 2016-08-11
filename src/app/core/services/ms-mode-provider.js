@@ -98,11 +98,11 @@
                     }
 
                     msNavigationService.saveItem('application.classes', {
-                        title: 'Classes',
+                        title: 'Tables',
                         icon: 'icon-library-plus',
                         group: true,
                         button: {
-                            title: 'Create new class',
+                            title: 'Create new table',
                             function: function(ev) {
                                 msDialogService.showDialog(ev, 'app/core/services/dialogs/addClassDialog.html');
                             }
@@ -127,7 +127,7 @@
                                 'className': schema.className,
                                 'appId': appId,
                                 'mode': mode,
-                                'objectId': null
+                                'objectId': undefined
                             }
                         });
 
@@ -257,9 +257,7 @@
                 });
             };
 
-            function renderCollaborationNavigations(mode, appId, appName, className) {
-                _clearNavigations();
-
+            function _renderCollaborationNavigations(mode, appId, appName, className) {
                 msNavigationService.saveItem('application', {
                     title: appName,
                     group: true,
@@ -269,6 +267,24 @@
                 _renderQueryNavigations(mode, appName);
                 _renderDiagramNavigations(mode, appName);
                 _renderClassesNavigations(mode, appId, appName, className);
+            };
+
+            function renderCollaborationNavigations(mode, appId, appName, className) {
+                _clearNavigations();
+                if (!appId) {
+                    msApplicationService.getAppId(appName, function(error, results) {
+                        if (error) {
+                            return console.log(error);
+                        }
+
+                        appId = results.appId;
+                        _renderCollaborationNavigations(mode, appId, appName, className);
+                        _applicationNavigationsExist = true;
+                    });
+                } else {
+                    _renderCollaborationNavigations(mode, appId, appName, className);
+                    _applicationNavigationsExist = true;
+                }
             };
 
             function renderGuestNavigations(mode, appName, state) {

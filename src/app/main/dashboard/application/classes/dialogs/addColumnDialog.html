@@ -10,18 +10,37 @@
         </md-toolbar>
         <md-dialog-content ms-scroll>
             <div layout="column">
+                <!-- Column Type -->
                 <div layout="row" layout-align="space-between center">
                     <div>Type of this column</div>
                     <md-input-container flex="50">
                         <label>Type</label>
                         <md-select ng-model="type">
-                            <md-option ng-repeat="type in types" value="{{type}}" ng-selected="$index == 0">
+                            <md-option ng-repeat="type in types" ng-value="type" ng-selected="$index == 0">
                                 {{type}}
                             </md-option>
                         </md-select>
                     </md-input-container>
                 </div>
                 <md-divider></md-divider>
+                <!-- / Column Type -->
+                <!-- Target Table (If Type is Pointer) -->
+                <div ng-show="type === 'Pointer'">
+                    <div layout="row" layout-align="space-between center">
+                        <div>Target table</div>
+                        <md-input-container flex="50">
+                            <label>Table</label>
+                            <md-select ng-model="targetClass">
+                                <md-option ng-repeat="targetClass in classNames" ng-value="targetClass" ng-selected="$index == 0">
+                                    {{targetClass}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <md-divider></md-divider>
+                </div>
+                <!-- / Target Table (If Type is Pointer) -->
+                <!-- Column Name -->
                 <div layout="row" layout-align="space-between center" class="mt-5">
                     <div layout="column">
                         <div>
@@ -36,6 +55,7 @@
                         <input ng-model="columnName" type="text">
                     </md-input-container>
                 </div>
+                <!-- / Column Name -->
             </div>
         </md-dialog-content>
         <md-dialog-actions layout="row" layout-align="space-between center">

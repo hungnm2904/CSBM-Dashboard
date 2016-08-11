@@ -10,8 +10,7 @@
     bottom: 10px;
     left: 10px;
     right: 10px;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: auto;
     background: rgba(0, 0, 0, 0.1);
     table {
         table-layout: fixed;
@@ -75,8 +74,6 @@
     }
     tbody {
         height: 81vh;
-        overflow-y: scroll;
-        overflow-x: hidden;
         white-space: nowrap;
         tr:nth-child(even) {
             background-color: #EEEEEE;

@@ -21,6 +21,7 @@
                 getSchemasFromLocal: getSchemasFromLocal,
                 getSchemasFromServer: getSchemasFromServer,
                 getSchemas: getSchemas,
+                getClassNames: getClassNames,
                 clearSchemas: clearSchemas,
                 getSchemaFromLocal: getSchemaFromLocal,
                 getSchemaFromServer: getSchemaFromServer,
@@ -85,6 +86,21 @@
                     getSchemasFromServer(appId, appName, className, callback);
                 }
             };
+
+            function getClassNames(appId, appName, className, callback) {
+                getSchemas(appId, appName, className, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var classNames = [];
+                    results.forEach(function(schema, index) {
+                        classNames.push(schema.className);
+                    });
+
+                    callback(null, classNames);
+                });
+            }
 
             function getSchemaFromLocal(className, callback) {
                 _schemas.some(function(schema) {
@@ -399,7 +415,7 @@
                 });
             };
 
-            function addField(className, appId, columnName, type, callback) {
+            function addField(className, targetClass, appId, columnName, type, callback) {
                 var accessToken = msUserService.getAccessToken();
 
                 var data = {
@@ -408,6 +424,10 @@
                 }
                 data.fields[columnName] = {
                     'type': type
+                }
+
+                if (type === 'Pointer') {
+                    data.fields[columnName]['targetClass'] = targetClass
                 }
 
                 msMasterKeyService.getMasterKey(appId, function(error, results) {
@@ -431,6 +451,10 @@
                                 schema.fields[columnName] = {
                                     'type': type
                                 };
+
+                                if (type === 'Pointer') {
+                                    schema.fields[columnName]['targetClass'] = targetClass;
+                                }
                             }
                         });
 
@@ -604,7 +628,7 @@
                     var masterKey = results;
                     $http({
                         method: 'GET',
-                        url: _domain + '/csbm/classes/' + className + '?where=' + JSON.stringify(filterCriteria),
+                        url: _domain + '/csbm/classes/' + className + '?where=' + JSON.stringify(filterCriteria) + '&order=-createdAt',
                         headers: {
                             'X-CSBM-Application-Id': appId,
                             'X-CSBM-Master-Key': masterKey

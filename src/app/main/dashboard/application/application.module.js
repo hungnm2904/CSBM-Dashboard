@@ -22,7 +22,38 @@
                     var mode = path[1];
                     var appName = path[2];
                     var className = path[4];
-                    msModeService.renderApplicationNavigations(mode, null, appName, className);
+                    if (mode === 'apps') {
+
+                        console.log('Reder Navigation');
+
+                        msModeService.renderApplicationNavigations(mode, null, appName, className);
+                    } else {
+                        var collaborationRole = mode.split('--')[1];
+                        if (collaborationRole === 'dev') {
+                            msModeService.getCollaborationRole(null, appName,
+                                function(error, results) {
+
+                                    if (error) {
+                                        if (error.status === 401) {
+                                            return $state.go('app.pages_auth_login');
+                                        }
+
+                                        return alert(error.statusText);
+                                    }
+
+                                    if (!msModeService.isDevCollaborationRole()) {
+                                        $state.go('app.pages_homescreen');
+                                    } else {
+
+                                        console.log('Reder Navigation');
+
+                                        msModeService.renderCollaborationNavigations(mode, null, appName, className);
+                                    }
+                                });
+                        } else if (collaborationRole === 'guest') {
+                            $state.go('app.pages_homescreen');
+                        }
+                    }
                 }
             }
         ]);
@@ -51,6 +82,9 @@
                             var appId = results.appId;
 
                             if (mode === 'apps') {
+
+                                console.log('Reder Navigation');
+
                                 msModeService.renderApplicationNavigations(mode, appId, toAppName, '');
                             } else {
                                 var collaborationRole = mode.split('--')[1];
@@ -67,8 +101,11 @@
                                             }
 
                                             if (!msModeService.isDevCollaborationRole()) {
-                                                $state.go('app.pages_auth_login');
+                                                $state.go('app.pages_homescreen');
                                             } else {
+
+                                                console.log('Reder Navigation');
+
                                                 msModeService.renderCollaborationNavigations(mode, appId, toAppName, '');
                                             }
                                         });
@@ -85,12 +122,14 @@
                                             }
 
                                             if (!msModeService.isGuestCollaborationRole()) {
-                                                $state.go('app.pages_auth_login');
+                                                $state.go('app.pages_homescreen');
                                             } else {
                                                 var state = 'app.application_diagram';
                                                 if (path[3] === 'query') {
                                                     state = 'app.application_query'
                                                 }
+
+                                                console.log('Reder Navigation');
 
                                                 msModeService.renderGuestNavigations(mode, toAppName, state);
                                             }
@@ -107,8 +146,11 @@
             var appId = args.appId;
             var appName = args.appName;
             var className = args.className;
+            var mode = $location.path().split('/')[1];
 
-            msModeService.renderApplicationNavigations(appId, appName, className);
+            console.log('Reder Navigation');
+
+            msModeService.renderApplicationNavigations(mode, appId, appName, className);
         });
     };
 })();

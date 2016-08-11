@@ -15,6 +15,7 @@
             var service = {
                 applications: applications,
                 getAll: getAll,
+                getById: getById,
                 clearApplications: clearApplications,
                 create: create,
                 remove: remove,
@@ -85,6 +86,22 @@
                     callback(response);
                 });
             };
+
+            function _getByIdLocal(appId, callback) {
+                _applications.some(function(application, index) {
+                    if (application._id === appId) {
+                        callback(null, application);
+
+                        return true;
+                    }
+                });
+            }
+
+            function getById(appId, callback) {
+                if (_applications && _applications.length > 0) {
+                    return _getByIdLocal(appId, callback);
+                }
+            }
 
             function clearApplications() {
                 _applications = [];
@@ -175,6 +192,9 @@
             };
 
             function getMasterkey(id, callback) {
+
+                console.log('~~>' + id);
+
                 var accessToken = msUserService.getAccessToken();
                 $http({
                     method: 'GET',
@@ -252,6 +272,9 @@
             };
 
             function checkUserExistById(appId, id, callback) {
+
+                console.log('checkUserExistById: ' + appId);
+
                 msMasterKeyService.getMasterKey(appId, function(error, results) {
                     if (error) {
                         return callback(error);

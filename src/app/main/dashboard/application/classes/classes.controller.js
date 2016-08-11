@@ -6,13 +6,15 @@
         .controller('ClassesController', function($scope, $http, $cookies, $window, $state,
             $stateParams, $mdDialog, $document, $rootScope, $timeout, msSchemasService,
             msDialogService, msToastService, msUserService, msApplicationService,
-            msFileUploadService) {
+            msFileUploadService, msConfigService) {
 
             if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');
             }
 
             var vm = this;
+            var _domain = (msConfigService.getConfig()).domain;
+            var mode = $stateParams.mode;
             var appId = $stateParams.appId;
             var appName = $stateParams.appName;
             var className = $stateParams.className;
@@ -28,7 +30,6 @@
             var textExtension = 'txt';
             var editing = false;
 
-            // $scope.className = className;
             $scope.columnName = '';
             $scope.fields = [];
             $scope.fields_add = [];
@@ -45,16 +46,23 @@
             var skip;
             $scope.numPerPage = 10;
 
+            var fixDocuments = function() {
+                $scope.documents.forEach(function(_document, index) {
+                    objectIdList.push(_document.objectId);
+                    if (!_document.ACL) {
+                        _document.ACL = {
+                            '*': {
+                                'read': true,
+                                'write': true
+                            }
+                        }
+                    }
+                });
+            }
+
             var renderClass = function(refresh) {
                 if (refresh) {
                     msSchemasService.getSchemaFromServer(appId, appName, className, function(error, results) {
-                        // $timeout(function() {
-                        //     $scope.schemas = [];
-                        // }).then(function() {
-                        //     $timeout(function() {
-                        //         $scope.schemas = results.fields;
-                        //     });
-                        // });
                         $scope.schemas = results.fields;
                         pagination(refresh);
                     });
@@ -84,17 +92,7 @@
 
                                 $scope.documents = results;
 
-                                $scope.documents.forEach(function(_document, index) {
-                                    objectIdList.push(_document.objectId);
-                                    if (!_document.ACL) {
-                                        _document.ACL = {
-                                            '*': {
-                                                'read': true,
-                                                'write': true
-                                            }
-                                        }
-                                    }
-                                });
+                                fixDocuments();
 
                                 $scope.filterCriteria = [{
                                     field: 'objectId',
@@ -113,9 +111,8 @@
                 var preparedCriteria = {};
                 filterCriteria.forEach(function(criteria, index) {
                     var field = criteria.field;
-
                     if (field) {
-                        convertToType(criteria.value, $scope.schemas[field].type,
+                        convertToType(criteria.value, field, $scope.schemas[field].type,
                             function(error, results) {
 
                                 if (error) {
@@ -152,16 +149,12 @@
                         alert(error.statusText);
                     } else {
                         $scope.documents = angular.copy(results);
+                        fixDocuments();
                     }
                 });
             }
 
             var pagination = function(refresh) {
-                // if ($scope.currentPage === 1) {
-                //     skip = 0;
-                // } else {
-                //     skip = ($scope.currentPage - 1) * $scope.numPerPage;
-                // }
                 if (refresh) {
                     msSchemasService.getDocumentsFromServer(appId, className, function(error, results) {
                         if (error) {
@@ -175,12 +168,7 @@
                             objectIdList.push(_document.objectId);
 
                             if (!_document.ACL) {
-                                _document.ACL = {
-                                    '*': {
-                                        'read': true,
-                                        'write': true
-                                    }
-                                }
+                                fixDocuments();
                             }
                         });
                     });
@@ -197,33 +185,15 @@
                             $scope.documents.forEach(function(_document) {
                                 objectIdList.push(_document.objectId);
 
-                                if (!_document.ACL) {
-                                    _document.ACL = {
-                                        '*': {
-                                            'read': true,
-                                            'write': true
-                                        }
-                                    }
-                                }
+                                fixDocuments();
                             });
                         });
                 }
             }
 
-            // var sort = function() {
-            //     $scope.predicate = 'updatedAt';
-            //     $scope.reverse = true;
-            //     $scope.currentPage = 1;
-            //     $scope.order = function(predicate) {
-            //         $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
-            //         $scope.predicate = predicate;
-            //     };
-            // };
-
             renderClass();
-            // sort();
 
-            var convertToType = function(value, type, callback) {
+            var convertToType = function(value, key, type, callback) {
                 if (value) {
                     switch (type) {
                         case 'Number':
@@ -240,9 +210,6 @@
                                 return callback(true, null);
                             }
                             break;
-                            // case 'Boolean':
-                            //     value = (value.toLowerCase() === 'true');
-                            //     break;
                         case 'GeoPoint':
                             var lat = value.latitude;
                             var long = value.longitude
@@ -255,8 +222,14 @@
                             break;
                         case 'File':
                             value = {
-                                'name': value,
-                                '__type': 'File'
+                                '__type': 'File',
+                                'name': value
+                            }
+                        case 'Pointer':
+                            value = {
+                                '__type': 'Pointer',
+                                'objectId': value.objectId,
+                                'className': $scope.schemas[key].targetClass
                             }
                             break;
                     }
@@ -268,10 +241,6 @@
 
                 return callback(null, value);
             };
-
-            // var toggleEditMode = function(index) {
-            //     $scope.editMode[index] = !$scope.editMode[index];
-            // };
 
             $scope.checkFieldType = function(fieldName, fieldType) {
                 return $scope.schemas[fieldName].type === fieldType;
@@ -287,7 +256,8 @@
                         $scope.showACLDialog(ev, _document);
                     } else {
                         if (!editing) {
-                            if ($scope.schemas[key].type === 'Array') {
+                            var type = $scope.schemas[key].type;
+                            if (type === 'Array') {
                                 _document[key] = JSON.stringify(_document[key]);
                             }
 
@@ -297,6 +267,7 @@
                                 field: key,
                                 updatedValue: _document[key]
                             };
+
                             $scope.editMode[index] = true;
                             editing = true;
                         }
@@ -326,7 +297,7 @@
                     var value = _document[field];
                     var type = $scope.schemas[field].type;
                     var data = {};
-                    convertToType(value, type, function(error, results) {
+                    convertToType(value, field, type, function(error, results) {
                         if (error) {
                             var titleMessage = 'Add New Row Fail';
                             var errorMessage = '"' + field + '"' + ' must be ' + '"' + type + '"';
@@ -339,12 +310,10 @@
                         } else {
                             data[field] = results;
 
-                            console.log(data);
-
                             msSchemasService.updateValues(className, appId, objectId, field, data,
                                 function(results) {
                                     if (type === 'File') {
-                                        data[field]['url'] = 'http://localhost:1337/csbm/files/' + appId + '/' + data[field].name;
+                                        data[field]['url'] = _domain + '/csbm/files/' + appId + '/' + data[field].name;
                                         _document[field] = data[field];
                                         $scope.allDocuments = angular.copy($scope.documents);
                                     }
@@ -433,9 +402,10 @@
 
             $scope.gotoPointerClass = function(_className, _objectId) {
                 $state.go('app.application_classes_' + _className, {
-                    'appId': appId,
                     'appName': appName,
                     'className': _className,
+                    'appId': appId,
+                    'mode': mode,
                     'objectId': _objectId
                 });
             };
@@ -450,6 +420,7 @@
             };
 
             $scope.refreshDocuments = function() {
+                $scope.filterCriteria = [];
                 renderClass(true);
             };
 
@@ -555,7 +526,18 @@
                     var pattern = new RegExp('^[a-zA-Z0-9]+[a-zA-Z0-9_]*$');
 
                     $scope.schemas = schemas;
-                    $scope.types = ['String', 'Number', 'Boolean', 'Array', 'File', 'GeoPoint'];
+                    $scope.classNames = [];
+                    $scope.types = ['String', 'Number', 'Boolean', 'Array', 'File', 'GeoPoint', 'Pointer'];
+
+                    msSchemasService.getClassNames(appId, appName, className,
+                        function(error, results) {
+
+                            if (error) {
+                                return alert(error.statusText);
+                            }
+
+                            $scope.classNames = angular.copy(results);
+                        });
 
                     $scope.closeDialog = function() {
                         $mdDialog.hide();
@@ -566,7 +548,7 @@
                     };
 
                     $scope.addColumn = function() {
-                        msSchemasService.addField(className, appId, $scope.columnName, $scope.type,
+                        msSchemasService.addField(className, $scope.targetClass, appId, $scope.columnName, $scope.type,
                             function(error, results) {
                                 if (error) {
                                     if (error.status === 401) {
@@ -596,7 +578,7 @@
                 });
 
                 function DeleteDialogController($scope, schemas, documents) {
-                    var uneditableFileds = ['objectId', 'createdAt', 'updatedAt'];
+                    var unDeleteable = ['objectId', 'createdAt', 'updatedAt', 'ACL'];
 
                     $scope.schemas = schemas;
 
@@ -604,8 +586,8 @@
                         $mdDialog.hide();
                     };
 
-                    $scope.editable = function(field) {
-                        return uneditableFileds.indexOf(field) === -1;
+                    $scope.deleteable = function(field) {
+                        return unDeleteable.indexOf(field) === -1;
                     };
 
                     $scope.deleteColumn = function() {

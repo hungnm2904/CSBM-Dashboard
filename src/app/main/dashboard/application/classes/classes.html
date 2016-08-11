@@ -2,7 +2,7 @@
     <!-- HEADER -->
     <div class="header md-accent-bg" layout="row" layout-align="space-between">
         <div layout="column" layout-align="center start">
-            <div class="sub-title">Class</div>
+            <div class="sub-title">Table</div>
             <div class="title">{{title}} <span class="title-info">{{documents.length}} objects</span></div>
         </div>
         <div layout="row" layout-align="start center">
@@ -36,7 +36,7 @@
                     <md-menu-item>
                         <md-button ng-click="showUpdateFieldNameDialog($event)" aria-label="">
                             <md-icon md-font-icon="icon-table-edit"></md-icon>
-                            <span>Update field name</span>
+                            <span>Update column name</span>
                         </md-button>
                     </md-menu-item>
                     <md-divider></md-divider>
@@ -49,7 +49,7 @@
                     <md-menu-item>
                         <md-button ng-click="deleteRow()" aria-label="delete rows" ng-disabled="checkList() == 0">
                             <md-icon md-font-icon="icon-delete"></md-icon>
-                            <span aria-label="delete this row" ng-if="checked.length == 1">Delete this rows</span>
+                            <span aria-label="delete this row" ng-if="checked.length == 1">Delete this row</span>
                             <span aria-label="delete these rows" ng-if="checked.length != 1">Delete these rows</span>
                         </md-button>
                     </md-menu-item>
@@ -71,10 +71,17 @@
             <thead>
                 <tr>
                     <th>
-                        <md-checkbox aria-label=" " ng-checked="isChecked()" md-indeterminate="isIndeterminate()" ng-click="toggleAll()"></md-checkbox>
+                        <md-checkbox aria-label="check all" ng-checked="isChecked()" md-indeterminate="isIndeterminate()" ng-click="toggleAll()"></md-checkbox>
                     </th>
                     <th ng-repeat="(key, value) in schemas" class="no-select">
-                        <div id="header_{{$index}}" class="be-header" draggable="false" ondragstart="angular.element(this).scope().handleDragStart(event)" ondragend="angular.element(this).scope().handleDragEnd(event)" ondragover="angular.element(this).scope().handleDragOver(event)" ondragenter="angular.element(this).scope().handleDragEnter(event)" ondragleave="angular.element(this).scope().handleDragLeave(event)" ondrop="angular.element(this).scope().handleDrop(event)">
+                        <!-- <div id="header_{{$index}}" class="be-header" draggable="false" ondragstart="angular.element(this).scope().handleDragStart(event)" ondragend="angular.element(this).scope().handleDragEnd(event)" ondragover="angular.element(this).scope().handleDragOver(event)" ondragenter="angular.element(this).scope().handleDragEnter(event)" ondragleave="angular.element(this).scope().handleDragLeave(event)" ondrop="angular.element(this).scope().handleDrop(event)">
+                            {{key}}
+                            <span ng-if="schemas[key].type != 'Pointer'">{{schemas[key].type}}</span>
+                            <span ng-if="schemas[key].type == 'Pointer'">
+                                {{schemas[key].type}} <{{schemas[key].targetClass}}>
+                            </span>
+                        </div> -->
+                        <div id="header_{{$index}}" class="be-header">
                             {{key}}
                             <span ng-if="schemas[key].type != 'Pointer'">{{schemas[key].type}}</span>
                             <span ng-if="schemas[key].type == 'Pointer'">
@@ -97,8 +104,8 @@
                             <span class="disable-text" ng-model="document[key]">{{document[key]}}</span>
                         </div>
                         <div ng-if="editable(key)" class="be-cell">
-                            <!-- String, Datetime, Number, Boolean Type -->
-                            <div ng-if="checkFieldType(key, 'String') || checkFieldType(key, 'Date') || checkFieldType(key, 'Number') || checkFieldType(key, 'Boolean') || checkFieldType(key, 'Array')">
+                            <!-- String, Datetime, Number, Array, Object, Boolean Type -->
+                            <div ng-if="checkFieldType(key, 'String') || checkFieldType(key, 'Date') || checkFieldType(key, 'Number') || checkFieldType(key, 'Boolean') || checkFieldType(key, 'Array') || checkFieldType(key, 'Object')"">
                                 <div ng-if="!editMode[(position + 1 + '') + ($index + '')]" class="ellipsis-text">
                                     <span ng-if="document[key] != undefined" name="schemavalue" ng-model="document[key]">
                                         {{document[key]}}
@@ -135,7 +142,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- / String, Datetime, Number, Boolean Type -->
+                            <!-- / String, Datetime, Number, Array, Boolean Type -->
                             <!-- GeoPoint Type -->
                             <div ng-if="checkFieldType(key, 'GeoPoint')">
                                 <div ng-if="!editMode[(position + 1 + '') + ($index + '')]">
@@ -213,6 +220,7 @@
                                 </div>
                                 <div ng-if="editMode[(position + 1 + '') + ($index + '')]">
                                     <div ng-form name="vm.editForm">
+                                        <textarea aria-label="pointer" ng-model="document[key].objectId" rows="3" autofocus></textarea>
                                     </div>
                                 </div>
                             </div>

@@ -4,13 +4,38 @@
     angular
         .module('app.application.appsettings.notifications')
         .controller('NotificationsController', function($scope, $stateParams, $http, msUserService,
-            msModeService, msConfigService) {
+            msConfigService, msSchemasService, msApplicationService) {
 
             if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');
             }
 
-            var appId = $stateParams.appId;
+            var appName = $stateParams.appName;
+            $scope.senderId = undefined;
+            $scope.apiKey = undefined;
+            $scope.appId = msSchemasService.getAppId();
+            if (!$scope.appId) {
+                msApplicationService.getAppId(appName, function(error, results) {
+                    if (error) {
+                        if (error.status === 401) {
+                            return $state.go('app.pages_auth_login');
+                        }
+
+                        return alert(error.statusText);
+                    }
+
+                    $scope.appId = results.appId;
+                    msApplicationService.getById($scope.appId, function(error, results) {
+                        $scope.senderId = results.push.android.senderId;
+                        $scope.apiKey = results.push.android.apiKey;
+                    });
+                });
+            } else {
+                msApplicationService.getById($scope.appId, function(error, results) {
+                    $scope.senderId = results.push.android.senderId;
+                    $scope.apiKey = results.push.android.apiKey;
+                });
+            }
             var _domain = (msConfigService.getConfig()).domain;
 
             $scope.senderId;
@@ -22,7 +47,7 @@
                     method: 'POST',
                     url: _domain + '/pushConfig',
                     headers: {
-                        'X-CSBM-Application-Id': appId,
+                        'X-CSBM-Application-Id': $scope.appId,
                         'Authorization': 'Bearer ' + accessToken
                     },
                     data: {
@@ -30,7 +55,7 @@
                         apiKey: $scope.apiKey
                     }
                 }).then(function(response) {
-                    
+
                 }, function(response) {
                     alert(response.statusText);
                 });

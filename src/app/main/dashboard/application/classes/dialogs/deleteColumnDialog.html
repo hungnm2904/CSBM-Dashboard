@@ -13,7 +13,7 @@
                 <md-input-container flex=100>
                     <label>Column Name</label>
                     <md-select ng-model="columnName">
-                        <md-option ng-if="editable(key)" ng-repeat="(key, value) in schemas" value="{{key}}">
+                        <md-option ng-if="deleteable(key)" ng-repeat="(key, value) in schemas" value="{{key}}">
                             {{key}}
                         </md-option>
                     </md-select>
