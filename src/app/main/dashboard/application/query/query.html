@@ -192,7 +192,24 @@
         <tbody>
             <tr ng-repeat="document in documents">
                 <td ng-repeat="field in fields">
-                    {{document[field]}}
+                    <div ng-if="!document[field]">
+                        (undefined)
+                    </div>
+                    <div ng-if="document[field]">
+                        <div ng-if="checkFieldType(field, 'String') || checkFieldType(field, 'Date') || checkFieldType(field, 'Number') || checkFieldType(field, 'Boolean') || checkFieldType(field, 'Array') || checkFieldType(field, 'Object')">
+                            {{document[field]}}
+                        </div>
+                        <div ng-if="checkFieldType(field, 'GeoPoint')">
+                            ({{document[field].latitude}}, {{document[field].longitude}})
+                        </div>
+                        <div ng-if="checkFieldType(field, 'File')">
+                            <div layout="column" layout-align="center stretch">
+                                <a ng-href="{{document[field].url}}" target="_blank" class="be-button be-button-blue">
+                                    {{document[field].name.substr((document[field].name).indexOf('_') + 1, document[field].name.length)}}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </td>
             </tr>
         </tbody>

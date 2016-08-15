@@ -181,12 +181,7 @@
 
                             $scope.documents = results
                             $scope.allDocuments = angular.copy(results);
-
-                            $scope.documents.forEach(function(_document) {
-                                objectIdList.push(_document.objectId);
-
-                                fixDocuments();
-                            });
+                            fixDocuments();
                         });
                 }
             }
@@ -408,6 +403,18 @@
                     'mode': mode,
                     'objectId': _objectId
                 });
+            };
+
+            $scope.showRelation = function(targetClassName, objectId, key) {
+                msSchemasService.getRelation(appId, className, targetClassName, objectId, key, function(error, results) {
+                    var documents = results.results;
+                    msSchemasService.getSchema(appId, appName, targetClassName, function(error, results) {
+                        $scope.schemas = angular.copy(results.fields);
+
+                        $scope.documents = angular.copy(documents);
+                        fixDocuments();
+                    });
+                })
             };
 
             var uneditableFileds = ['objectId', 'createdAt', 'updatedAt'];

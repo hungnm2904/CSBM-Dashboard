@@ -102,8 +102,6 @@
             var filter = function(filterCriteria) {
                 var fields = $scope.schema.fields;
 
-                console.log(fields);
-
                 var preparedCriteria = {};
                 filterCriteria.forEach(function(criteria, index) {
                     var field = criteria.field;
@@ -160,6 +158,13 @@
                     });
 
                 });
+            };
+
+            $scope.checkFieldType = function(fieldName, fieldType) {
+                if (!$scope.schema.fields[fieldName]) {
+                    return false;
+                }
+                return $scope.schema.fields[fieldName].type === fieldType;
             };
 
             $scope.changeTable = function() {

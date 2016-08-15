@@ -52,19 +52,21 @@
                 return alert(error.statusText);
             }
 
-            $scope.applications.forEach(function(application) {
-                var appId = application._id;
-                var appName = application.name;
+            if ($scope.applications && $scope.applications.length > 0) {
+                $scope.applications.forEach(function(application) {
+                    var appId = application._id;
+                    var appName = application.name;
 
-                $scope.applicationNames.push(appName);
+                    $scope.applicationNames.push(appName);
 
-                var createdAt = new Date(application.created_at);
-                createdAt = new Date(createdAt.getTime() + (createdAt.getTimezoneOffset() * 60000));
+                    var createdAt = new Date(application.created_at);
+                    createdAt = new Date(createdAt.getTime() + (createdAt.getTimezoneOffset() * 60000));
 
-                application.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
+                    application.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
 
-                countInfo(application);
-            });
+                    countInfo(application);
+                });
+            }
         });
 
         msUserService.getCollaborations(function(error, results) {

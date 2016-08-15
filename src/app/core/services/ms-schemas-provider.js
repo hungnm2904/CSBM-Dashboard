@@ -42,7 +42,8 @@
                 changeFieldName: changeFieldName,
                 filter: filter,
                 deleteClass: deleteClass,
-                countObjectInClass: countObjectInClass
+                countObjectInClass: countObjectInClass,
+                getRelation: getRelation
             }
 
             return service;
@@ -712,6 +713,32 @@
                     });
                 });
             };
+
+            function getRelation(appId, className, targetClassName, objectId, key, callback) {
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var queryString = '?where={"$relatedTo":{"object":{"__type":"Relation","className":"' + className + '","objectId":"' + objectId + '"},"key":"' + key + '"}}'
+
+                    console.log(_domain + '/csbm/classes/' + targetClassName + queryString);
+
+                    var masterKey = results;
+                    $http({
+                        method: 'GET',
+                        url: _domain + '/csbm/classes/' + targetClassName + queryString,
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey
+                        }
+                    }).then(function(response) {
+                        callback(null, response.data);
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            }
         };
     };
 })();

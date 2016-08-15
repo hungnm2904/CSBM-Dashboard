@@ -83,8 +83,8 @@
                         </div> -->
                         <div id="header_{{$index}}" class="be-header">
                             {{key}}
-                            <span ng-if="schemas[key].type != 'Pointer'">{{schemas[key].type}}</span>
-                            <span ng-if="schemas[key].type == 'Pointer'">
+                            <span ng-if="schemas[key].type != 'Pointer' && schemas[key].type != 'Relation'">{{schemas[key].type}}</span>
+                            <span ng-if="schemas[key].type == 'Pointer' || schemas[key].type == 'Relation'">
                                 {{schemas[key].type}} <{{schemas[key].targetClass}}>
                             </span>
                         </div>
@@ -225,6 +225,20 @@
                                 </div>
                             </div>
                             <!-- / Pointer Type -->
+                            <!-- Relation Type -->
+                            <div ng-if="checkFieldType(key, 'Relation')">
+                                <div ng-if="!document[key]" class="ellipsis-text">
+                                    <span class="undefined-text" ng-model="document[key]">
+                                        (undefined)
+                                    </span>
+                                </div>
+                                <div ng-if="document[key]" class="ellipsis-text">
+                                    <a href="javascript:void(0)" ng-click="showRelation(document[key].className, document.objectId, key)" class="be-button be-button-blue">
+                                        <span>View relation</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- / Relation Type -->
                             <!-- ACL Type -->
                             <div ng-if="checkFieldType(key, 'ACL')">
                                 <div ng-if="!editMode[(position + 1 + '') + ($index + '')]" class="ellipsis-text">
