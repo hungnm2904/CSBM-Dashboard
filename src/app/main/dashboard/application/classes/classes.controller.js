@@ -163,14 +163,7 @@
 
                         $scope.documents = results
                         $scope.allDocuments = angular.copy(results);
-
-                        $scope.documents.forEach(function(_document) {
-                            objectIdList.push(_document.objectId);
-
-                            if (!_document.ACL) {
-                                fixDocuments();
-                            }
-                        });
+                        fixDocuments();
                     });
                 } else {
                     msSchemasService.getDocuments(appId, className, null, null,
@@ -412,6 +405,7 @@
                         $scope.schemas = angular.copy(results.fields);
 
                         $scope.documents = angular.copy(documents);
+                        className = targetClassName;
                         fixDocuments();
                     });
                 })
@@ -428,6 +422,7 @@
 
             $scope.refreshDocuments = function() {
                 $scope.filterCriteria = [];
+                className = $stateParams.className;
                 renderClass(true);
             };
 

@@ -566,11 +566,13 @@
                         _schemas.forEach(function(schema) {
                             if (schema.className === className) {
                                 var documents = schema.documents;
-                                documents.forEach(function(_document) {
-                                    if (_document.objectId === objectId) {
-                                        return _document[field] = data[field];
-                                    }
-                                });
+                                if (documents && documents.length > 0) {
+                                    documents.forEach(function(_document) {
+                                        if (_document.objectId === objectId) {
+                                            return _document[field] = data[field];
+                                        }
+                                    });
+                                }
                             }
                         });
                         callback(null, response.data);
@@ -721,8 +723,6 @@
                     }
 
                     var queryString = '?where={"$relatedTo":{"object":{"__type":"Relation","className":"' + className + '","objectId":"' + objectId + '"},"key":"' + key + '"}}'
-
-                    console.log(_domain + '/csbm/classes/' + targetClassName + queryString);
 
                     var masterKey = results;
                     $http({

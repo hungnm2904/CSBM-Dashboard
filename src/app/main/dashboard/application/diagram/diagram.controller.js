@@ -226,7 +226,7 @@
                 $scope.schemas.forEach(function(schema, index) {
                     var fields = schema.fields
                     for (var key in fields) {
-                        if (fields[key].type === 'Pointer') {
+                        if (fields[key].type === 'Pointer' || fields[key].type === 'Relation') {
                             var fromIndex = getIndexByClassName(schema.className, nodedata);
                             var toIndex = getIndexByClassName(fields[key].targetClass, nodedata);
 
