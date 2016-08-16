@@ -213,6 +213,7 @@
                                 '__type': 'File',
                                 'name': value
                             }
+                            break;
                         case 'Pointer':
                             value = {
                                 '__type': 'Pointer',
@@ -285,6 +286,7 @@
                     var value = _document[field];
                     var type = $scope.schemas[field].type;
                     var data = {};
+
                     convertToType(value, field, type, function(error, results) {
                         if (error) {
                             var titleMessage = 'Add New Row Fail';
@@ -372,6 +374,7 @@
                 var file = el.files[0];
                 msFileUploadService.uploadFile(appId, file, function(error, results) {
                     vm.editForm.$setDirty();
+
                     $scope.updatingObject.document[$scope.updatingObject.field] = results.data.name;
                     $scope.updateValues($scope.updatingObject.index,
                         $scope.updatingObject.document, $scope.updatingObject.field,
@@ -380,7 +383,6 @@
             };
 
             $scope.deleteFile = function(_document, key) {
-                // console.log(_document[key]);
                 vm.editForm.$setDirty();
                 $scope.updatingObject.document[$scope.updatingObject.field] = "deleted";
                 $scope.updateValues($scope.updatingObject.index,
@@ -708,7 +710,6 @@
                                         alert(error.statusText);
                                     } else {
                                         msSchemasService.deleteClass(appName, className, function(error, results) {
-                                            // console.log(results);
                                         });
                                     }
 
@@ -716,7 +717,6 @@
                                 });
                         } else {
                             msSchemasService.deleteClass(appName, className, function(error, results) {
-                                // console.log(results);
                             });
 
                             $mdDialog.hide();
@@ -811,7 +811,6 @@
                         });
 
                         if (check) {
-                            console.log('check check');
                             $scope.userOrRoleError = true;
                         } else {
                             msApplicationService.checkUserExistById(appId, newKey, function(error, resuls) {
@@ -856,8 +855,6 @@
                         var data = {
                             'ACL': ACL
                         };
-
-                        console.log(data);
 
                         msSchemasService.updateValues(className, appId, objectId, 'ACL', data,
                             function(results) {

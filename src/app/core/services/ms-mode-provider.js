@@ -228,7 +228,7 @@
                 _renderDiagramNavigations(mode, appName);
                 _renderApplicationSettingsNavigations(mode, appName);
                 _renderClassesNavigations(mode, appId, appName, className);
-                _renderPushNavigations(mode, appName);
+                // _renderPushNavigations(mode, appName);
             }
 
             function renderDevManagementNavigations() {

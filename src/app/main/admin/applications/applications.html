@@ -19,20 +19,20 @@
             <table class="dataTable row-border hover" datatable="ng" dt-options="dtOptions">
                 <thead>
                     <tr>
-                        <th ng-repeat="(key, value) in headers" class="secondary-text">
+                        <th ng-repeat="header in headers" class="secondary-text">
                             <div class="table-header">
-                                <span class="column-title">{{key}}</span>
+                                <span class="column-title">{{header}}</span>
                             </div>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="document in documents">
-                        <td>{{document.objectId}}</td>
-                        <td>{{document.createdAt}}</td>
-                        <td>{{document.updatedAt}}</td>
+                    <tr ng-repeat="application in applications">
+                        <td ng-repeat="header in headers">
+                            {{application[header]}}
+                        </td>
                         <td>
-                            <md-switch class="md-primary" aria-label="Switch" ng-model="document.active" ng-change="onChange(document.objectId, document.active)">
+                            <md-switch class="md-primary" aria-label="Switch" ng-model="application.status" ng-change="onChange(application._id, application.status)">
                             </md-switch>
                         </td>
                     </tr>
