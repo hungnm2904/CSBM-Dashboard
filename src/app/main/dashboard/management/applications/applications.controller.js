@@ -60,9 +60,11 @@
                     $scope.applicationNames.push(appName);
 
                     var createdAt = new Date(application.created_at);
-                    createdAt = new Date(createdAt.getTime() + (createdAt.getTimezoneOffset() * 60000));
+                    if (!isNaN(createdAt)) {
+                        createdAt = new Date(createdAt.getTime() + (createdAt.getTimezoneOffset() * 60000));
 
-                    application.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
+                        application.created_at = (createdAt.getDate() + '') + '/' + (createdAt.getMonth() + 1 + '') + '/' + (createdAt.getFullYear() + '');
+                    }
 
                     countInfo(application);
                 });

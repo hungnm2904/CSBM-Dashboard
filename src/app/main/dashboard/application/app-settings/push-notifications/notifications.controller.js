@@ -26,14 +26,22 @@
 
                     $scope.appId = results.appId;
                     msApplicationService.getById($scope.appId, function(error, results) {
-                        $scope.senderId = results.push.android.senderId;
-                        $scope.apiKey = results.push.android.apiKey;
+                        if (results.push) {
+                            if (results.push.android) {
+                                $scope.senderId = results.push.android.senderId;
+                                $scope.apiKey = results.push.android.apiKey;
+                            }
+                        }
                     });
                 });
             } else {
                 msApplicationService.getById($scope.appId, function(error, results) {
-                    $scope.senderId = results.push.android.senderId;
-                    $scope.apiKey = results.push.android.apiKey;
+                    if (results.push) {
+                        if (results.push.android) {
+                            $scope.senderId = results.push.android.senderId;
+                            $scope.apiKey = results.push.android.apiKey;
+                        }
+                    }
                 });
             }
             var _domain = (msConfigService.getConfig()).domain;

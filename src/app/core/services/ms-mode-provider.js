@@ -208,6 +208,15 @@
                 });
             };
 
+            function _renderPushNavigations(mode, appName) {
+                msNavigationService.saveItem('application.push', {
+                    title: 'Push',
+                    icon: 'icon-drawing',
+                    state: 'app.application_push',
+                    stateParams: { 'mode': mode, 'appName': appName }
+                });
+            };
+
             function _renderApplicationNavigations(mode, appId, appName, className) {
                 msNavigationService.saveItem('application', {
                     title: appName,
@@ -219,6 +228,7 @@
                 _renderDiagramNavigations(mode, appName);
                 _renderApplicationSettingsNavigations(mode, appName);
                 _renderClassesNavigations(mode, appId, appName, className);
+                _renderPushNavigations(mode, appName);
             }
 
             function renderDevManagementNavigations() {

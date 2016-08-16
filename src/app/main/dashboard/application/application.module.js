@@ -6,6 +6,7 @@
             'app.application.diagram',
             'app.application.query',
             'app.application.classes',
+            'app.application.push',
             'app.application.appsettings.general',
             'app.application.appsettings.keys',
             'app.application.appsettings.notifications'
@@ -69,7 +70,7 @@
                 var fromAppName = fromParams.appName;
                 if (toAppName != fromAppName) {
                     var path = toState.url.split('/');
-                    if (path[3] === 'settings' || path[3] === 'diagram' || path[3] === 'query') {
+                    if (path[3] === 'settings' || path[3] === 'diagram' || path[3] === 'query' || path[3] === 'push') {
                         msApplicationService.getAppId(toAppName, function(error, results) {
                             if (error) {
                                 if (error.status === 401) {

@@ -17,7 +17,7 @@
                 <span class="md-subhead">Android push notidication requires GCM sender ID and GCM API key to enable</span>
             </div>
         </div>
-        <div layout="column" layout-margin layout-align="center center" layout-wrap>
+        <div layout="column" layout-margin layout-align="center stretch" layout-wrap>
             <!-- GCM sender ID -->
             <div flex="65" class="md-whiteframe-4dp">
                 <div layout="row">
@@ -58,7 +58,7 @@
                 </div>
             </div>
             <!-- / GCM API key -->
-            <div>
+            <div flex="100" layout="row" layout-align="center center">
                 <md-button class="md-raised md-warn" ng-click="enablePush()" ng-disabled="!appId">
                     Enable
                 </md-button>

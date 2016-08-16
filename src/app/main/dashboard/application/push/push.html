@@ -1,0 +1,47 @@
+<div id="push" class="page-layout simple fullwidth doc-page">
+    <!-- HEADER -->
+    <!--     <div class="header md-accent-bg" layout="row" layout-align="space-between">
+        <div layout="column" layout-align="center start">
+            <div class="title">General Settings</div>
+        </div>
+        <div layout="row" layout-align="start center">
+        </div>
+    </div> -->
+    <!-- / HEADER -->
+    <!-- CONTENT -->
+    <div class="content" md-background-bg>
+        <!-- Push Conditions -->
+        <div layout="row" layout-align="center">
+            <div layout-margin style="text-align: center">
+                <h1><strong>Push Conditions</strong></h1>
+                <span class="md-subhead">Set conditions to limit your target device</span>
+            </div>
+        </div>
+        <div layout="row" layout-margin layout-align="center" layout-wrap>
+            <div flex="65" class="md-whiteframe-4dp">
+                <div layout="row">
+                    <div flex="60">
+                        <div layout="row" layout-margin layout-wrap>
+                            <h3 flex="100"><strong>Application name</strong></h3>
+                        </div>
+                    </div>
+                    <div flex="40" class="md-grey-300-bg ph-20" layout="column" layout-align="center strech">
+                        <md-input-container md-no-float class="md-block no-error-check-input">
+                            <input ng-model="appName" value="{{appName}}" placeholder="Application name can not be null" ng-change="changeAppName(appName)" ng-model-options="{debounce:500}" style="text-align: center; font-size: 1.3em">
+                        </md-input-container>
+                        <div ng-show="changed" layout="row" layout-align="center center">
+                            <md-button class="md-warn" ng-click="cancel()">
+                                Cancel
+                            </md-button>
+                            <md-button class="md-raised md-accent" ng-click="saveChanges()" ng-disabled="!appName">
+                                Save changes
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- / Push Conditions -->
+    </div>
+    <!-- / CONTENT -->
+</div>
