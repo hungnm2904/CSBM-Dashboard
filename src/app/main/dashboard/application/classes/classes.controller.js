@@ -653,7 +653,7 @@
                             .cancel('No');
 
                         $mdDialog.show(confirm).then(function() {
-                            msSchemasService.changeFieldName(appName, className, $scope.field,
+                            msSchemasService.changeFieldName(className, $scope.field,
                                 $scope.newFieldName, appId,
                                 function(error, results) {
                                     if (error) {

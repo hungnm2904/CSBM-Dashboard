@@ -582,7 +582,7 @@
                 });
             };
 
-            function changeFieldName(applicationName, className, fieldName, newFieldName, appId,
+            function changeFieldName(className, fieldName, newFieldName, appId,
                 callback) {
 
                 var accessToken = msUserService.getAccessToken();
@@ -593,7 +593,7 @@
                         'Authorization': 'Bearer ' + accessToken
                     },
                     data: {
-                        applicationName: applicationName,
+                        appId: appId,
                         className: className,
                         fieldName: fieldName,
                         newFieldName: newFieldName
