@@ -201,7 +201,23 @@
                         $(go.Shape, { scale: 1.3, fill: "white" },
                             new go.Binding("fromArrow", "relationship", convertFromArrow)),
                         $(go.Shape, { scale: 1.3, fill: "white" },
-                            new go.Binding("toArrow", "relationship", convertToArrow))
+                            new go.Binding("toArrow", "relationship", convertToArrow)),
+                        $(go.TextBlock, {
+                                textAlign: "center",
+                                font: "bold 14px sans-serif",
+                                segmentIndex: 0,
+                                segmentOffset: new go.Point(NaN, NaN),
+                                segmentOrientation: go.Link.OrientUpright
+                            },
+                            new go.Binding("text", "text")),
+                        $(go.TextBlock, {
+                                textAlign: "center",
+                                font: "bold 14px sans-serif",
+                                segmentIndex: -1,
+                                segmentOffset: new go.Point(NaN, NaN),
+                                segmentOrientation: go.Link.OrientUpright
+                            },
+                            new go.Binding("text", "toText"))
                     );
 
                 var nodedata = [];
@@ -210,7 +226,8 @@
                     nodedata.push({
                         key: index,
                         name: schema.className,
-                        properties: []
+                        properties: [],
+                        loc: "0 0"
                     });
 
                     var fields = schema.fields
@@ -226,13 +243,26 @@
                 $scope.schemas.forEach(function(schema, index) {
                     var fields = schema.fields
                     for (var key in fields) {
-                        if (fields[key].type === 'Pointer' || fields[key].type === 'Relation') {
+                        if (fields[key].type === 'Pointer') {
                             var fromIndex = getIndexByClassName(schema.className, nodedata);
                             var toIndex = getIndexByClassName(fields[key].targetClass, nodedata);
 
                             linkdata.push({
                                 from: fromIndex,
                                 to: toIndex,
+                                text: "*",
+                                toText: "1",
+                                relationship: "association"
+                            });
+                        } else if (fields[key].type === 'Relation') {
+                            var fromIndex = getIndexByClassName(schema.className, nodedata);
+                            var toIndex = getIndexByClassName(fields[key].targetClass, nodedata);
+
+                            linkdata.push({
+                                from: fromIndex,
+                                to: toIndex,
+                                text: "*",
+                                toText: "*",
                                 relationship: "association"
                             });
                         }

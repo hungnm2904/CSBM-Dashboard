@@ -23,7 +23,8 @@
                 getCurrentEmail: getCurrentEmail,
                 getCurrentRole: getCurrentRole,
                 removeCurrentUser: removeCurrentUser,
-                getCollaborations: getCollaborations
+                getCollaborations: getCollaborations,
+                checkPassword: checkPassword
             }
 
             return service;
@@ -162,6 +163,24 @@
                     }
                 }).then(function(response) {
                     callback(null, response.data.data);
+                }, function(response) {
+                    callback(response);
+                });
+            };
+
+            function checkPassword(password, callback) {
+                var accessToken = getAccessToken();
+                $http({
+                    method: 'POST',
+                    url: _domain + '/checkPassword',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken
+                    },
+                    data: {
+                        password: password
+                    }
+                }).then(function(response) {
+                    callback(null, response.data);
                 }, function(response) {
                     callback(response);
                 });

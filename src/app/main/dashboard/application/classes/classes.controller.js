@@ -709,15 +709,13 @@
                                     if (error) {
                                         alert(error.statusText);
                                     } else {
-                                        msSchemasService.deleteClass(appName, className, function(error, results) {
-                                        });
+                                        msSchemasService.deleteClass(appName, className, function(error, results) {});
                                     }
 
                                     $mdDialog.hide();
                                 });
                         } else {
-                            msSchemasService.deleteClass(appName, className, function(error, results) {
-                            });
+                            msSchemasService.deleteClass(appName, className, function(error, results) {});
 
                             $mdDialog.hide();
                         }
@@ -862,7 +860,66 @@
                             });
                     };
                 };
-            }
+            };
+
+            $scope.showExportClass = function(ev) {
+                $mdDialog.show({
+                    controller: ExportClassDialogController,
+                    controllerAs: 'vm',
+                    templateUrl: 'app/main/dashboard/application/classes/dialogs/exportClassDialog.html',
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false,
+                    escapeToClose: false
+                });
+
+                function ExportClassDialogController($scope) {
+                    $scope.password = undefined;
+
+                    $scope.closeDialog = function() {
+                        $mdDialog.hide();
+                    };
+
+                    $scope.exportClass = function() {
+                        msUserService.checkPassword($scope.password, function(error, results) {
+                            var isMath = results.isMath;
+
+                            if (isMath) {
+                                msSchemasService.exportClass(appId, className,
+                                    function(error, results) {
+
+                                        if (error) {
+                                            return alert(error.statusText);
+                                        }
+
+                                        var data = results.data;
+                                        if (data.results && data.results.length > 0) {
+                                            data = JSON.stringify(data, null, 4);
+                                        } else {
+                                            data = '';
+                                        }
+                                        // application/json
+                                        var blob = new Blob([data], { type: "application/json;charset=utf-8" });
+                                        saveAs(blob, className + ".json");
+
+                                        $scope.closeDialog();
+                                    });
+                            } else {
+                                $mdDialog.show(
+                                    $mdDialog.alert()
+                                    .parent(angular.element($document.body))
+                                    .clickOutsideToClose(true)
+                                    .title('Password is incorrect')
+                                    .textContent('This class was not exported.')
+                                    .ariaLabel('Alert Dialog Demo')
+                                    .ok('Close')
+                                    .targetEvent(ev)
+                                );
+                            }
+                        });
+                    };
+                };
+            };
 
             $scope.toggle = function(objectId) {
                 var index = $scope.checked.indexOf(objectId);

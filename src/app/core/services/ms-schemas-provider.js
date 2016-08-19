@@ -43,7 +43,8 @@
                 filter: filter,
                 deleteClass: deleteClass,
                 countObjectInClass: countObjectInClass,
-                getRelation: getRelation
+                getRelation: getRelation,
+                exportClass: exportClass
             }
 
             return service;
@@ -384,8 +385,6 @@
                         'path': '/csbm/classes/' + className + '/' + objectId
                     });
                 });
-
-                console.log(data);
 
                 msMasterKeyService.getMasterKey(appId, function(error, results) {
                     if (error) {
@@ -738,7 +737,31 @@
                         callback(response);
                     });
                 });
-            }
+            };
+
+            function exportClass(appId, className, callback) {
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    var url = _domain + '/csbm/classes/' + className + '?order=-createdAt';
+
+                    $http({
+                        method: 'GET',
+                        url: url,
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey
+                        }
+                    }).then(function(response) {
+                        callback(null, response);
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            };
         };
     };
 })();

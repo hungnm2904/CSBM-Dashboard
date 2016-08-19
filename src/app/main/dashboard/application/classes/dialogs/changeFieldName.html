@@ -2,7 +2,7 @@
     <form class="md-inline-form">
         <md-toolbar class="md-accent md-hue-2">
             <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-                <span class="title">Update Field Name</span>
+                <span class="title">Update Column Name</span>
                 <md-button class="md-icon-button" ng-click="closeDialog()" aria-label="Close dialog" tranlate translate-aria-label="CLOSE DIALOG">
                     <md-icon md-font-icon="icon-close"></md-icon>
                 </md-button>
@@ -11,7 +11,7 @@
         <md-dialog-content ms-scroll>
             <div layout="row">
                 <md-input-container flex=50>
-                    <label>Field Name</label>
+                    <label>Column Name</label>
                     <md-select ng-model="field">
                         <md-option ng-repeat="(key, value) in schemas" value="{{key}}" ng-if="editable(key)">
                             {{key}}

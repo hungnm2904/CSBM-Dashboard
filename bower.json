@@ -20,7 +20,8 @@
     "perfect-scrollbar": "0.6.10",
     "toastr": "2.1.2",
     "clipboard": "^1.5.12",
-    "gojs": "^1.6.12"
+    "gojs": "^1.6.12",
+    "file-saver": "^1.3.2"
   },
   "devDependencies": {
     "angular-mocks": "1.5.0"
