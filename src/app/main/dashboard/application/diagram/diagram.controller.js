@@ -225,7 +225,7 @@
                 $scope.schemas.forEach(function(schema, index) {
                     var name = schema.className;
                     if (name.includes('_')) {
-                        name = name.split('_')[1];
+                        name = name.split('_')[1].trim();
                     }
                     nodedata.push({
                         key: index,
@@ -247,9 +247,20 @@
                 $scope.schemas.forEach(function(schema, index) {
                     var fields = schema.fields
                     for (var key in fields) {
+                        var className = schema.className;
+
+                        if (className.includes('_')) {
+                            className = className.split('_')[1].trim();
+                        }
+
                         if (fields[key].type === 'Pointer') {
-                            var fromIndex = getIndexByClassName(schema.className, nodedata);
-                            var toIndex = getIndexByClassName(fields[key].targetClass, nodedata);
+                            var targetClassName = fields[key].targetClass;
+                            if (targetClassName.includes('_')) {
+                                targetClassName = targetClassName.split('_')[1].trim();
+                            }
+
+                            var fromIndex = getIndexByClassName(className, nodedata);
+                            var toIndex = getIndexByClassName(targetClassName, nodedata);
 
                             linkdata.push({
                                 from: fromIndex,
@@ -259,8 +270,13 @@
                                 relationship: "association"
                             });
                         } else if (fields[key].type === 'Relation') {
-                            var fromIndex = getIndexByClassName(schema.className, nodedata);
-                            var toIndex = getIndexByClassName(fields[key].targetClass, nodedata);
+                            var targetClassName = fields[key].targetClass;
+                            if (targetClassName.includes('_')) {
+                                targetClassName = targetClassName.split('_')[1].trim();
+                            }
+
+                            var fromIndex = getIndexByClassName(className, nodedata);
+                            var toIndex = getIndexByClassName(targetClassName, nodedata);
 
                             linkdata.push({
                                 from: fromIndex,
