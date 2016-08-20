@@ -1,0 +1,51 @@
+<md-dialog class="compose-dialog" aria-label="New Message">
+    <form class="md-inline-form">
+        <md-toolbar class="md-accent">
+            <div class="md-toolbar-tools" layout="row" layout-align="center center">
+                <h2>Clone this application</h2>
+            </div>
+        </md-toolbar>
+        <md-dialog-content ms-scroll>
+            <div layout="row" layout-align="start" layout-wrap>
+                <div flex="100" layout="row" layout-align="start center">
+                    <div flex="60">
+                        <h3><strong>Name your cloned application</strong></h3>
+                    </div>
+                    <div flex="40" layout="column" layout-align="stretch center">
+                        <md-input-container md-no-float class="md-block">
+                            <input type="text" placeholder="Name" ng-model="name" style="text-align: center">
+                        </md-input-container>
+                    </div>
+                </div>
+                <md-divider></md-divider>
+                <div flex="100" layout="row" layout-align="start center">
+                    <div flex="60">
+                        <h3><strong>What should be included in the clone</strong></h3>
+                    </div>
+                    <div flex="40" layout="column" layout-align="stretch center">
+                        <md-input-container>
+                            <md-select aria-label="item" ng-model="item">
+                                <md-option ng-value="item" ng-selected="$index === 0" ng-repeat="item in items" style="text-align: center">
+                                    {{item}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </div>
+            </div>
+            <div layout="row" layout-align="center center" class="mt-20" ng-if="error" style="color: red">
+                Application name must not already be used in your account
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions>
+            <div layout="row" layout-align="start center">
+                <md-button ng-disabled="!name" ng-click="cloneApplication()" class="send-button md-raised md-accent md-default-theme">
+                    Clone
+                </md-button>
+                <md-button class="md-default md-raised" ng-click="closeDialog()">
+                    Close
+                </md-button>
+            </div>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

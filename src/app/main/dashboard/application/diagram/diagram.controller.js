@@ -223,9 +223,13 @@
                 var nodedata = [];
                 var linkdata = [];
                 $scope.schemas.forEach(function(schema, index) {
+                    var name = schema.className;
+                    if (name.includes('_')) {
+                        name = name.split('_')[1];
+                    }
                     nodedata.push({
                         key: index,
-                        name: schema.className,
+                        name: name,
                         properties: [],
                         loc: "0 0"
                     });

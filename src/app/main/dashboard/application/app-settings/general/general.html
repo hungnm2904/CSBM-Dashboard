@@ -63,8 +63,8 @@
                         <tr ng-repeat="collaborator in collaborators">
                             <td>{{collaborator.email}}</td>
                             <td>
-                                <md-select aria-label="collaborators" class="no-error-check-input" " ng-model="collaborator.role" ng-change="changeRole(collaborator)">
-                                    <md-option ng-repeat="acceptedRole in acceptedRoles" ng-value="acceptedRole">
+                                <md-select aria-label="collaborators" class="no-error-check-input" " ng-model="collaborator.role " ng-change="changeRole(collaborator) ">
+                                    <md-option ng-repeat="acceptedRole in acceptedRoles " ng-value="acceptedRole ">
                                         {{acceptedRole}}
                                     </md-option>
                                 </md-select>
@@ -106,25 +106,57 @@
                 <span class="md-subhead">These options will affect your entire appplication</span>
             </div>
         </div>
+        <!-- Delete Application -->
         <div layout="row" layout-margin layout-align="center" layout-wrap>
             <div flex="65" class="md-whiteframe-4dp">
                 <div layout="row">
                     <div flex="60">
                         <div layout="row" layout-margin layout-wrap>
-                            <h3 flex="100"><strong>Delete application</strong></h3>
+                            <h3>
+                                <strong>
+                                    Delete application
+                                </strong>
+                            </h3>
                             <span flex="100">
-                                Completely remove any trace of this application's existence. </span>
+                                Completely remove any trace of this application's existence.
+                            </span>
+                        </div>
+                    </div>
+                    <div flex="40" class="md-grey-300-bg" layout="column" layout-align="center strech">
+                        <md-button ng-if="!!!masterKey" class="md-raised md-warn" ng-click="showDeleteDialog($event)">
+                            Delete this application
+                        </md-button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div flex="40" class="md-grey-300-bg" layout="column" layout-align="center strech">
-            <md-button ng-if="!!!masterKey" class="md-raised md-warn" ng-click="showDeleteDialog()">
-                Delete this application
-            </md-button>
+        <!-- / Delete Application -->
+        <!-- Clone Application -->
+        <div layout="row" layout-margin layout-align="center" layout-wrap>
+            <div flex="65" class="md-whiteframe-4dp">
+                <div layout="row">
+                    <div flex="60">
+                        <div layout="row" layout-margin layout-wrap>
+                            <h3>
+                                <strong>
+                                    Clone application
+                                </strong>
+                            </h3>
+                            <span flex="100">
+                                Create a copy of this application
+                            </span>
+                        </div>
+                    </div>
+                    <div flex="40" class="md-grey-300-bg" layout="column" layout-align="center strech">
+                        <md-button class="md-raised md-accent" ng-click="showCloneDialog($event)">
+                            Clone this application
+                        </md-button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-</div>
-<!-- / Application Management -->
+        <!-- / Clone Application -->
+        <!-- / Application Management -->
 </div>
 <!-- / CONTENT -->
 </div>

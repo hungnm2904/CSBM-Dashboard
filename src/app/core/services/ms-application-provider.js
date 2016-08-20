@@ -7,6 +7,77 @@
 
     function msApplicationServiceProvider() {
         var _applications = [];
+        const defaultColumns = Object.freeze({
+            // Contain the default columns for every parse object type (except _Join collection)
+            _Default: {
+                "objectId": { type: 'String' },
+                "createdAt": { type: 'Date' },
+                "updatedAt": { type: 'Date' },
+                "ACL": { type: 'ACL' },
+            },
+            // The additional default columns for the _User collection (in addition to DefaultCols)
+            _User: {
+                "username": { type: 'String' },
+                "password": { type: 'String' },
+                "email": { type: 'String' },
+                "emailVerified": { type: 'Boolean' },
+            },
+            // The additional default columns for the _Installation collection (in addition to DefaultCols)
+            _Installation: {
+                "installationId": { type: 'String' },
+                "deviceToken": { type: 'String' },
+                "channels": { type: 'Array' },
+                "deviceType": { type: 'String' },
+                "pushType": { type: 'String' },
+                "GCMSenderId": { type: 'String' },
+                "timeZone": { type: 'String' },
+                "localeIdentifier": { type: 'String' },
+                "badge": { type: 'Number' },
+                "appVersion": { type: 'String' },
+                "appName": { type: 'String' },
+                "appIdentifier": { type: 'String' },
+                "parseVersion": { type: 'String' },
+            },
+            // The additional default columns for the _Role collection (in addition to DefaultCols)
+            _Role: {
+                "name": { type: 'String' },
+                "users": { type: 'Relation', targetClass: '_User' },
+                "roles": { type: 'Relation', targetClass: '_Role' }
+            },
+            // The additional default columns for the _Session collection (in addition to DefaultCols)
+            _Session: {
+                "restricted": { type: 'Boolean' },
+                "user": { type: 'Pointer', targetClass: '_User' },
+                "installationId": { type: 'String' },
+                "sessionToken": { type: 'String' },
+                "expiresAt": { type: 'Date' },
+                "createdWith": { type: 'Object' }
+            },
+            _Product: {
+                "productIdentifier": { type: 'String' },
+                "download": { type: 'File' },
+                "downloadName": { type: 'String' },
+                "icon": { type: 'File' },
+                "order": { type: 'Number' },
+                "title": { type: 'String' },
+                "subtitle": { type: 'String' },
+            },
+            _PushStatus: {
+                "pushTime": { type: 'String' },
+                "source": { type: 'String' }, // rest or webui
+                "query": { type: 'String' }, // the stringified JSON query
+                "payload": { type: 'Object' }, // the JSON payload,
+                "title": { type: 'String' },
+                "expiry": { type: 'Number' },
+                "status": { type: 'String' },
+                "numSent": { type: 'Number' },
+                "numFailed": { type: 'Number' },
+                "pushHash": { type: 'String' },
+                "errorMessage": { type: 'Object' },
+                "sentPerType": { type: 'Object' },
+                "failedPerType": { type: 'Object' },
+            }
+        });
         // var service = this;
         this.$get = function($http, $state, $cookies, msConfigService, msUserService,
             msMasterKeyService) {
@@ -25,7 +96,8 @@
                 getAppId: getAppId,
                 getCollaborators: getCollaborators,
                 checkUserExistById: checkUserExistById,
-                countTotalClasses: countTotalClasses
+                countTotalClasses: countTotalClasses,
+                cloneApplication: cloneApplication
             };
 
             return service;
@@ -37,7 +109,7 @@
             };
 
             function _add(application) {
-                _applications.push(application);
+                _applications.unshift(application);
             };
 
             function _updateApplication(id, data) {
@@ -316,6 +388,162 @@
                         callback(response);
                     });
                 });
+            };
+
+            function _fieldNameIsValidForClass(fieldName, className) {
+                if (defaultColumns._Default[fieldName]) {
+                    return false;
+                }
+                if (defaultColumns[className] && defaultColumns[className][fieldName]) {
+                    return false;
+                }
+                return true;
+            }
+
+            function _cloneApplicationSchema(appId, clonedMasterKey, schemas, callback) {
+                var data = {
+                    'requests': []
+                };
+
+                schemas.forEach(function(schema, index) {
+                    var className = schema.className;
+                    var fields = schema.fields;
+
+                    for (var fieldName in fields) {
+                        if (!_fieldNameIsValidForClass(fieldName, className)) {
+                            delete fields[fieldName];
+                        };
+                    };
+
+                    data.requests.push({
+                        'method': 'POST',
+                        'path': '/csbm/schemas/' + className,
+                        'body': {
+                            'className': className,
+                            'fields': fields
+                        }
+                    });
+                });
+
+                $http({
+                    method: 'POST',
+                    url: _domain + '/csbm/batch',
+                    headers: {
+                        'X-CSBM-Application-Id': appId,
+                        'X-CSBM-Master-Key': clonedMasterKey
+                    },
+                    data: data
+                }).then(function(response) {
+                    callback(null, response.data);
+                }, function(response) {
+                    callback(response);
+                });
+            };
+
+            function _cloneApplicationData(appId, cloneId, masterKey, clonedMasterKey, schemas, callback) {
+                schemas.forEach(function(schema, index) {
+                    var className = schema.className;
+                    if (className !== '_Session') {
+                        var url = _domain + '/csbm/classes/' + className + '?order=-createdAt';
+                        $http({
+                            method: 'GET',
+                            url: url,
+                            headers: {
+                                'X-CSBM-Application-Id': appId,
+                                'X-CSBM-Master-Key': masterKey
+                            }
+                        }).then(function(response) {
+                            var documents = response.data.results;
+
+                            documents.forEach(function(_document) {
+                                delete _document.objectId;
+                                delete _document.createdAt;
+                                delete _document.updatedAt;
+
+                                $http({
+                                    method: 'POST',
+                                    url: _domain + '/csbm/classes/' + className,
+                                    headers: {
+                                        'X-CSBM-Application-Id': cloneId,
+                                        'X-CSBM-Master-Key': clonedMasterKey,
+                                        'Content-Type': 'application/json'
+                                    },
+                                    data: _document
+                                }).then(function(response) {
+
+                                }, function(response) {
+                                    callback(response);
+                                });
+                            });
+                        }, function(response) {});
+                    }
+                    if (index === schemas.length - 1) {
+                        return callback(null, null);
+                    }
+                });
+            };
+
+            function _cloneApplication(appId, cloneName, mode, callback) {
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'GET',
+                        url: _domain + '/csbm/schemas',
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey,
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(function(response) {
+                        var schemas = response.data.results;
+
+                        create(cloneName, function(error, results) {
+                            if (error) {
+                                callback(error);
+                            } else {
+                                var cloneId = results._id;
+
+                                msMasterKeyService.getMasterKey(cloneId, function(error, results) {
+                                    if (error) {
+                                        return callback(error);
+                                    }
+
+                                    var clonedMasterKey = results;
+
+                                    if (mode === 'Schema only') {
+                                        _cloneApplicationSchema(cloneId, clonedMasterKey, schemas, callback);
+                                    } else {
+                                        _cloneApplicationSchema(cloneId, clonedMasterKey, schemas,
+                                            function(error, results) {
+                                                if (error) {
+                                                    return callback(error);
+                                                }
+
+                                                _cloneApplicationData(appId, cloneId, masterKey, clonedMasterKey, schemas, callback);
+                                            });
+                                    }
+                                });
+                            }
+                        });
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            };
+
+            function cloneApplication(appId, appName, cloneName, mode, callback) {
+                if (!appId) {
+                    getAppId(appName, function(error, results) {
+                        appId = results.appId;
+                        _cloneApplication(appId, cloneName, mode, callback);
+                    });
+                } else {
+                    _cloneApplication(appId, cloneName, mode, callback);
+                }
             };
         };
     };

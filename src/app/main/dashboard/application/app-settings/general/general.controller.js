@@ -229,5 +229,38 @@
                 });
             };
 
+            $scope.showCloneDialog = function(ev) {
+                $mdDialog.show({
+                    controller: CloneApplicationDialogController,
+                    controllerAs: 'vm',
+                    templateUrl: 'app/main/dashboard/application/app-settings/general/dialogs/cloneApplicationDialog.html',
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false,
+                    escapeToClose: false
+                });
+
+                function CloneApplicationDialogController($scope) {
+                    $scope.items = ['Schema only'];
+
+                    $scope.closeDialog = function() {
+                        $mdDialog.hide();
+                    };
+
+                    $scope.cloneApplication = function(appId) {
+                        msApplicationService.cloneApplication(appId, appName, $scope.name, $scope.item,
+                            function(error, results) {
+
+                                if (error) {
+                                    return alert(error.statusText);
+                                }
+
+                                $scope.closeDialog();
+                                $state.go('app.management_applications');
+                            });
+                    };
+                };
+            };
+
         });
 })();
