@@ -285,12 +285,7 @@
                             <!-- / Pointer Type -->
                             <!-- Relation Type -->
                             <div ng-if="checkFieldType(key, 'Relation')">
-                                <div ng-if="!document[key]" class="ellipsis-text">
-                                    <span class="undefined-text" ng-model="document[key]">
-                                        (undefined)
-                                    </span>
-                                </div>
-                                <div ng-if="document[key]" class="ellipsis-text">
+                                <div class="ellipsis-text">
                                     <a href="javascript:void(0)" ng-click="showRelation(document[key].className, document.objectId, key)" class="be-button be-button-blue">
                                         <span>View relation</span>
                                     </a>

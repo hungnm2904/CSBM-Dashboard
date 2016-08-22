@@ -25,7 +25,7 @@
                 <md-divider></md-divider>
                 <!-- / Column Type -->
                 <!-- Target Table (If Type is Pointer) -->
-                <div ng-show="type === 'Pointer'">
+                <div ng-show="type === 'Pointer' || type === 'Relation'">
                     <div layout="row" layout-align="space-between center">
                         <div>Target table</div>
                         <md-input-container flex="50">
