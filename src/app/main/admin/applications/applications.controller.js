@@ -4,7 +4,7 @@
     angular
         .module('app.admin.applications')
         .controller('ManageApplicationsController', function($scope, $http, $cookies, $window, $state,
-            msUserService, msConfigService) {
+            msUserService, msConfigService, msApplicationService) {
 
             if (!msUserService.getAccessToken()) {
                 $state.go('app.pages_auth_login');
@@ -19,7 +19,7 @@
                 responsive: true
             };
             $scope.applications = [];
-            $scope.headers = ['_id', 'name', 'userId', 'created_at', 'updated_at'];
+            $scope.headers = ['_id', 'name', 'userId', 'created_at', 'updated_at', 'status'];
 
             var getAllApplications = function() {
                 var accessToken = msUserService.getAccessToken();
@@ -31,19 +31,26 @@
                     }
                 }).then(function(response) {
                     $scope.applications = angular.copy(response.data);
-
-                    console.log($scope.applications);
-
                 }, function(response) {
                     alert(response.statusText);
                 });
             };
             getAllApplications();
 
-            var get
+            $scope.onChange = function(appId, appName, active) {
+                var data = {
+                    'status': active
+                }
 
-            $scope.onChange = function(objectId, active) {
-                console.log(objectId + ", " + active);
+                msApplicationService.update(appId, appName, data, function(error, results) {
+                    if (error) {
+                        if (error.status === 401) {
+                            return $state.go('app.pages_auth_login');
+                        }
+
+                        return alert(error.statusText);
+                    }
+                });
             };
         });
 })();
