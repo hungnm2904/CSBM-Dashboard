@@ -191,12 +191,15 @@
         <tbody>
             <tr ng-repeat="document in documents">
                 <td ng-repeat="field in fields">
-                    <div ng-if="!document[field]">
+                    <div ng-if="document[field] == undefined">
                         (undefined)
                     </div>
-                    <div ng-if="document[field]">
-                        <div ng-if="checkFieldType(field, 'String') || checkFieldType(field, 'Date') || checkFieldType(field, 'Number') || checkFieldType(field, 'Boolean') || checkFieldType(field, 'Array') || checkFieldType(field, 'Object')">
+                    <div ng-if="document[field] != undefined">
+                        <div ng-if="checkFieldType(field, 'String') || checkFieldType(field, 'Number') || checkFieldType(field, 'Boolean') || checkFieldType(field, 'Array') || checkFieldType(field, 'Object') || checkFieldType(field, 'Pointer') || checkFieldType(field, 'Relation')">
                             {{document[field]}}
+                        </div>
+                        <div ng-if="checkFieldType(field, 'Date')">
+                            {{convertToLocaleStringDate(document[field])}}
                         </div>
                         <div ng-if="checkFieldType(field, 'GeoPoint')">
                             ({{document[field].latitude}}, {{document[field].longitude}})

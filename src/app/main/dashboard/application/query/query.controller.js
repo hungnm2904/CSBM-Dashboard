@@ -186,6 +186,13 @@
                 });
             };
 
+            $scope.convertToLocaleStringDate = function(isoDateString) {
+                if (isoDateString.iso) {
+                    isoDateString = isoDateString.iso;
+                }
+                return new Date(isoDateString).toLocaleString();
+            };
+
             $scope.checkFieldType = function(fieldName, fieldType) {
                 if (!$scope.schema.fields[fieldName]) {
                     return false;
