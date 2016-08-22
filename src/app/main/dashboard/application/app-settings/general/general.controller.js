@@ -45,6 +45,11 @@
             };
             getCollaborators();
 
+            var pattern = /[a-zA-Z0-9]+[_a-zA-Z0-9\.-]*[a-zA-Z0-9]+@[a-z0-9-A-Z]+(\.[a-z0-9-A-Z]+)*(\.[a-zA-Z]{2,4})/
+            $scope.validEmail = function() {
+                return pattern.test($scope.email);
+            };
+
             $scope.showDeleteDialog = function(ev) {
                 $mdDialog.show({
                     controller: DeleteApplicationDialogController,
@@ -157,9 +162,10 @@
                             return $state.go('app.pages_auth_login');
                         }
 
-                        return alert(error.statusText);
+                        return $scope.error = true;
                     }
 
+                    $scope.error = false;
                     var newCollaborators = data.collaborators.objects;
                     newCollaborators.forEach(function(collaborator, index) {
                         $scope.collaborators.push(collaborator);

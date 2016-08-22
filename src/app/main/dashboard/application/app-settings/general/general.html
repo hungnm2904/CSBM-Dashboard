@@ -34,7 +34,7 @@
                                 Cancel
                             </md-button>
                             <md-button class="md-raised md-accent" ng-click="saveChanges()" ng-disabled="!appName">
-                                Save changes
+                                Save
                             </md-button>
                         </div>
                     </div>
@@ -63,36 +63,36 @@
                         <tr ng-repeat="collaborator in collaborators">
                             <td>{{collaborator.email}}</td>
                             <td>
-                                <md-select aria-label="collaborators" class="no-error-check-input" " ng-model="collaborator.role " ng-change="changeRole(collaborator) ">
-                                    <md-option ng-repeat="acceptedRole in acceptedRoles " ng-value="acceptedRole ">
+                                <md-select aria-label="collaborators" class="no-error-check-input" ng-model="collaborator.role" ng-change="changeRole(collaborator)">
+                                    <md-option ng-repeat="acceptedRole in acceptedRoles " ng-value="acceptedRole">
                                         {{acceptedRole}}
                                     </md-option>
                                 </md-select>
                             </td>
                             <td>
-                                <div layout="row " layout-align="center center ">
-                                    <md-icon md-font-icon="icon-close " ng-click="removeCollaborator(collaborator.email) "></md-icon>
+                                <div layout="row " layout-align="center center">
+                                    <md-icon md-font-icon="icon-close" ng-click="removeCollaborator(collaborator.email) "></md-icon>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
                 <div layout="row " layout-align="center center ">
-                    <md-input-container md-no-float class="md-block no-error-check-input ">
-                        <input ng-model="email " value="{{email}} " placeholder="Collaborator 's email" style="text-align: center; font-size: 1.3em">
+                    <md-input-container md-no-float class="md-block no-error-check-input" ng-class="{'email-error': error == true}">
+                        <input ng-model="email" value="{{email}}" placeholder="Collaborator 's email" style="text-align: center; font-size: 1.3em">
                     </md-input-container>
                     <md-input-container class="md-block no-error-check-input" style=" font-size: 1.3em">
                         <label>Role</label>
                         <md-select ng-model="role">
-                            <md-option ng-value="'Dev '">
+                            <md-option ng-value="'Dev'">
                                 Dev
                             </md-option>
-                            <md-option ng-value="'Guest '">
+                            <md-option ng-value="'Guest'">
                                 Guest
                             </md-option>
                         </md-select>
                     </md-input-container>
-                    <md-button class="md-raised md-accent" ng-click="addCollaborator()" ng-disabled="!appName">
+                    <md-button class="md-raised md-accent" ng-click="addCollaborator()" ng-disabled="!email || !role || !validEmail()">
                         Add collaborator
                     </md-button>
                 </div>

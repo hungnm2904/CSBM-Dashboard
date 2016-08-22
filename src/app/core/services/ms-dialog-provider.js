@@ -80,6 +80,11 @@
             });
         }
 
+        var pattern = new RegExp('^[a-zA-Z0-9]+[a-zA-Z0-9_]*$');
+        $scope.validTableName = function() {
+            return pattern.test($scope.className);
+        };
+
         $scope.createApplication = function() {
             msApplicationService.create($scope.applicationName,
                 function(error, results) {

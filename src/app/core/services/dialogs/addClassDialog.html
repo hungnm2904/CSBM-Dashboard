@@ -16,7 +16,7 @@
         </md-dialog-content>
         <md-dialog-actions layout="row" layout-align="space-between center">
             <div layout="row" layout-align="start center">
-                <md-button ng-disabled="!!!className" ng-click="createClass()" class="send-button md-accent md-raised" aria-label="Create">
+                <md-button ng-disabled="!!!className || !validTableName()" ng-click="createClass()" class="send-button md-accent md-raised" aria-label="Create">
                     Create table
                 </md-button>
                 <div layout="row" layout-align="center center">
