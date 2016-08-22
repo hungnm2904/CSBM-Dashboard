@@ -135,7 +135,14 @@
                     </td>
                     <td ng-repeat="(key, value) in schemas" id="cell_{{(position + 1 + '') + ($index + '')}}" class="cell_{{$index}}" ng-dblclick="goEditMode((position + 1 + '') + ($index + ''), document, key, $event)">
                         <div ng-if="!editable(key)" class="be-cell">
-                            <span class="disable-text" ng-model="document[key]">{{document[key]}}</span>
+                            <div ng-if="!checkFieldType(key, 'Date')">
+                                <span class="disable-text" ng-model="document[key]">{{document[key]}}</span>
+                            </div>
+                            <div ng-if="checkFieldType(key, 'Date')">
+                                <span class="disable-text" ng-model="document[key]">
+                                    {{convertToLocaleStringDate(document[key])}}
+                                </span>
+                            </div>
                         </div>
                         <div ng-if="editable(key)" class="be-cell">
                             <!-- String, Number, Array, Object, Boolean Type -->
