@@ -7,6 +7,7 @@
 
     function msApplicationServiceProvider() {
         var _applications = [];
+        var _applicationsAndCollaboratioApps = []
         const defaultColumns = Object.freeze({
             // Contain the default columns for every parse object type (except _Join collection)
             _Default: {
@@ -85,6 +86,7 @@
             var _domain = (msConfigService.getConfig()).domain;
             var service = {
                 applications: applications,
+                applicationsAndCollaborationApps: applicationsAndCollaborationApps,
                 getAll: getAll,
                 getById: getById,
                 clearApplications: clearApplications,
@@ -139,6 +141,10 @@
                 return _applications;
             };
 
+            function collaborationApps() {
+                return _collaborationApps;
+            }
+
             function getAll(callback) {
                 if (_applications && _applications.length > 0) {
                     return callback(null, _applications);
@@ -154,6 +160,21 @@
                 }).then(function(response) {
                     _setApplications(response.data);
                     callback(null);
+                }, function(response) {
+                    callback(response);
+                });
+            };
+
+            function applicationsAndCollaborationApps(callback) {
+                var accessToken = msUserService.getAccessToken();
+                $http({
+                    method: 'GET',
+                    url: _domain + '/applications/allAndColl',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken
+                    }
+                }).then(function(response) {
+                    callback(null, response.data);
                 }, function(response) {
                     callback(response);
                 });

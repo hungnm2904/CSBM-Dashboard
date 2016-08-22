@@ -42,6 +42,13 @@
             $scope.jsFileImport;
             $scope.filteredDocuments;
             $scope.allDocuments;
+            $scope.allSchemas;
+            $scope.mode = 'classMode';
+            $scope.relationInfo = {
+                'name': undefined,
+                'targetClass': undefined,
+                'owningId': undefined
+            };
 
             var skip;
             $scope.numPerPage = 10;
@@ -58,14 +65,52 @@
                         }
                     }
                 });
-            }
+            };
+
+            var fixDocument = function(_document) {
+                if (!_document.ACL) {
+                    _document.ACL = {
+                        '*': {
+                            'read': true,
+                            'write': true
+                        }
+                    }
+                }
+            };
 
             var renderClass = function(refresh) {
                 if (refresh) {
-                    msSchemasService.getSchemaFromServer(appId, appName, className, function(error, results) {
-                        $scope.schemas = results.fields;
-                        pagination(refresh);
-                    });
+                    if ($scope.mode === 'classMode') {
+                        msSchemasService.getSchemaFromServer(appId, appName, className, function(error, results) {
+                            className = $stateParams.className;
+                            $scope.schemas = results.fields;
+                            $scope.allSchemas = angular.copy($scope.schemas);
+                            pagination(refresh);
+                        });
+                    } else {
+                        msSchemasService.getRelation(appId, $scope.relationInfo.owningClass,
+                            $scope.relationInfo.targetClass, $scope.relationInfo.owningId,
+                            $scope.relationInfo.name,
+                            function(error, results) {
+
+                                var documents = results.results;
+                                msSchemasService.getSchema(appId, appName, $scope.relationInfo.targetClass,
+                                    function(error, results) {
+
+                                        // $scope.mode = 'relationMode';
+                                        // $scope.relationInfo = {
+                                        //     'name': key,
+                                        //     'owningClass': className,
+                                        //     'targetClass': targetClassName,
+                                        //     'owningId': objectId
+                                        // };
+
+                                        $scope.schemas = angular.copy(results.fields);
+                                        $scope.documents = angular.copy(documents);
+                                        fixDocuments();
+                                    });
+                            });
+                    }
                 } else {
                     msSchemasService.getSchema(appId, appName, className, function(error, results) {
                         if (error) {
@@ -79,6 +124,7 @@
                         appId = msSchemasService.getAppId();
 
                         $scope.schemas = results.fields;
+                        $scope.allSchemas = angular.copy($scope.schemas);
 
                         if (_objectId) {
                             var preparedCriteria = {
@@ -162,8 +208,8 @@
                         }
 
                         $scope.documents = results
-                        $scope.allDocuments = angular.copy(results);
                         fixDocuments();
+                        $scope.allDocuments = angular.copy($scope.documents);
                     });
                 } else {
                     msSchemasService.getDocuments(appId, className, null, null,
@@ -173,8 +219,8 @@
                             }
 
                             $scope.documents = results
-                            $scope.allDocuments = angular.copy(results);
                             fixDocuments();
+                            $scope.allDocuments = angular.copy($scope.documents);
                         });
                 }
             }
@@ -235,6 +281,10 @@
                 return $scope.schemas[fieldName].type === fieldType;
             };
 
+            $scope.convertToLocaleStringDate = function(isoDateString) {
+                return new Date(isoDateString).toLocaleString();
+            };
+
             $scope.closeDialog = function() {
                 $mdDialog.hide();
             };
@@ -246,7 +296,7 @@
                     } else {
                         if (!editing) {
                             var type = $scope.schemas[key].type;
-                            if (type === 'Array') {
+                            if (type === 'Array' || type === 'Object') {
                                 _document[key] = JSON.stringify(_document[key]);
                             }
 
@@ -310,7 +360,7 @@
                                 });
                         }
                     });
-                } else if ($scope.schemas[field].type === 'Array') {
+                } else if ($scope.schemas[field].type === 'Array' || $scope.schemas[field].type === 'Object') {
                     _document[field] = JSON.parse(_document[field]);
                 }
 
@@ -404,6 +454,14 @@
                 msSchemasService.getRelation(appId, className, targetClassName, objectId, key, function(error, results) {
                     var documents = results.results;
                     msSchemasService.getSchema(appId, appName, targetClassName, function(error, results) {
+                        $scope.mode = 'relationMode';
+                        $scope.relationInfo = {
+                            'name': key,
+                            'owningClass': className,
+                            'targetClass': targetClassName,
+                            'owningId': objectId
+                        };
+
                         $scope.schemas = angular.copy(results.fields);
 
                         $scope.documents = angular.copy(documents);
@@ -411,6 +469,104 @@
                         fixDocuments();
                     });
                 })
+            };
+
+            $scope.showAddRelation = function(ev) {
+                var relatedIds = [];
+                $scope.documents.forEach(function(_document, index) {
+                    relatedIds.push(_document.objectId);
+                });
+
+                $mdDialog.show({
+                    controller: AddRelationDialogController,
+                    controllerAs: 'vm',
+                    templateUrl: 'app/main/dashboard/application/classes/dialogs/addRelationDialog.html',
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false,
+                    escapeToclose: false,
+                    locals: {
+                        relationInfo: $scope.relationInfo,
+                        relatedIds: relatedIds,
+                        documents: $scope.documents
+                    }
+                });
+
+                function AddRelationDialogController($scope, relationInfo, relatedIds, documents) {
+                    $scope.relationInfo = relationInfo;
+                    $scope.relatedIds = relatedIds;
+
+                    $scope.closeDialog = function(results) {
+                        $mdDialog.hide(results);
+                    }
+
+                    $scope.addRelation = function() {
+                        msSchemasService.addRelation(appId, relationInfo.name,
+                            relationInfo.owningClass, relationInfo.targetClass, relationInfo.owningId, $scope.relatedId,
+
+                            function(error, results) {
+                                if (error) {
+                                    return alert(error.statusText);
+                                }
+
+                                fixDocument(results);
+                                documents.unshift(results);
+                                $scope.closeDialog();
+                            });
+                    };
+                }
+            };
+
+            $scope.showRemoveRelation = function(ev) {
+                var relatedIds = [];
+                $scope.documents.forEach(function(_document, index) {
+                    relatedIds.push(_document.objectId);
+                });
+
+                $mdDialog.show({
+                    controller: RemoveRelationDialogController,
+                    controllerAs: 'vm',
+                    templateUrl: 'app/main/dashboard/application/classes/dialogs/removeRelationDialog.html',
+                    parent: angular.element($document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false,
+                    escapeToclose: false,
+                    locals: {
+                        relationInfo: $scope.relationInfo,
+                        relatedIds: relatedIds,
+                        documents: $scope.documents
+                    }
+                });
+
+                function RemoveRelationDialogController($scope, relationInfo, relatedIds, documents) {
+                    $scope.relationInfo = relationInfo;
+                    $scope.relatedIds = relatedIds;
+
+                    $scope.closeDialog = function(results) {
+                        $mdDialog.hide(results);
+                    }
+
+                    $scope.removeRelation = function() {
+                        msSchemasService.removeRelation(appId, relationInfo.name,
+                            relationInfo.owningClass, relationInfo.targetClass, relationInfo.owningId, $scope.relatedId,
+
+                            function(error, results) {
+                                if (error) {
+                                    return alert(error.statusText);
+                                }
+
+                                documents.some(function(_document, index) {
+                                    if (_document.objectId === results) {
+                                        documents.splice(index, 1);
+
+                                        return true;
+                                    }
+                                });
+
+                                $scope.closeDialog();
+                            });
+                    };
+                }
             };
 
             var uneditableFileds = ['objectId', 'createdAt', 'updatedAt'];
@@ -424,7 +580,7 @@
 
             $scope.refreshDocuments = function() {
                 $scope.filterCriteria = [];
-                className = $stateParams.className;
+                // className = $stateParams.className;
                 renderClass(true);
             };
 
@@ -444,7 +600,7 @@
                     }
                 }).then(function(filterCriteria) {
                     if (filterCriteria.length === 0) {
-                        $scope.documents = $scope.allDocuments;
+                        $scope.documents = angular.copy($scope.allDocuments);
                     }
                     $scope.filterCriteria = filterCriteria;
                 });
@@ -531,7 +687,7 @@
 
                     $scope.schemas = schemas;
                     $scope.classNames = [];
-                    $scope.types = ['String', 'Number', 'Boolean', 'Array', 'File', 'GeoPoint', 'Pointer'];
+                    $scope.types = ['String', 'Number', 'Boolean', 'Array', 'File', 'GeoPoint', 'Pointer', 'Relation'];
 
                     msSchemasService.getClassNames(appId, appName, className,
                         function(error, results) {
@@ -553,7 +709,9 @@
 
                     $scope.addColumn = function() {
                         msSchemasService.addField(className, $scope.targetClass, appId, $scope.columnName, $scope.type,
+                            $scope.schemas,
                             function(error, results) {
+
                                 if (error) {
                                     if (error.status === 401) {
                                         return $state.go('app.pages_auth_login');
@@ -1011,6 +1169,13 @@
                 $scope.fields.forEach(function(field) {
                     $scope.add[field] = '';
                 });
+            };
+
+            $scope.backToClassView = function() {
+                $scope.mode = 'classMode';
+                className = $stateParams.className;
+                $scope.documents = angular.copy($scope.allDocuments);
+                $scope.schemas = angular.copy($scope.allSchemas);
             };
 
             var curTH;

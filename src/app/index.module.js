@@ -25,6 +25,9 @@
             // Management
             'app.management',
 
+            // Other applications
+            'app.otherApps',
+
             // Application
             'app.application',
 

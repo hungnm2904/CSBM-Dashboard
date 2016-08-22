@@ -8,7 +8,7 @@
     function msModeServiceProvider($stateProvider) {
 
         var _mode = 'application';
-        var _applicationNavigationsExist = false;
+        // var _applicationNavigationsExist = false;
         var _collaborationRole = undefined;
         var service = this;
 
@@ -159,7 +159,7 @@
                             'appName': appName,
                             'className': className,
                             'mode': mode,
-                            'objectId': null
+                            'objectId': undefined
                         });
                     }
                 });
@@ -217,22 +217,88 @@
                 });
             };
 
-            function _renderApplicationNavigations(mode, appId, appName, className) {
-                msNavigationService.saveItem('application', {
-                    title: appName,
-                    group: true,
-                    weight: 1
-                });
+            function _renderOtherApplicationsNavigations(mode, appName, callback) {
+                msApplicationService.applicationsAndCollaborationApps(
+                    function(error, results) {
+                        if (error) {
+                            if (error.status === 401) {
+                                return $state.go('app.pages_auth_login', { error: error.statusText });
+                            }
+                            alert(error.statusText);
+                            return callback();
+                        }
 
-                _renderQueryNavigations(mode, appName);
-                _renderDiagramNavigations(mode, appName);
-                _renderApplicationSettingsNavigations(mode, appName);
-                _renderClassesNavigations(mode, appId, appName, className);
-                // _renderPushNavigations(mode, appName);
+                        if (results.data) {
+                            var applications = results.data.applications || [];
+                            var collaborationApps = results.data.collaborationApps || [];
+
+                            if (applications.length > 0 || collaborationApps.length > 0) {
+                                msNavigationService.saveItem('otherApps', {
+                                    title: 'Other Applications',
+                                    group: false,
+                                    weight: 1
+                                });
+
+                                applications.forEach(function(application, index) {
+                                    if (application.name !== appName) {
+                                        msNavigationService.saveItem('otherApps.' + application.name, {
+                                            title: application.name,
+                                            state: 'app.application_classes__User',
+                                            stateParams: {
+                                                'appName': application.name,
+                                                'className': '_User',
+                                                'appId': application._id,
+                                                'mode': 'apps',
+                                                'objectId': undefined
+                                            }
+                                        });
+                                    }
+                                });
+
+                                collaborationApps.forEach(function(application, index) {
+                                    if (application.name !== appName) {
+                                        var mode = 'collaboration--guest';
+                                        if (application.role === 'Dev') {
+                                            mode = 'collaboration--dev';
+                                        }
+                                        msNavigationService.saveItem('otherApps.' + application.name, {
+                                            title: application.name,
+                                            state: 'app.application_classes__User',
+                                            stateParams: {
+                                                'appName': application.name,
+                                                'className': '_User',
+                                                'appId': application._id,
+                                                'mode': mode,
+                                                'objectId': undefined
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
+
+                        callback();
+                    });
+            };
+
+            function _renderApplicationNavigations(mode, appId, appName, className) {
+                _renderOtherApplicationsNavigations(mode, appName, function() {
+                    msNavigationService.saveItem('application', {
+                        title: appName,
+                        group: true,
+                        weight: 2
+                    });
+
+                    _renderQueryNavigations(mode, appName);
+                    _renderDiagramNavigations(mode, appName);
+                    _renderApplicationSettingsNavigations(mode, appName);
+                    _renderClassesNavigations(mode, appId, appName, className);
+                    // _renderPushNavigations(mode, appName);
+                });
             }
 
             function renderDevManagementNavigations() {
-                _clearNavigations()
+                _clearNavigations();
                 msNavigationService.saveItem('management', {
                     title: 'Management',
                     group: true,
@@ -268,15 +334,17 @@
             };
 
             function _renderCollaborationNavigations(mode, appId, appName, className) {
-                msNavigationService.saveItem('application', {
-                    title: appName,
-                    group: true,
-                    weight: 1
-                });
+                _renderOtherApplicationsNavigations(mode, appName, function() {
+                    msNavigationService.saveItem('application', {
+                        title: appName,
+                        group: true,
+                        weight: 2
+                    });
 
-                _renderQueryNavigations(mode, appName);
-                _renderDiagramNavigations(mode, appName);
-                _renderClassesNavigations(mode, appId, appName, className);
+                    _renderQueryNavigations(mode, appName);
+                    _renderDiagramNavigations(mode, appName);
+                    _renderClassesNavigations(mode, appId, appName, className);
+                });
             };
 
             function renderCollaborationNavigations(mode, appId, appName, className) {
@@ -289,26 +357,28 @@
 
                         appId = results.appId;
                         _renderCollaborationNavigations(mode, appId, appName, className);
-                        _applicationNavigationsExist = true;
+                        // _applicationNavigationsExist = true;
                     });
                 } else {
                     _renderCollaborationNavigations(mode, appId, appName, className);
-                    _applicationNavigationsExist = true;
+                    // _applicationNavigationsExist = true;
                 }
             };
 
             function renderGuestNavigations(mode, appName, state) {
                 _clearNavigations();
+                _renderOtherApplicationsNavigations(mode, appName, function() {
 
-                msNavigationService.saveItem('application', {
-                    title: appName,
-                    group: true,
-                    weight: 1
+                    msNavigationService.saveItem('application', {
+                        title: appName,
+                        group: true,
+                        weight: 1
+                    });
+
+                    _renderQueryNavigations(mode, appName);
+                    _renderDiagramNavigations(mode, appName);
+                    $state.go(state, { 'mode': mode, 'appName': appName });
                 });
-
-                _renderQueryNavigations(mode, appName);
-                _renderDiagramNavigations(mode, appName);
-                $state.go(state, { 'mode': mode, 'appName': appName });
             };
 
             function renderApplicationNavigations(mode, appId, appName, className) {
@@ -321,11 +391,11 @@
 
                         appId = results.appId;
                         _renderApplicationNavigations(mode, appId, appName, className);
-                        _applicationNavigationsExist = true;
+                        // _applicationNavigationsExist = true;
                     });
                 } else {
                     _renderApplicationNavigations(mode, appId, appName, className);
-                    _applicationNavigationsExist = true;
+                    // _applicationNavigationsExist = true;
                 }
             };
 
@@ -383,21 +453,17 @@
             };
 
             function getCollaborationRole(appId, appName, callback) {
-                if (_collaborationRole) {
-                    return _collaborationRole;
+                if (appId) {
+                    _getCollaborationRole(appId, callback);
                 } else {
-                    if (appId) {
-                        _getCollaborationRole(appId, callback);
-                    } else {
-                        msApplicationService.getAppId(appName, function(error, results) {
-                            if (error) {
-                                return callback(error);
-                            }
+                    msApplicationService.getAppId(appName, function(error, results) {
+                        if (error) {
+                            return callback(error);
+                        }
 
-                            appId = results.appId;
-                            _getCollaborationRole(appId, callback);
-                        });
-                    }
+                        appId = results.appId;
+                        _getCollaborationRole(appId, callback);
+                    });
                 }
             };
 

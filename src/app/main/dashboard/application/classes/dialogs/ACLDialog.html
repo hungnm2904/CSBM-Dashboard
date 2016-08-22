@@ -28,13 +28,13 @@
                         <td ng-if="acl.key">
                             <div>
                                 <md-input-container md-no-float class="md-block no-error-check-input">
-                                    <input placeholder="UserId or Role" ng-model="acl.key" value="{{acl.key}}" disabled>
+                                    <input placeholder="UserId" ng-model="acl.key" value="{{acl.key}}" disabled>
                                 </md-input-container>
                             </div>
                         </td>
                         <td ng-if="$index == acls.length - 1" ng-class="{'user-or-role-error': userOrRoleError == true}">
                             <md-input-container md-no-float class="md-block no-error-check-input">
-                                <input placeholder="UserId or Role" ng-model="newKey" ng-change=" checkUserOrRole(newKey)" value="{{}}" ng-model-options="{debounce:1000}">
+                                <input placeholder="UserId" ng-model="newKey" ng-change=" checkUserOrRole(newKey)" value="{{}}" ng-model-options="{debounce:1000}">
                             </md-input-container>
                         </td>
                         <td>

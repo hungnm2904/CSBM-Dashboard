@@ -2,10 +2,22 @@
     <!-- HEADER -->
     <div class="header md-accent-bg" layout="row" layout-align="space-between">
         <div layout="column" layout-align="center start">
-            <div class="sub-title">Table</div>
-            <div class="title">{{title}} <span class="title-info">{{documents.length}} objects</span></div>
+            <div ng-if="mode === 'classMode'">
+                <div class="sub-title">Table</div>
+                <div class="title">{{title}} <span class="title-info">{{documents.length}} objects</span></div>
+            </div>
+            <div ng-if="mode === 'relationMode'">
+                <div class="sub-title">Relation <{{relationInfo.targetClass}}></div>
+                <div class="title">"{{relationInfo.name}}" on {{relationInfo.owningId}} <span class="title-info">{{documents.length}} objects</span></div>
+            </div>
         </div>
         <div layout="row" layout-align="start center">
+            <div ng-if="mode === 'relationMode'">
+                <md-button aria-label="refresh button" ng-click="backToClassView()">
+                    <md-icon md-font-icon="icon-arrow-left-bold-circle-outline"></md-icon>
+                    <span>Back to "Classes" view</span>
+                </md-button>
+            </div>
             <md-button aria-label="refresh button" ng-click="refreshDocuments()">
                 <md-icon md-font-icon="icon-refresh"></md-icon>
                 <span>Refresh</span>
@@ -20,51 +32,67 @@
                     <md-icon md-font-icon="icon-dots-horizontal"></md-icon>
                 </md-button>
                 <md-menu-content width="3" class="md-background-bg">
-                    <md-menu-item>
-                        <md-button ng-click="showAddColumnDialog($event)" aria-label="">
-                            <md-icon md-font-icon="icon-plus"></md-icon>
-                            <span>Add new column</span>
-                        </md-button>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <md-button ng-click="addRow()" aria-label="">
-                            <md-icon md-font-icon="icon-plus"></md-icon>
-                            <span>Add new row</span>
-                        </md-button>
-                    </md-menu-item>
-                    <md-divider></md-divider>
-                    <md-menu-item>
-                        <md-button ng-click="showUpdateFieldNameDialog($event)" aria-label="">
-                            <md-icon md-font-icon="icon-table-edit"></md-icon>
-                            <span>Update column name</span>
-                        </md-button>
-                    </md-menu-item>
-                    <md-divider></md-divider>
-                    <md-menu-item>
-                        <md-button ng-click="showDeleteColumnDialog($event)" aria-label="">
-                            <md-icon md-font-icon="icon-delete"></md-icon>
-                            <span>Delete column</span>
-                        </md-button>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <md-button ng-click="deleteRow()" aria-label="delete rows" ng-disabled="checkList() == 0">
-                            <md-icon md-font-icon="icon-delete"></md-icon>
-                            <span aria-label="delete this row" ng-if="checked.length == 1">Delete this row</span>
-                            <span aria-label="delete these rows" ng-if="checked.length != 1">Delete these rows</span>
-                        </md-button>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <md-button ng-click="showDeleteClassDialog($event)" aria-label="">
-                            <md-icon md-font-icon="icon-delete"></md-icon>
-                            <span>Delete this class</span>
-                        </md-button>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <md-button ng-click="showExportClass($event)" aria-label="">
-                            <md-icon md-font-icon="icon-export"></md-icon>
-                            <span>Export this class</span>
-                        </md-button>
-                    </md-menu-item>
+                    <div ng-if="mode === 'relationMode'">
+                        <md-menu-item>
+                            <md-button aria-label="add relation" ng-click="showAddRelation($event)" aria-label="Add relation">
+                                <md-icon md-font-icon="icon-key-plus"></md-icon>
+                                <span>Add Relation</span>
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button aria-label="add relation" ng-click="showRemoveRelation($event)" aria-label="Remove relation">
+                                <md-icon md-font-icon="icon-key-remove"></md-icon>
+                                <span>Remove Relation</span>
+                            </md-button>        
+                        </md-menu-item>
+                    </div>
+                    <div ng-if="mode === 'classMode'">
+                        <md-menu-item>
+                            <md-button ng-click="showAddColumnDialog($event)" aria-label="">
+                                <md-icon md-font-icon="icon-plus"></md-icon>
+                                <span>Add new column</span>
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ng-click="addRow()" aria-label="">
+                                <md-icon md-font-icon="icon-plus"></md-icon>
+                                <span>Add new row</span>
+                            </md-button>
+                        </md-menu-item>
+                        <md-divider></md-divider>
+                        <md-menu-item>
+                            <md-button ng-click="showUpdateFieldNameDialog($event)" aria-label="">
+                                <md-icon md-font-icon="icon-table-edit"></md-icon>
+                                <span>Update column name</span>
+                            </md-button>
+                        </md-menu-item>
+                        <md-divider></md-divider>
+                        <md-menu-item>
+                            <md-button ng-click="showDeleteColumnDialog($event)" aria-label="">
+                                <md-icon md-font-icon="icon-delete"></md-icon>
+                                <span>Delete column</span>
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ng-click="deleteRow()" aria-label="delete rows" ng-disabled="checkList() == 0">
+                                <md-icon md-font-icon="icon-delete"></md-icon>
+                                <span aria-label="delete this row" ng-if="checked.length == 1">Delete this row</span>
+                                <span aria-label="delete these rows" ng-if="checked.length != 1">Delete these rows</span>
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ng-click="showDeleteClassDialog($event)" aria-label="">
+                                <md-icon md-font-icon="icon-delete"></md-icon>
+                                <span>Delete this class</span>
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ng-click="showExportClass($event)" aria-label="">
+                                <md-icon md-font-icon="icon-export"></md-icon>
+                                <span>Export this class</span>
+                            </md-button>
+                        </md-menu-item>
+                    </div>
                 </md-menu-content>
             </md-menu>
         </div>
@@ -110,8 +138,8 @@
                             <span class="disable-text" ng-model="document[key]">{{document[key]}}</span>
                         </div>
                         <div ng-if="editable(key)" class="be-cell">
-                            <!-- String, Datetime, Number, Array, Object, Boolean Type -->
-                            <div ng-if="checkFieldType(key, 'String') || checkFieldType(key, 'Date') || checkFieldType(key, 'Number') || checkFieldType(key, 'Boolean') || checkFieldType(key, 'Array') || checkFieldType(key, 'Object')"">
+                            <!-- String, Number, Array, Object, Boolean Type -->
+                            <div ng-if="checkFieldType(key, 'String') || checkFieldType(key, 'Number') || checkFieldType(key, 'Boolean') || checkFieldType(key, 'Array') || checkFieldType(key, 'Object')"">
                                 <div ng-if="!editMode[(position + 1 + '') + ($index + '')]" class="ellipsis-text">
                                     <span ng-if="document[key] != undefined" name="schemavalue" ng-model="document[key]">
                                         {{document[key]}}
@@ -141,14 +169,31 @@
                                         </div>
                                         <!-- / Edit for Boolean Type -->
                                         <!-- Edit for Array Type -->
-                                        <div ng-if="checkFieldType(key, 'Array')">
+                                        <div ng-if="checkFieldType(key, 'Array') || checkFieldType(key, 'Object')">
                                             <textarea aria-label=" " ng-model="document[key]" rows="3" autofocus></textarea>
                                         </div>
                                         <!-- / Edit for Array Type -->
                                     </div>
                                 </div>
                             </div>
-                            <!-- / String, Datetime, Number, Array, Boolean Type -->
+                            <!-- / String, Number, Array, Boolean Type -->
+                            <!-- Datetime -->
+                            <div ng-if="checkFieldType(key, 'Date')">
+                                <div ng-if="!editMode[(position + 1 + '') + ($index + '')]" class="ellipsis-text">
+                                    <span ng-if="document[key] != undefined" name="schemavalue" ng-model="document[key]">
+                                        {{convertToLocaleStringDate(document[key].iso)}}
+                                    </span>
+                                    <span class="undefined-text" ng-if="document[key] == undefined" id="doc-input-{{(position + 1 + '') + ($index + '')}}" name="schemavalue" ng-model="document[key]">
+                                        (undefined)
+                                    </span>
+                                </div>
+                                <div ng-if="editMode[(position + 1 + '') + ($index + '')]" class="ellipsis-text">
+                                    <div ng-form name="vm.editForm" onkeydown="angular.element(this).scope().updateOnEnter(event)">
+                                        <textarea aria-label=" " ng-model="document[key].iso" rows="3" autofocus></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / Datetime -->
                             <!-- GeoPoint Type -->
                             <div ng-if="checkFieldType(key, 'GeoPoint')">
                                 <div ng-if="!editMode[(position + 1 + '') + ($index + '')]">

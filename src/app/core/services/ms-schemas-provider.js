@@ -44,7 +44,9 @@
                 deleteClass: deleteClass,
                 countObjectInClass: countObjectInClass,
                 getRelation: getRelation,
-                exportClass: exportClass
+                exportClass: exportClass,
+                addRelation: addRelation,
+                removeRelation: removeRelation
             }
 
             return service;
@@ -415,7 +417,7 @@
                 });
             };
 
-            function addField(className, targetClass, appId, columnName, type, callback) {
+            function addField(className, targetClass, appId, columnName, type, schemas, callback) {
                 var accessToken = msUserService.getAccessToken();
 
                 var data = {
@@ -426,7 +428,7 @@
                     'type': type
                 }
 
-                if (type === 'Pointer') {
+                if (type === 'Pointer' || type === 'Relation') {
                     data.fields[columnName]['targetClass'] = targetClass
                 }
 
@@ -446,19 +448,14 @@
                         },
                         data: data
                     }).then(function(response) {
-                        _schemas.forEach(function(schema) {
-                            if (schema.className === className) {
-                                schema.fields[columnName] = {
-                                    'type': type
-                                };
+                        schemas[columnName] = {
+                            'type': type
+                        };
 
-                                if (type === 'Pointer') {
-                                    schema.fields[columnName]['targetClass'] = targetClass;
-                                }
-                            }
-                        });
+                        if (type === 'Pointer' || type === 'Relation') {
+                            schemas[columnName]['targetClass'] = targetClass;
+                        }
 
-                        // updateField(schema);
                         callback(null, response.data);
                     }, function(response) {
                         callback(response);
@@ -757,6 +754,92 @@
                         }
                     }).then(function(response) {
                         callback(null, response);
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            };
+
+            function addRelation(appId, relationName, owningClassName, targetClassName, owningId,
+                relatedId, callback) {
+
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var data = {};
+                    data[relationName] = {
+                        '__op': 'AddRelation',
+                        'objects': [{
+                            '_type': 'Pointer',
+                            'className': targetClassName,
+                            'objectId': relatedId
+                        }]
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'PUT',
+                        url: _domain + '/csbm/classes/' + owningClassName + '/' + owningId,
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey,
+                            'Content-Type': 'application/json'
+                        },
+                        data: data
+                    }).then(function(response) {
+
+                        $http({
+                            method: 'GET',
+                            url: _domain + '/csbm/classes/' + targetClassName + '/' + relatedId,
+                            headers: {
+                                'X-CSBM-Application-Id': appId,
+                                'X-CSBM-Master-Key': masterKey,
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(function(response) {
+                            callback(null, response.data);
+                        }, function(response) {
+                            callback(response);
+                        });
+
+                    }, function(response) {
+                        callback(response);
+                    });
+                });
+            };
+
+            function removeRelation(appId, relationName, owningClassName, targetClassName, owningId,
+                relatedId, callback) {
+
+                msMasterKeyService.getMasterKey(appId, function(error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    var data = {};
+                    data[relationName] = {
+                        '__op': 'RemoveRelation',
+                        'objects': [{
+                            '_type': 'Pointer',
+                            'className': targetClassName,
+                            'objectId': relatedId
+                        }]
+                    }
+
+                    var masterKey = results;
+                    $http({
+                        method: 'PUT',
+                        url: _domain + '/csbm/classes/' + owningClassName + '/' + owningId,
+                        headers: {
+                            'X-CSBM-Application-Id': appId,
+                            'X-CSBM-Master-Key': masterKey,
+                            'Content-Type': 'application/json'
+                        },
+                        data: data
+                    }).then(function(response) {
+                        callback(null, relatedId);
                     }, function(response) {
                         callback(response);
                     });

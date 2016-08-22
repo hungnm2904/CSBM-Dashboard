@@ -265,7 +265,7 @@
                             linkdata.push({
                                 from: fromIndex,
                                 to: toIndex,
-                                text: "*",
+                                text: "n",
                                 toText: "1",
                                 relationship: "association"
                             });
@@ -281,8 +281,8 @@
                             linkdata.push({
                                 from: fromIndex,
                                 to: toIndex,
-                                text: "*",
-                                toText: "*",
+                                text: "n",
+                                toText: "n",
                                 relationship: "association"
                             });
                         }

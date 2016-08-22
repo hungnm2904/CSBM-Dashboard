@@ -30,7 +30,7 @@
 
             var appName = $stateParams.appName;
             var appId = msSchemasService.getAppId();
-            var filterOperationsWithInput = ['equals', 'does not equal', 'starts with'];
+            var filterOperationsWithInput = ['equals', 'does not equal', 'starts with', 'less than', 'less than or equal', 'greater than', 'greater than or equal'];
             var swiftOperationWithoutValue = ['exists', 'does not exist'];
             var _domain = (msConfigService.getConfig()).domain;
 
@@ -115,24 +115,50 @@
 
                                 var value = results;
 
-                                if (criteria.operation === 'exists') {
-                                    preparedCriteria[field] = {
-                                        '$exists': true
-                                    }
-                                } else if (criteria.operation === 'does not exist') {
-                                    preparedCriteria[field] = {
-                                        '$exists': false
-                                    }
-                                } else if (criteria.operation === 'does not equal') {
-                                    preparedCriteria[field] = {
-                                        '$ne': value
-                                    }
-                                } else if (criteria.operation === 'starts with') {
-                                    preparedCriteria[field] = {
-                                        '$regex': '^' + value
-                                    }
-                                } else {
-                                    preparedCriteria[criteria.field] = value;
+                                switch (criteria.operation) {
+                                    case 'exists':
+                                        preparedCriteria[field] = {
+                                            '$exists': true
+                                        }
+                                        break;
+                                    case 'does not exist':
+                                        preparedCriteria[field] = {
+                                            '$exists': false
+                                        }
+                                        break;
+                                    case 'does not equal':
+                                        preparedCriteria[field] = {
+                                            '$ne': value
+                                        }
+                                        break;
+                                    case 'starts with':
+                                        preparedCriteria[field] = {
+                                            '$regex': '^' + value
+                                        }
+                                        break;
+                                    case 'less than':
+                                        preparedCriteria[field] = {
+                                            '$lt': value
+                                        }
+                                        break;
+                                    case 'less than or equal':
+                                        preparedCriteria[field] = {
+                                            '$lte': value
+                                        }
+                                        break;
+                                    case 'greater than':
+                                        preparedCriteria[field] = {
+                                            '$gt': value
+                                        }
+                                        break;
+                                    case 'greater than or equal':
+                                        preparedCriteria[field] = {
+                                            '$gte': value
+                                        }
+                                        break;
+                                    default:
+                                        preparedCriteria[criteria.field] = value;
+                                        break;
                                 }
                             });
                     }
